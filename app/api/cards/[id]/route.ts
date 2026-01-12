@@ -22,7 +22,7 @@ export async function PUT(
         const db = client.db();
 
         const result = await db.collection('cards').updateOne(
-            { _id: id, userId: session.user.id },
+            { _id: id, userId: session.user.id } as any,
             { $set: updateData }
         );
 
@@ -54,7 +54,7 @@ export async function DELETE(
         const result = await db.collection('cards').deleteOne({
             _id: id,
             userId: session.user.id
-        });
+        } as any);
 
         if (result.deletedCount === 0) {
             return NextResponse.json({ error: 'Card not found' }, { status: 404 });

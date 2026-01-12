@@ -25,8 +25,13 @@ export async function POST() {
         // We import mongoose dynamically to access the native db connection if managed there
         const mongoose = await import('mongoose');
         if (mongoose.connection.db) {
+            let query: any = { _id: userId };
+            if (mongoose.Types.ObjectId.isValid(userId)) {
+                query = { $or: [{ _id: new mongoose.Types.ObjectId(userId) }, { _id: userId }] };
+            }
+
             await mongoose.connection.db.collection('users').updateOne(
-                { _id: userId },
+                query,
                 {
                     $set: {
                         isSetupCompleted: false,

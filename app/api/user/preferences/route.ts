@@ -2,6 +2,17 @@ import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import clientPromise from '@/lib/db';
 
+import { ObjectId } from 'mongodb';
+
+// Helper to create ID query
+const getUserQuery = (id: string) => {
+    if (ObjectId.isValid(id)) {
+        // Try to match both ObjectId and String to be safe
+        return { $or: [{ _id: new ObjectId(id) }, { _id: id }] };
+    }
+    return { _id: id };
+};
+
 export async function GET() {
     try {
         const session = await auth();
@@ -13,9 +24,7 @@ export async function GET() {
         const client = await clientPromise;
         const db = client.db();
 
-        const user = await db.collection('users').findOne({
-            _id: session.user.id
-        });
+        const user = await db.collection('users').findOne(getUserQuery(session.user.id));
 
         return NextResponse.json({
             colorScheme: user?.colorScheme || 'dark',
@@ -48,7 +57,7 @@ export async function POST(request: Request) {
         const db = client.db();
 
         await db.collection('users').updateOne(
-            { _id: session.user.id },
+            getUserQuery(session.user.id),
             { $set: updateData },
             { upsert: false }
         );

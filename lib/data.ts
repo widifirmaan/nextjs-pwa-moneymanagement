@@ -11,6 +11,7 @@ export const initialCategories: Category[] = [
     { id: 'c8', name: 'Health', icon: 'Heart', color: 'bg-rose-500', type: 'expense' },
     { id: 'c9', name: 'Education', icon: 'BookOpen', color: 'bg-indigo-500', type: 'expense' },
     { id: 'c10', name: 'Others', icon: 'MoreHorizontal', color: 'bg-slate-500', type: 'expense' },
+    { id: 'c11', name: 'Other', icon: 'MoreHorizontal', color: 'bg-slate-500', type: 'income' },
 ];
 
 export const initialWallets: Wallet[] = [

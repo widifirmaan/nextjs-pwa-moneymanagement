@@ -80,6 +80,18 @@ export default function WalletsPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        // Check for duplicate name
+        const nameExists = wallets.some(w =>
+            w.name.trim().toLowerCase() === formData.name.trim().toLowerCase() &&
+            w.id !== editingWallet?.id
+        );
+
+        if (nameExists) {
+            alert("A wallet with this name already exists. Please choose a different name.");
+            return;
+        }
+
         setIsSubmitting(true);
 
         try {
@@ -97,6 +109,12 @@ export default function WalletsPage() {
     };
 
     const handleDelete = async (id: string) => {
+        const w = wallets.find(w => w.id === id);
+        if (w?.type === 'cash' && w?.name === 'Cash') {
+            alert("Default Cash wallet cannot be deleted.");
+            return;
+        }
+
         if (confirm("Are you sure you want to delete this wallet?")) {
             try {
                 await deleteWallet(id);
@@ -228,16 +246,18 @@ export default function WalletsPage() {
                                         />
                                         {wallet.isFrozen ? "Unfreeze" : "Freeze"} Wallet
                                     </button>
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleDelete(wallet.id);
-                                        }}
-                                        className="w-full px-4 py-3 text-left hover:bg-secondary transition-colors flex items-center gap-3 text-sm text-red-500"
-                                    >
-                                        <Trash2 className="w-4 h-4" />
-                                        Delete Wallet
-                                    </button>
+                                    {!(wallet.type === 'cash' && wallet.name === 'Cash') && (
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleDelete(wallet.id);
+                                            }}
+                                            className="w-full px-4 py-3 text-left hover:bg-secondary transition-colors flex items-center gap-3 text-sm text-red-500"
+                                        >
+                                            <Trash2 className="w-4 h-4" />
+                                            Delete Wallet
+                                        </button>
+                                    )}
                                 </div>
                             )}
                         </div>

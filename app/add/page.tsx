@@ -134,12 +134,7 @@ export default function AddTransaction() {
                                 <span className="text-[10px] font-medium truncate w-full text-center text-muted-foreground">{cat.name}</span>
                             </button>
                         ))}
-                        <button className="flex flex-col items-center gap-2 p-3 rounded-2xl border bg-secondary/10 border-dashed border-muted-foreground/30 hover:bg-secondary/20">
-                            <div className="w-10 h-10 rounded-full flex items-center justify-center bg-secondary/50 text-muted-foreground">
-                                <Icon name="Plus" className="w-5 h-5" />
-                            </div>
-                            <span className="text-[10px] font-medium text-muted-foreground">Add New</span>
-                        </button>
+
                     </div>
                 </div>
 

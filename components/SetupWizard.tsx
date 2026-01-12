@@ -3,12 +3,12 @@
 import { useState, useEffect } from "react";
 import { useStore } from "@/context/StoreContext";
 import { motion, AnimatePresence } from "framer-motion";
-import { Wallet, CreditCard, ArrowRight, Check, Smartphone, ShieldCheck, ChevronRight, Plus, X, Bell } from "lucide-react";
+import { Wallet, ArrowRight, Check, Smartphone, ShieldCheck, ChevronRight, Plus, X, Bell } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { GlassCard } from "./ui/GlassCard";
 
 export function SetupWizard() {
-    const { isSetupCompleted, completeSetup, wallets, updateWallet, addWallet, addCard, installPrompt } = useStore();
+    const { isSetupCompleted, completeSetup, wallets, updateWallet, addWallet, installPrompt } = useStore();
     const [step, setStep] = useState(1);
 
     // Initial Wallet State (usually Cash w1)
@@ -19,16 +19,7 @@ export function SetupWizard() {
     const [selectedWalletId, setSelectedWalletId] = useState<string>('');
     const [limits, setLimits] = useState({ daily: 0, weekly: 0, monthly: 0 });
 
-    // Card State
-    const [cardData, setCardData] = useState({
-        cardName: "",
-        cardHolderName: "",
-        cardNumber: "",
-        expiryDate: "",
-        cvv: "",
-        color: "bg-blue-600",
-        cardType: "visa" as any
-    });
+
 
     useEffect(() => {
         const cashWallet = wallets.find(w => w.type === 'cash');
@@ -59,15 +50,7 @@ export function SetupWizard() {
         handleNext();
     };
 
-    const saveCard = async () => {
-        if (cardData.cardNumber) {
-            await addCard({
-                ...cardData,
-                bankName: "Unknown"
-            });
-        }
-        handleNext();
-    };
+
 
     const handleInstallClick = async () => {
         if (installPrompt) {
@@ -103,7 +86,7 @@ export function SetupWizard() {
                     <motion.div
                         className="h-full bg-primary"
                         initial={{ width: 0 }}
-                        animate={{ width: `${(step / 6) * 100}%` }}
+                        animate={{ width: `${(step / 5) * 100}%` }}
                     />
                 </div>
 
@@ -210,70 +193,10 @@ export function SetupWizard() {
                             </motion.div>
                         )}
 
+
                         {step === 4 && (
                             <motion.div
                                 key="step4"
-                                initial={{ opacity: 0, x: 20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                exit={{ opacity: 0, x: -20 }}
-                                className="flex-1 flex flex-col space-y-6"
-                            >
-                                <div className="text-center mb-4">
-                                    <div className="w-16 h-16 mx-auto rounded-2xl bg-purple-500/10 flex items-center justify-center text-purple-500 mb-4">
-                                        <CreditCard className="w-8 h-8" />
-                                    </div>
-                                    <h2 className="text-2xl font-bold">Add a Card</h2>
-                                    <p className="text-sm text-muted-foreground">Optional: Add a debit/credit card.</p>
-                                </div>
-
-                                <div className="space-y-3">
-                                    <input
-                                        placeholder="Card Name (e.g. Jenius)"
-                                        value={cardData.cardName}
-                                        onChange={e => setCardData({ ...cardData, cardName: e.target.value })}
-                                        className="w-full p-3 bg-secondary/50 border border-border rounded-xl text-foreground placeholder:text-muted-foreground/40 focus:ring-2 focus:ring-primary focus:outline-none transition-all"
-                                    />
-                                    <input
-                                        placeholder="Card Number"
-                                        value={cardData.cardNumber}
-                                        onChange={e => setCardData({ ...cardData, cardNumber: e.target.value })}
-                                        className="w-full p-3 bg-secondary/50 border border-border rounded-xl text-foreground placeholder:text-muted-foreground/40 focus:ring-2 focus:ring-primary focus:outline-none transition-all"
-                                        inputMode="numeric"
-                                    />
-                                    <div className="flex gap-2">
-                                        <input
-                                            placeholder="MM/YY"
-                                            value={cardData.expiryDate}
-                                            onChange={e => setCardData({ ...cardData, expiryDate: e.target.value })}
-                                            className="w-1/2 p-3 bg-secondary/50 border border-border rounded-xl text-foreground placeholder:text-muted-foreground/40 focus:ring-2 focus:ring-primary focus:outline-none transition-all"
-                                        />
-                                        <input
-                                            placeholder="CVV"
-                                            value={cardData.cvv}
-                                            onChange={e => setCardData({ ...cardData, cvv: e.target.value })}
-                                            className="w-1/2 p-3 bg-secondary/50 border border-border rounded-xl text-foreground placeholder:text-muted-foreground/40 focus:ring-2 focus:ring-primary focus:outline-none transition-all"
-                                            inputMode="numeric"
-                                            maxLength={3}
-                                        />
-                                    </div>
-                                    <input
-                                        placeholder="Holder Name"
-                                        value={cardData.cardHolderName}
-                                        onChange={e => setCardData({ ...cardData, cardHolderName: e.target.value })}
-                                        className="w-full p-3 bg-secondary/50 border border-border rounded-xl text-foreground placeholder:text-muted-foreground/40 focus:ring-2 focus:ring-primary focus:outline-none transition-all uppercase"
-                                    />
-                                </div>
-
-                                <div className="mt-auto flex gap-3">
-                                    <button onClick={handleNext} className="flex-1 py-3 text-muted-foreground hover:text-foreground transition-colors font-medium">Skip</button>
-                                    <button onClick={saveCard} disabled={!cardData.cardNumber} className="flex-1 py-3 bg-primary text-primary-foreground rounded-xl font-bold shadow-lg shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.02] active:scale-95 transition-transform enabled:hover:shadow-primary/30">Add Card</button>
-                                </div>
-                            </motion.div>
-                        )}
-
-                        {step === 5 && (
-                            <motion.div
-                                key="step5"
                                 initial={{ opacity: 0, x: 20 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 exit={{ opacity: 0, x: -20 }}
@@ -315,9 +238,9 @@ export function SetupWizard() {
                             </motion.div>
                         )}
 
-                        {step === 6 && (
+                        {step === 5 && (
                             <motion.div
-                                key="step6"
+                                key="step5"
                                 initial={{ opacity: 0, x: 20 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 exit={{ opacity: 0, x: -20 }}
@@ -334,16 +257,24 @@ export function SetupWizard() {
                                 <div className="space-y-6 bg-secondary/30 p-4 rounded-2xl border border-white/5">
                                     <div className="flex items-start gap-4">
                                         <div className="mt-1 w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-xs font-bold">1</div>
-                                        <div>
-                                            <p className="font-semibold text-sm">iOS (Safari)</p>
-                                            <p className="text-xs text-muted-foreground mt-1">Tap <span className="inline-block px-1 bg-white/10 rounded">Share</span> button, then "Add to Home Screen".</p>
+                                        <div className="flex-1">
+                                            <p className="font-semibold text-sm">iOS Safari (iPhone/iPad)</p>
+                                            <div className="text-xs text-muted-foreground mt-2 space-y-1.5">
+                                                <p>• Tap the <span className="inline-block px-1.5 py-0.5 bg-blue-500/20 text-blue-400 rounded font-medium">Share</span> button at the bottom</p>
+                                                <p>• Scroll down and tap <span className="font-medium text-foreground">"Add to Home Screen"</span></p>
+                                                <p>• Tap <span className="font-medium text-foreground">"Add"</span> to confirm</p>
+                                            </div>
                                         </div>
                                     </div>
                                     <div className="flex items-start gap-4">
                                         <div className="mt-1 w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-xs font-bold">2</div>
-                                        <div>
-                                            <p className="font-semibold text-sm">Android (Chrome)</p>
-                                            <p className="text-xs text-muted-foreground mt-1">Tap <span className="inline-block px-1 bg-white/10 rounded">Menu (⋮)</span> button, then "Install App" or "Add to Home Screen".</p>
+                                        <div className="flex-1">
+                                            <p className="font-semibold text-sm">Android Chrome</p>
+                                            <div className="text-xs text-muted-foreground mt-2 space-y-1.5">
+                                                <p>• Tap the <span className="inline-block px-1.5 py-0.5 bg-green-500/20 text-green-400 rounded font-medium">Menu (⋮)</span> button</p>
+                                                <p>• Select <span className="font-medium text-foreground">"Install app"</span> or <span className="font-medium text-foreground">"Add to Home screen"</span></p>
+                                                <p>• Tap <span className="font-medium text-foreground">"Install"</span> to confirm</p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

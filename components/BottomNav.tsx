@@ -17,8 +17,8 @@ export function BottomNav() {
     ]
 
     return (
-        <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 flex justify-center pointer-events-none">
-            <div className="w-full max-w-md bg-background/95 backdrop-blur-xl border-t border-border px-6 py-3 flex items-center justify-between pointer-events-auto pb-6 shadow-[0_-5px_30px_-10px_rgba(0,0,0,0.1)]">
+        <div className="xl:hidden fixed bottom-0 left-0 right-0 z-50 flex justify-center pointer-events-none">
+            <div className="w-full max-w-2xl bg-background/95 backdrop-blur-xl border-t border-border px-6 sm:px-8 md:px-12 py-3 flex items-center justify-between pointer-events-auto pb-6 shadow-[0_-5px_30px_-10px_rgba(0,0,0,0.1)]">
                 {navItems.map((item) => (
                     <Link key={item.label} href={item.href} className="flex flex-col items-center gap-1 group w-12 pt-2">
                         <item.icon className={cn("w-6 h-6 transition-colors", pathname === item.href ? "text-primary fill-current" : "text-muted-foreground group-hover:text-primary/70")} />

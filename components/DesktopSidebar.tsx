@@ -66,7 +66,7 @@ export function DesktopSidebar() {
             initial={{ x: -100, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.5, type: 'spring' }}
-            className="hidden md:flex flex-col w-80 h-[96vh] fixed left-4 top-[2vh] rounded-[32px] bg-card/60 backdrop-blur-3xl border border-border p-6 z-50 shadow-2xl group overflow-visible will-change-transform"
+            className="hidden xl:flex flex-col w-80 h-[96vh] fixed left-4 top-[2vh] rounded-[32px] bg-card/60 backdrop-blur-3xl border border-border p-6 z-50 shadow-2xl group overflow-visible will-change-transform"
         >
             {/* 3D Glow Effect */}
             <div

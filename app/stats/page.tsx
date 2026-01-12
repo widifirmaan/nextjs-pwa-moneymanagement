@@ -194,7 +194,7 @@ export default function StatsPage() {
     }, [categoryData]);
 
     return (
-        <div className="p-6 space-y-8 pt-10 min-h-screen pb-28 md:pb-10 md:pt-8 md:max-w-6xl md:mx-auto">
+        <div className="p-6 md:p-8 space-y-8 pt-10 min-h-screen pb-28 xl:pb-10 md:pt-8 xl:max-w-6xl xl:mx-auto xl:ml-[22rem]">
             {/* Header */}
             <div className="animate-in slide-in-from-top-5 duration-500 space-y-4">
                 <div>

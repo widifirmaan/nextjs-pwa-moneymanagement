@@ -113,7 +113,7 @@ export function InstallPrompt() {
                                     </div>
                                     <div className="flex-1">
                                         <p className="text-muted-foreground">
-                                            1. Tap the <span className="font-semibold text-foreground">Share</span> button below
+                                            1. Tap the <span className="font-semibold text-foreground">Share</span> button <span className="text-blue-400">(⬆)</span> at the bottom
                                         </p>
                                     </div>
                                 </div>
@@ -123,7 +123,17 @@ export function InstallPrompt() {
                                     </div>
                                     <div className="flex-1">
                                         <p className="text-muted-foreground">
-                                            2. Select <span className="font-semibold text-foreground">"Add to Home Screen"</span>
+                                            2. Scroll down and select <span className="font-semibold text-foreground">"Add to Home Screen"</span>
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="flex items-start gap-3 text-xs">
+                                    <div className="mt-0.5 p-1.5 rounded-lg bg-emerald-500/10 text-emerald-500 flex-shrink-0">
+                                        <Plus className="w-4 h-4" />
+                                    </div>
+                                    <div className="flex-1">
+                                        <p className="text-muted-foreground">
+                                            3. Tap <span className="font-semibold text-foreground">"Add"</span> to confirm
                                         </p>
                                     </div>
                                 </div>

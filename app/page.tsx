@@ -33,7 +33,7 @@ export default function Home() {
   }
 
   return (
-    <div className="p-6 space-y-8 pt-10 min-h-screen pb-28 md:pb-10 md:pt-8 md:max-w-6xl md:mx-auto">
+    <div className="p-6 md:p-8 space-y-8 pt-10 min-h-screen pb-28 xl:pb-10 md:pt-8 xl:max-w-6xl xl:mx-auto xl:ml-[22rem]">
       {/* Header */}
       <div className="flex justify-between items-end animate-in slide-in-from-top-5 duration-500 mb-6 gap-4">
         <div className="min-w-0 flex-1">
@@ -118,11 +118,11 @@ export default function Home() {
 
           {/* Wallets */}
           <div className="space-y-4 animate-in slide-in-from-bottom-5 duration-500 delay-200">
-            <div className="flex justify-between items-center px-1">
+            <div className="flex justify-between items-center">
               <h3 className="text-lg font-bold tracking-tight">My Wallets</h3>
               <Link href="/wallets" className="text-xs font-semibold text-primary hover:text-primary/80 transition-colors">View All</Link>
             </div>
-            <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide -mx-6 px-6 md:mx-0 md:px-0 md:grid md:grid-cols-3 md:pb-0 snap-x">
+            <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide -mx-2 px-2 md:mx-0 md:px-0 md:overflow-visible md:grid md:grid-cols-2 md:gap-4 md:pb-0 xl:grid-cols-3 md:snap-none snap-x">
               {wallets.map(wallet => (
                 <GlassCard key={wallet.id} className={cn("snap-start min-w-[160px] p-5 flex flex-col justify-between h-36 relative overflow-hidden", wallet.color)}>
                   <div className="absolute -right-6 -bottom-6 opacity-20 rotate-12">

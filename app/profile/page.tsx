@@ -33,7 +33,7 @@ export default function Profile() {
     };
 
     return (
-        <div className="p-6 space-y-8 pt-10 min-h-screen pb-28 md:pb-10 md:pt-8 md:max-w-xl md:mx-auto animate-in slide-in-from-bottom-5 duration-500">
+        <div className="p-6 md:p-8 space-y-8 pt-10 min-h-screen pb-28 xl:pb-10 md:pt-8 md:max-w-xl md:mx-auto animate-in slide-in-from-bottom-5 duration-500">
             <div className="text-center space-y-2">
                 <h1 className="text-2xl font-bold">Profile</h1>
             </div>
@@ -81,9 +81,9 @@ export default function Profile() {
                             </div>
                         </div>
                     ) : (
-                        <div className="group flex items-center gap-2 justify-center hover:bg-white/5 px-4 py-2 rounded-xl transition-all cursor-pointer" onClick={() => { setTempName(displayName); setIsEditingName(true); }}>
+                        <div className="group relative flex items-center justify-center hover:bg-white/5 px-4 py-2 rounded-xl transition-all cursor-pointer" onClick={() => { setTempName(displayName); setIsEditingName(true); }}>
                             <h2 className="text-xl font-bold truncate max-w-[200px]" title={displayName}>{displayName}</h2>
-                            <Pencil className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                            <Pencil className="absolute right-4 w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
                         </div>
                     )}
                     <p className="text-sm text-muted-foreground mt-1">{user?.email}</p>

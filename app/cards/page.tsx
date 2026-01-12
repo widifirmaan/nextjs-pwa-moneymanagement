@@ -1,18 +1,18 @@
 "use client"
+
 import Link from "next/link";
 import { useState } from "react";
 import { useStore } from "@/context/StoreContext";
-import { ArrowLeft, Plus, CreditCard, Trash2 } from "lucide-react";
-import { GlassCard } from "@/components/ui/GlassCard";
+import { ArrowLeft, Plus, CreditCard, Trash2, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SavedCard } from "@/lib/types";
+import { Modal } from "@/components/ui/Modal";
 
 export default function CardsPage() {
     const { savedCards, addCard, updateCard, deleteCard } = useStore();
     const [showModal, setShowModal] = useState(false);
     const [editingCard, setEditingCard] = useState<SavedCard | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [flippedCardId, setFlippedCardId] = useState<string | null>(null);
 
     const [formData, setFormData] = useState<Omit<SavedCard, 'id' | 'userId'>>({
         cardName: "",
@@ -20,12 +20,11 @@ export default function CardsPage() {
         cardNumber: "",
         expiryDate: "",
         cvv: "",
-        cardType: "visa", // default
+        cardType: "visa",
         color: "from-purple-500 to-indigo-600",
         bankName: ""
     });
 
-    // Card Colors (Gradients)
     const cardColors = [
         { label: "Purple", value: "from-purple-500 to-indigo-600" },
         { label: "Blue", value: "from-blue-500 to-cyan-500" },
@@ -99,11 +98,24 @@ export default function CardsPage() {
         }
     };
 
-
+    const handleDelete = async () => {
+        if (!editingCard) return;
+        if (confirm("Are you sure you want to delete this card?")) {
+            setIsSubmitting(true);
+            try {
+                await deleteCard(editingCard.id);
+                setShowModal(false);
+            } catch (err) {
+                console.error(err);
+            } finally {
+                setIsSubmitting(false);
+            }
+        }
+    }
 
     const getCardLogo = (type: string) => {
         switch (type) {
-            case 'visa': return "VISA"; // Placeholder, idealnya SVG logo
+            case 'visa': return "VISA";
             case 'mastercard': return "Mastercard";
             case 'amex': return "Amex";
             case 'jcb': return "JCB";
@@ -116,7 +128,7 @@ export default function CardsPage() {
             <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-4">
                     <Link
-                        href="/"
+                        href="/profile"
                         className="p-2 rounded-full bg-secondary/50 hover:bg-secondary transition-colors"
                     >
                         <ArrowLeft className="w-5 h-5" />
@@ -138,7 +150,7 @@ export default function CardsPage() {
                         <p>No cards saved yet. Add your first card safely!</p>
                     </div>
                 ) : (
-                    savedCards.map((card, i) => (
+                    savedCards.map((card) => (
                         <div key={card.id} className="relative group perspective-1000 h-56 w-full cursor-pointer" onClick={() => handleOpenModal(card)}>
                             <div className={cn(
                                 "relative w-full h-full rounded-2xl shadow-xl transition-all duration-500 transform bg-gradient-to-br p-6 text-white overflow-hidden border border-white/10",
@@ -186,189 +198,162 @@ export default function CardsPage() {
                                     </div>
                                 </div>
                             </div>
-
-
                         </div>
                     ))
                 )}
             </div>
 
-            {/* Modal */}
-            {showModal && (
-                <div
-                    className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-6 animate-in fade-in duration-200"
-                    onClick={() => setShowModal(false)}
-                >
-                    <div
-                        className="bg-background border border-border rounded-3xl p-6 max-w-md w-full shadow-2xl animate-in slide-in-from-bottom-10 duration-300 max-h-[90vh] overflow-y-auto"
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <h2 className="text-2xl font-bold mb-6">
-                            {editingCard ? "Edit Card" : "Add New Card"}
-                        </h2>
-
-                        <form onSubmit={handleSubmit} className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium mb-2">Card Name (Alias)</label>
-                                <input
-                                    type="text"
-                                    value={formData.cardName}
-                                    onChange={(e) => setFormData({ ...formData, cardName: e.target.value })}
-                                    className="w-full px-4 py-3 bg-secondary border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary"
-                                    placeholder="e.g., Main Debit, Shopping Card"
-                                    required
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium mb-2">Bank / Issuer Name</label>
-                                <input
-                                    type="text"
-                                    value={formData.bankName || ''}
-                                    onChange={(e) => setFormData({ ...formData, bankName: e.target.value })}
-                                    className="w-full px-4 py-3 bg-secondary border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary"
-                                    placeholder="e.g., BCA, Mandiri"
-                                />
-                            </div>
-
-                            <div className="grid grid-cols-3 gap-4">
-                                <div>
-                                    <label className="block text-sm font-medium mb-2">Type</label>
-                                    <select
-                                        value={formData.cardType}
-                                        onChange={(e) => setFormData({ ...formData, cardType: e.target.value as any })}
-                                        className="w-full px-4 py-3 bg-secondary border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary text-sm"
-                                    >
-                                        <option value="visa">Visa</option>
-                                        <option value="mastercard">Master</option>
-                                        <option value="jcb">JCB</option>
-                                        <option value="amex">Amex</option>
-                                        <option value="other">Other</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium mb-2">Expiry</label>
-                                    <input
-                                        type="text"
-                                        value={formData.expiryDate}
-                                        onChange={(e) => {
-                                            const val = formatExpiryDate(e.target.value);
-                                            if (val.length <= 5) setFormData({ ...formData, expiryDate: val });
-                                        }}
-                                        className="w-full px-4 py-3 bg-secondary border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary text-center"
-                                        placeholder="MM/YY"
-                                        required
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium mb-2">CVV</label>
-                                    <input
-                                        type="password"
-                                        value={formData.cvv}
-                                        onChange={(e) => {
-                                            const val = e.target.value.replace(/[^0-9]/g, '').slice(0, 4);
-                                            setFormData({ ...formData, cvv: val });
-                                        }}
-                                        className="w-full px-4 py-3 bg-secondary border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary text-center tracking-widest"
-                                        placeholder="***"
-                                        required
-                                    />
-                                </div>
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium mb-2">Card Number</label>
-                                <div className="relative">
-                                    <input
-                                        type="text"
-                                        value={formData.cardNumber}
-                                        onChange={(e) => {
-                                            const val = formatCardNumber(e.target.value);
-                                            if (val.length <= 19) setFormData({ ...formData, cardNumber: val });
-                                        }}
-                                        className="w-full px-4 py-3 bg-secondary border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary font-mono"
-                                        placeholder="0000 0000 0000 0000"
-                                        required
-                                    />
-                                    <CreditCard className="absolute right-4 top-3.5 w-5 h-5 text-muted-foreground" />
-                                </div>
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium mb-2">Card Holder Name</label>
-                                <input
-                                    type="text"
-                                    value={formData.cardHolderName}
-                                    onChange={(e) => setFormData({ ...formData, cardHolderName: e.target.value.toUpperCase() })}
-                                    className="w-full px-4 py-3 bg-secondary border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary uppercase"
-                                    placeholder="YOUR NAME"
-                                    required
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium mb-3">Card Color</label>
-                                <div className="grid grid-cols-4 gap-3">
-                                    {cardColors.map((c) => (
-                                        <button
-                                            key={c.value}
-                                            type="button"
-                                            onClick={() => setFormData({ ...formData, color: c.value })}
-                                            className={cn(
-                                                "h-10 rounded-full transition-all bg-gradient-to-br",
-                                                c.value,
-                                                formData.color === c.value
-                                                    ? "ring-4 ring-primary ring-offset-2 ring-offset-background scale-110"
-                                                    : "hover:scale-105"
-                                            )}
-                                            title={c.label}
-                                        />
-                                    ))}
-                                </div>
-                            </div>
-
-                            <div className="flex flex-col gap-3 pt-4">
-                                <div className="flex gap-3">
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowModal(false)}
-                                        className="flex-1 px-4 py-3 bg-secondary text-foreground rounded-xl font-semibold hover:bg-secondary/80 transition-colors"
-                                        disabled={isSubmitting}
-                                    >
-                                        Cancel
-                                    </button>
-                                    <button
-                                        type="submit"
-                                        disabled={isSubmitting}
-                                        className="flex-1 px-4 py-3 bg-primary text-primary-foreground rounded-xl font-semibold hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                                    >
-                                        {isSubmitting ? "Saving..." : (editingCard ? "Update Card" : "Add Card")}
-                                    </button>
-                                </div>
-
-                                {editingCard && (
-                                    <button
-                                        type="button"
-                                        onClick={async () => {
-                                            if (confirm("Are you sure you want to delete this card?")) {
-                                                setIsSubmitting(true);
-                                                await deleteCard(editingCard.id);
-                                                setIsSubmitting(false);
-                                                setShowModal(false);
-                                            }
-                                        }}
-                                        className="w-full px-4 py-3 text-red-500 bg-red-500/10 hover:bg-red-500/20 rounded-xl font-semibold transition-colors flex items-center justify-center gap-2"
-                                        disabled={isSubmitting}
-                                    >
-                                        <Trash2 className="w-4 h-4" />
-                                        Delete Card
-                                    </button>
-                                )}
-                            </div>
-                        </form>
+            <Modal
+                isOpen={showModal}
+                onClose={() => setShowModal(false)}
+                title={editingCard ? "Edit Card" : "Add New Card"}
+                footer={
+                    <>
+                        {editingCard && (
+                            <button
+                                type="button"
+                                onClick={handleDelete}
+                                className="px-5 py-3 rounded-xl bg-rose-500/10 text-rose-500 font-bold hover:bg-rose-500/20 hover:scale-105 active:scale-95 transition-all text-sm flex items-center gap-2"
+                            >
+                                <Trash2 className="w-4 h-4" />
+                                Delete
+                            </button>
+                        )}
+                        <button
+                            type="submit"
+                            form="card-form"
+                            disabled={isSubmitting}
+                            className="flex-1 px-5 py-3 rounded-xl bg-primary text-primary-foreground font-bold shadow-lg shadow-primary/25 hover:bg-primary/90 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50 text-sm"
+                        >
+                            <Check className="w-4 h-4" />
+                            {isSubmitting ? "Saving..." : "Save Card"}
+                        </button>
+                    </>
+                }
+            >
+                <form id="card-form" onSubmit={handleSubmit} className="space-y-4">
+                    <div>
+                        <label className="block text-xs font-semibold text-muted-foreground mb-2">Card Name (Alias)</label>
+                        <input
+                            type="text"
+                            value={formData.cardName}
+                            onChange={(e) => setFormData({ ...formData, cardName: e.target.value })}
+                            className="w-full p-4 rounded-xl bg-secondary/50 border border-white/5 focus:border-primary focus:outline-none font-medium text-sm transition-all focus:bg-secondary/80"
+                            placeholder="e.g., Main Debit"
+                            required
+                        />
                     </div>
-                </div>
-            )}
+
+                    <div>
+                        <label className="block text-xs font-semibold text-muted-foreground mb-2">Bank / Issuer Name</label>
+                        <input
+                            type="text"
+                            value={formData.bankName || ''}
+                            onChange={(e) => setFormData({ ...formData, bankName: e.target.value })}
+                            className="w-full p-4 rounded-xl bg-secondary/50 border border-white/5 focus:border-primary focus:outline-none font-medium text-sm transition-all focus:bg-secondary/80"
+                            placeholder="e.g., BCA, Mandiri"
+                        />
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-3">
+                        <div>
+                            <label className="block text-xs font-semibold text-muted-foreground mb-2">Type</label>
+                            <select
+                                value={formData.cardType}
+                                onChange={(e) => setFormData({ ...formData, cardType: e.target.value as any })}
+                                className="w-full p-4 rounded-xl bg-secondary/50 border border-white/5 focus:border-primary focus:outline-none font-medium text-sm transition-all focus:bg-secondary/80 appearance-none"
+                            >
+                                <option value="visa">Visa</option>
+                                <option value="mastercard">Master</option>
+                                <option value="jcb">JCB</option>
+                                <option value="amex">Amex</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-xs font-semibold text-muted-foreground mb-2">Expiry</label>
+                            <input
+                                type="text"
+                                value={formData.expiryDate}
+                                onChange={(e) => {
+                                    const val = formatExpiryDate(e.target.value);
+                                    if (val.length <= 5) setFormData({ ...formData, expiryDate: val });
+                                }}
+                                className="w-full p-4 rounded-xl bg-secondary/50 border border-white/5 focus:border-primary focus:outline-none font-medium text-sm text-center transition-all focus:bg-secondary/80"
+                                placeholder="MM/YY"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-xs font-semibold text-muted-foreground mb-2">CVV</label>
+                            <input
+                                type="password"
+                                value={formData.cvv}
+                                onChange={(e) => {
+                                    const val = e.target.value.replace(/[^0-9]/g, '').slice(0, 4);
+                                    setFormData({ ...formData, cvv: val });
+                                }}
+                                className="w-full p-4 rounded-xl bg-secondary/50 border border-white/5 focus:border-primary focus:outline-none font-medium text-sm text-center tracking-widest transition-all focus:bg-secondary/80"
+                                placeholder="***"
+                                required
+                            />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-xs font-semibold text-muted-foreground mb-2">Card Number</label>
+                        <div className="relative">
+                            <input
+                                type="text"
+                                value={formData.cardNumber}
+                                onChange={(e) => {
+                                    const val = formatCardNumber(e.target.value);
+                                    if (val.length <= 19) setFormData({ ...formData, cardNumber: val });
+                                }}
+                                className="w-full p-4 rounded-xl bg-secondary/50 border border-white/5 focus:border-primary focus:outline-none font-medium font-mono text-sm pl-12 transition-all focus:bg-secondary/80"
+                                placeholder="0000 0000 0000 0000"
+                                required
+                            />
+                            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground">
+                                <CreditCard className="w-5 h-5" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-xs font-semibold text-muted-foreground mb-2">Card Holder Name</label>
+                        <input
+                            type="text"
+                            value={formData.cardHolderName}
+                            onChange={(e) => setFormData({ ...formData, cardHolderName: e.target.value.toUpperCase() })}
+                            className="w-full p-4 rounded-xl bg-secondary/50 border border-white/5 focus:border-primary focus:outline-none font-medium text-sm uppercase transition-all focus:bg-secondary/80"
+                            placeholder="YOUR NAME"
+                            required
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-xs font-semibold text-muted-foreground mb-3">Card Color</label>
+                        <div className="grid grid-cols-7 gap-2">
+                            {cardColors.map((c) => (
+                                <button
+                                    key={c.value}
+                                    type="button"
+                                    onClick={() => setFormData({ ...formData, color: c.value })}
+                                    className={cn(
+                                        "h-8 w-8 rounded-full transition-all bg-gradient-to-br ring-2 ring-offset-2 ring-offset-[#1a1b2e]",
+                                        c.value,
+                                        formData.color === c.value
+                                            ? "ring-primary scale-110"
+                                            : "ring-transparent hover:scale-110 opacity-70 hover:opacity-100"
+                                    )}
+                                    title={c.label}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                </form>
+            </Modal>
         </div>
     );
 }

@@ -9,21 +9,7 @@ import { Icon } from "@/components/ui/Icon";
 import { useMemo, useState, useEffect } from "react";
 import { EditTransactionModal } from "@/components/ui/EditTransactionModal";
 import { Transaction } from "@/lib/types";
-import {
-    LineChart,
-    Line,
-    BarChart,
-    Bar,
-    PieChart,
-    Pie,
-    Cell,
-    XAxis,
-    YAxis,
-    CartesianGrid,
-    Tooltip,
-    Legend,
-    ResponsiveContainer,
-} from "recharts";
+
 
 export default function StatsPage() {
     const { transactions, categories, wallets, totalBalance, updateTransaction, deleteTransaction } = useStore();
@@ -162,20 +148,7 @@ export default function StatsPage() {
     const expenseChange = previousExpense > 0 ? ((totalExpense - previousExpense) / previousExpense) * 100 : 0;
 
     // Daily spending data for line chart
-    const dailyData = useMemo(() => {
-        const days = eachDayOfInterval({ start: startDate, end: endDate });
-        return days.map(day => {
-            const dayTransactions = currentMonthTransactions.filter(t => isSameDay(new Date(t.date), day));
-            const income = dayTransactions.filter(t => t.type === 'income').reduce((acc, curr) => acc + curr.amount, 0);
-            const expense = dayTransactions.filter(t => t.type === 'expense').reduce((acc, curr) => acc + curr.amount, 0);
 
-            return {
-                date: format(day, 'dd MMM'),
-                income: income / 1000,
-                expense: expense / 1000,
-            };
-        });
-    }, [currentMonthTransactions, startDate, endDate]);
 
     // Category breakdown for pie chart
     const categoryData = useMemo(() => {
@@ -356,93 +329,7 @@ export default function StatsPage() {
                 </GlassCard>
             </div>
 
-            {/* Charts Section */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-in slide-in-from-bottom-5 duration-500 delay-200">
-                {/* Income vs Expense Chart */}
-                <GlassCard className="p-6">
-                    <h3 className="text-lg font-bold mb-6">Income vs Expense</h3>
-                    <ResponsiveContainer width="100%" height={300}>
-                        <LineChart data={dailyData}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                            <XAxis
-                                dataKey="date"
-                                stroke="rgba(255,255,255,0.5)"
-                                style={{ fontSize: '12px' }}
-                            />
-                            <YAxis
-                                stroke="rgba(255,255,255,0.5)"
-                                style={{ fontSize: '12px' }}
-                                tickFormatter={(value) => `${value}k`}
-                            />
-                            <Tooltip
-                                contentStyle={{
-                                    backgroundColor: 'rgba(0,0,0,0.8)',
-                                    border: '1px solid rgba(255,255,255,0.1)',
-                                    borderRadius: '12px',
-                                    backdropFilter: 'blur(10px)'
-                                }}
-                                formatter={(value: number) => [`${value.toFixed(0)}k`, '']}
-                            />
-                            <Legend />
-                            <Line
-                                type="monotone"
-                                dataKey="income"
-                                stroke="#22c55e"
-                                strokeWidth={3}
-                                dot={{ fill: '#22c55e', r: 4 }}
-                                activeDot={{ r: 6 }}
-                                name="Income (IDR)"
-                            />
-                            <Line
-                                type="monotone"
-                                dataKey="expense"
-                                stroke="#ef4444"
-                                strokeWidth={3}
-                                dot={{ fill: '#ef4444', r: 4 }}
-                                activeDot={{ r: 6 }}
-                                name="Expense (IDR)"
-                            />
-                        </LineChart>
-                    </ResponsiveContainer>
-                </GlassCard>
 
-                {/* Category Breakdown */}
-                <GlassCard className="p-6">
-                    <h3 className="text-lg font-bold mb-6">Spending by Category</h3>
-                    {categoryData.length > 0 ? (
-                        <ResponsiveContainer width="100%" height={300}>
-                            <PieChart>
-                                <Pie
-                                    data={categoryData}
-                                    cx="50%"
-                                    cy="50%"
-                                    labelLine={false}
-                                    label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
-                                    outerRadius={100}
-                                    fill="#8884d8"
-                                    dataKey="value"
-                                >
-                                    {categoryData.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={getColorFromClass(entry.color)} />
-                                    ))}
-                                </Pie>
-                                <Tooltip
-                                    contentStyle={{
-                                        backgroundColor: 'rgba(0,0,0,0.8)',
-                                        border: '1px solid rgba(255,255,255,0.1)',
-                                        borderRadius: '12px'
-                                    }}
-                                    formatter={(value: number) => formatCurrency(value)}
-                                />
-                            </PieChart>
-                        </ResponsiveContainer>
-                    ) : (
-                        <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-                            No expense data available
-                        </div>
-                    )}
-                </GlassCard>
-            </div>
 
             {/* Top Categories */}
             <div className="animate-in slide-in-from-bottom-5 duration-500 delay-300">

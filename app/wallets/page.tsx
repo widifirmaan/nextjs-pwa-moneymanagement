@@ -208,13 +208,6 @@ export default function WalletsPage() {
                                 )}
                                 style={{ animationDelay: `${i * 100}ms` }}
                             >
-                                {wallet.isFrozen && (
-                                    <div className="absolute top-4 left-4 bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full flex items-center gap-2 z-10">
-                                        <Snowflake className="w-4 h-4 text-white" />
-                                        <span className="text-xs text-white font-medium">Frozen</span>
-                                    </div>
-                                )}
-
                                 <div className="absolute -right-8 -bottom-8 opacity-20 rotate-12 transition-transform group-hover:scale-110 duration-500">
                                     <WalletIcon className="w-32 h-32 text-white" />
                                 </div>
@@ -222,7 +215,15 @@ export default function WalletsPage() {
                                 <div className="relative z-10 flex flex-col gap-6">
                                     <div className="flex justify-between items-start">
                                         <div>
-                                            <p className="text-white/80 font-medium mb-1">{wallet.name}</p>
+                                            <div className="flex items-center gap-2 mb-1">
+                                                <p className="text-white/80 font-medium">{wallet.name}</p>
+                                                {wallet.isFrozen && (
+                                                    <div className="px-2 py-0.5 rounded-full bg-cyan-500/30 border border-cyan-500/50 flex items-center gap-1 backdrop-blur-md">
+                                                        <Snowflake className="w-3 h-3 text-white" />
+                                                        <span className="text-[10px] text-white font-bold uppercase tracking-wider">Frozen</span>
+                                                    </div>
+                                                )}
+                                            </div>
                                             <p className="text-white/60 text-xs uppercase tracking-wider bg-black/10 px-2 py-1 rounded-lg inline-block backdrop-blur-sm">
                                                 {wallet.type}
                                             </p>

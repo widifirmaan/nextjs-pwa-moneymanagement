@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Category, Transaction, Wallet, ExpenseLimits, Notification, SavedCard } from '@/lib/types';
-import { startOfDay, startOfWeek, startOfMonth, isAfter } from 'date-fns';
+import { startOfDay, startOfWeek, startOfMonth, isAfter, format } from 'date-fns';
 
 interface StoreContextType {
     transactions: Transaction[];
@@ -141,7 +141,11 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
                 .filter(t => isAfter(new Date(t.date), startMth))
                 .reduce((acc, t) => acc + t.amount, 0);
 
-            const dailyId = `limit-daily-${wallet.id}`;
+            const dateKey = format(now, 'yyyy-MM-dd');
+            const weekKey = format(now, 'yyyy-ww');
+            const monthKey = format(now, 'yyyy-MM');
+
+            const dailyId = `limit-daily-${wallet.id}-${dateKey}`;
             if (limits.daily > 0 && dailyExpense > limits.daily && !dismissedIds.has(dailyId)) {
                 newNotifications.push({
                     id: dailyId,
@@ -152,7 +156,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
                 });
             }
 
-            const weeklyId = `limit-weekly-${wallet.id}`;
+            const weeklyId = `limit-weekly-${wallet.id}-${weekKey}`;
             if (limits.weekly > 0 && weeklyExpense > limits.weekly && !dismissedIds.has(weeklyId)) {
                 newNotifications.push({
                     id: weeklyId,
@@ -163,7 +167,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
                 });
             }
 
-            const monthlyId = `limit-monthly-${wallet.id}`;
+            const monthlyId = `limit-monthly-${wallet.id}-${monthKey}`;
             if (limits.monthly > 0 && monthlyExpense > limits.monthly && !dismissedIds.has(monthlyId)) {
                 newNotifications.push({
                     id: monthlyId,

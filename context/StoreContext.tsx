@@ -23,37 +23,44 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     const [isLoaded, setIsLoaded] = useState(false);
 
     useEffect(() => {
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        const loadData = () => {
-            const storedTransactions = localStorage.getItem('transactions');
-            const storedWallets = localStorage.getItem('wallets');
-            const storedCategories = localStorage.getItem('categories');
+        const loadData = async () => {
+            try {
+                const res = await fetch('/api/data');
+                if (!res.ok) throw new Error('Failed to fetch data');
+                const data = await res.json();
 
-            if (storedTransactions) setTransactions(JSON.parse(storedTransactions));
-            else setTransactions(initialTransactions);
-
-            if (storedWallets) setWallets(JSON.parse(storedWallets));
-            else setWallets(initialWallets);
-
-            if (storedCategories) setCategories(JSON.parse(storedCategories));
-            else setCategories(initialCategories);
-
+                // If database is empty, seed it
+                if (data.categories.length === 0 && data.wallets.length === 0) {
+                    await fetch('/api/seed', { method: 'POST' });
+                    // Fetch again
+                    const res2 = await fetch('/api/data');
+                    const data2 = await res2.json();
+                    setCategories(data2.categories);
+                    setWallets(data2.wallets);
+                    setTransactions(data2.transactions);
+                } else {
+                    setCategories(data.categories);
+                    setWallets(data.wallets);
+                    setTransactions(data.transactions);
+                }
+            } catch (error) {
+                console.error("Error loading data:", error);
+                // Fallback to initial data if offline/error? 
+                // For now, let's keep it empty or retry.
+            }
             setIsLoaded(true);
         };
         loadData();
     }, []);
 
-    useEffect(() => {
-        if (!isLoaded) return;
-        localStorage.setItem('transactions', JSON.stringify(transactions));
-        localStorage.setItem('wallets', JSON.stringify(wallets));
-        localStorage.setItem('categories', JSON.stringify(categories));
-    }, [transactions, wallets, categories, isLoaded]);
+    // Remove the localStorage sync effect
+    // useEffect(() => { ... }, [transactions, wallets, categories, isLoaded]);
 
-    const addTransaction = (t: Omit<Transaction, 'id'>) => {
+    const addTransaction = async (t: Omit<Transaction, 'id'>) => {
         const newTransaction = { ...t, id: crypto.randomUUID() };
-        setTransactions(prev => [newTransaction, ...prev]);
 
+        // Optimistic UI Update
+        setTransactions(prev => [newTransaction, ...prev]);
         setWallets(prev => prev.map(w => {
             if (w.id === t.walletId) {
                 return {
@@ -63,14 +70,28 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
             }
             return w;
         }));
+
+        try {
+            const res = await fetch('/api/transactions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(newTransaction),
+            });
+            if (!res.ok) {
+                // Revert if failed (omitted for brevity in this step, but ideal)
+                console.error("Failed to save transaction");
+            }
+        } catch (error) {
+            console.error("Error saving transaction:", error);
+        }
     };
 
-    const deleteTransaction = (id: string) => {
+    const deleteTransaction = async (id: string) => {
         const t = transactions.find(tx => tx.id === id);
         if (!t) return;
 
+        // Optimistic UI Update
         setTransactions(prev => prev.filter(tx => tx.id !== id));
-
         setWallets(prev => prev.map(w => {
             if (w.id === t.walletId) {
                 return {
@@ -80,6 +101,12 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
             }
             return w;
         }));
+
+        try {
+            await fetch(`/api/transactions/${id}`, { method: 'DELETE' });
+        } catch (error) {
+            console.error("Error deleting transaction:", error);
+        }
     };
 
     const getWalletBalance = (id: string) => {

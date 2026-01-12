@@ -5,6 +5,7 @@ import { useStore } from "@/context/StoreContext";
 import { ArrowLeft, Calendar, Check } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { Icon } from "@/components/ui/Icon";
 
 export default function AddTransaction() {
     const router = useRouter();

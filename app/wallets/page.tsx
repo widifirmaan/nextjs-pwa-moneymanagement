@@ -109,6 +109,8 @@ export default function WalletsPage() {
         }
     };
 
+    const isDefaultCash = editingWallet?.type === 'cash' && editingWallet?.name === 'Cash';
+
     const handleDelete = async (id: string) => {
         const w = wallets.find(w => w.id === id);
         if (w?.type === 'cash' && w?.name === 'Cash') {
@@ -127,6 +129,9 @@ export default function WalletsPage() {
     };
 
     const handleToggleFreeze = async (wallet: Wallet) => {
+        if (wallet.type === 'cash' && wallet.name === 'Cash') {
+            return;
+        }
         try {
             await updateWallet(wallet.id, { isFrozen: !wallet.isFrozen });
             setShowMenu(null);
@@ -143,12 +148,12 @@ export default function WalletsPage() {
                 className="flex-1 px-4 py-3 bg-secondary/20 text-white/70 rounded-xl font-semibold hover:bg-secondary/40 transition-colors border border-white/5 hover:border-white/10"
                 disabled={isSubmitting}
             >
-                Cancel
+                {isDefaultCash ? "Close" : "Cancel"}
             </button>
             <button
                 form="wallet-form"
                 type="submit"
-                disabled={isSubmitting}
+                disabled={isSubmitting || isDefaultCash}
                 className="flex-1 px-4 py-3 bg-primary text-primary-foreground rounded-xl font-semibold hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-primary/20"
             >
                 {isSubmitting ? (
@@ -261,34 +266,37 @@ export default function WalletsPage() {
                                         className="w-full px-4 py-3 text-left hover:bg-secondary transition-colors flex items-center gap-3 text-sm"
                                     >
                                         <Edit className="w-4 h-4 text-blue-500" />
-                                        Edit Wallet
+                                        {wallet.type === 'cash' && wallet.name === 'Cash' ? "View Details" : "Edit Wallet"}
                                     </button>
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleToggleFreeze(wallet);
-                                        }}
-                                        className="w-full px-4 py-3 text-left hover:bg-secondary transition-colors flex items-center gap-3 text-sm"
-                                    >
-                                        <Snowflake
-                                            className={cn(
-                                                "w-4 h-4",
-                                                wallet.isFrozen ? "text-orange-500" : "text-cyan-500"
-                                            )}
-                                        />
-                                        {wallet.isFrozen ? "Unfreeze" : "Freeze"} Wallet
-                                    </button>
+
                                     {!(wallet.type === 'cash' && wallet.name === 'Cash') && (
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleDelete(wallet.id);
-                                            }}
-                                            className="w-full px-4 py-3 text-left hover:bg-secondary transition-colors flex items-center gap-3 text-sm text-red-500"
-                                        >
-                                            <Trash2 className="w-4 h-4" />
-                                            Delete Wallet
-                                        </button>
+                                        <>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleToggleFreeze(wallet);
+                                                }}
+                                                className="w-full px-4 py-3 text-left hover:bg-secondary transition-colors flex items-center gap-3 text-sm"
+                                            >
+                                                <Snowflake
+                                                    className={cn(
+                                                        "w-4 h-4",
+                                                        wallet.isFrozen ? "text-orange-500" : "text-cyan-500"
+                                                    )}
+                                                />
+                                                {wallet.isFrozen ? "Unfreeze" : "Freeze"} Wallet
+                                            </button>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleDelete(wallet.id);
+                                                }}
+                                                className="w-full px-4 py-3 text-left hover:bg-secondary transition-colors flex items-center gap-3 text-sm text-red-500"
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                                Delete Wallet
+                                            </button>
+                                        </>
                                     )}
                                 </div>
                             )}
@@ -301,10 +309,16 @@ export default function WalletsPage() {
             <Modal
                 isOpen={showModal}
                 onClose={handleCloseModal}
-                title={editingWallet ? "Edit Wallet" : "Add New Wallet"}
+                title={editingWallet ? (isDefaultCash ? "Wallet Details" : "Edit Wallet") : "Add New Wallet"}
                 footer={footerButtons}
             >
                 <form id="wallet-form" onSubmit={handleSubmit} className="space-y-4">
+                    {isDefaultCash && (
+                        <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-3 flex gap-3 items-center">
+                            <Snowflake className="w-5 h-5 text-yellow-500 shrink-0" />
+                            <p className="text-xs text-yellow-500">Default Cash wallet cannot be edited or frozen so that you always have a safe place for your money.</p>
+                        </div>
+                    )}
                     <div>
                         <label className="block text-sm font-medium mb-2 text-muted-foreground">Wallet Name</label>
                         <input
@@ -313,10 +327,11 @@ export default function WalletsPage() {
                             onChange={(e) =>
                                 setFormData({ ...formData, name: e.target.value })
                             }
-                            className="w-full px-4 py-3 bg-secondary/50 border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary text-white placeholder:text-muted-foreground/30"
+                            className="w-full px-4 py-3 bg-secondary/50 border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary text-white placeholder:text-muted-foreground/30 disabled:opacity-50 disabled:cursor-not-allowed"
                             placeholder="e.g., BCA, GoPay, Cash"
                             required
                             maxLength={50}
+                            disabled={isDefaultCash}
                         />
                     </div>
 
@@ -330,7 +345,8 @@ export default function WalletsPage() {
                                     type: e.target.value as "bank" | "ewallet" | "cash",
                                 })
                             }
-                            className="w-full px-4 py-3 bg-secondary/50 border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary appearance-none text-white"
+                            className="w-full px-4 py-3 bg-secondary/50 border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary appearance-none text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={isDefaultCash}
                         >
                             <option value="bank" className="text-black">Bank</option>
                             <option value="ewallet" className="text-black">E-Wallet</option>
@@ -348,10 +364,11 @@ export default function WalletsPage() {
                             onChange={(e) =>
                                 setFormData({ ...formData, balance: Number(e.target.value) })
                             }
-                            className="w-full px-4 py-3 bg-secondary/50 border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary text-white placeholder:text-muted-foreground/30"
+                            className="w-full px-4 py-3 bg-secondary/50 border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary text-white placeholder:text-muted-foreground/30 disabled:opacity-50 disabled:cursor-not-allowed"
                             placeholder="0"
                             required
                             min="0"
+                            disabled={isDefaultCash}
                         />
                     </div>
 
@@ -365,9 +382,10 @@ export default function WalletsPage() {
                             onChange={(e) =>
                                 setFormData({ ...formData, accountNumber: e.target.value })
                             }
-                            className="w-full px-4 py-3 bg-secondary/50 border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary text-white placeholder:text-muted-foreground/30"
+                            className="w-full px-4 py-3 bg-secondary/50 border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary text-white placeholder:text-muted-foreground/30 disabled:opacity-50 disabled:cursor-not-allowed"
                             placeholder="1234567890"
                             maxLength={50}
+                            disabled={isDefaultCash}
                         />
                     </div>
 
@@ -384,8 +402,9 @@ export default function WalletsPage() {
                                         ...formData,
                                         expenseLimits: { ...formData.expenseLimits, daily: Number(e.target.value) }
                                     })}
-                                    className="w-full px-3 py-2 bg-secondary/50 border border-white/10 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary text-white"
+                                    className="w-full px-3 py-2 bg-secondary/50 border border-white/10 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary text-white disabled:opacity-50 disabled:cursor-not-allowed"
                                     placeholder="0"
+                                    disabled={isDefaultCash}
                                 />
                             </div>
                             <div>
@@ -398,8 +417,9 @@ export default function WalletsPage() {
                                         ...formData,
                                         expenseLimits: { ...formData.expenseLimits, weekly: Number(e.target.value) }
                                     })}
-                                    className="w-full px-3 py-2 bg-secondary/50 border border-white/10 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary text-white"
+                                    className="w-full px-3 py-2 bg-secondary/50 border border-white/10 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary text-white disabled:opacity-50 disabled:cursor-not-allowed"
                                     placeholder="0"
+                                    disabled={isDefaultCash}
                                 />
                             </div>
                             <div>
@@ -412,8 +432,9 @@ export default function WalletsPage() {
                                         ...formData,
                                         expenseLimits: { ...formData.expenseLimits, monthly: Number(e.target.value) }
                                     })}
-                                    className="w-full px-3 py-2 bg-secondary/50 border border-white/10 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary text-white"
+                                    className="w-full px-3 py-2 bg-secondary/50 border border-white/10 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary text-white disabled:opacity-50 disabled:cursor-not-allowed"
                                     placeholder="0"
+                                    disabled={isDefaultCash}
                                 />
                             </div>
                         </div>
@@ -427,8 +448,9 @@ export default function WalletsPage() {
                                     key={color}
                                     type="button"
                                     onClick={() => setFormData({ ...formData, color })}
+                                    disabled={isDefaultCash}
                                     className={cn(
-                                        "h-12 rounded-xl transition-all",
+                                        "h-12 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed",
                                         color,
                                         formData.color === color
                                             ? "ring-4 ring-primary ring-offset-2 ring-offset-background scale-110"
@@ -441,7 +463,6 @@ export default function WalletsPage() {
                 </form>
             </Modal>
 
-            {/* Click outside to close menu - Wait, Modal Portal handles click outside for modal. Menu logic is different. */}
             {
                 showMenu && (
                     <div
@@ -450,6 +471,6 @@ export default function WalletsPage() {
                     />
                 )
             }
-        </div >
+        </div>
     );
 }

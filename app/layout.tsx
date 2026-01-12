@@ -6,6 +6,7 @@ import "./globals.css";
 import MobileLayout from "@/components/layout/MobileLayout";
 import { BottomNav } from "@/components/BottomNav";
 import { DesktopSidebar } from "@/components/DesktopSidebar";
+import { InstallPrompt } from "@/components/InstallPrompt";
 import Providers from "@/components/Providers";
 import AuthWrapper from "@/components/AuthWrapper";
 
@@ -45,6 +46,7 @@ export default function RootLayout({
                   <DesktopSidebar />
                   {children}
                   <BottomNav />
+                  <InstallPrompt />
                 </MobileLayout>
               </StoreProvider>
             </ThemeProvider>

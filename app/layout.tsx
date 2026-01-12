@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { StoreProvider } from "@/context/StoreContext";
 import { ThemeProvider } from "@/context/ThemeContext";
@@ -17,12 +17,19 @@ const inter = Inter({
   weight: ["300", "400", "500", "600", "700", "800"],
 });
 
+export const viewport: Viewport = {
+  minimumScale: 1,
+  initialScale: 1,
+  width: 'device-width',
+  userScalable: false,
+  viewportFit: 'cover',
+  themeColor: '#09090b',
+};
+
 export const metadata: Metadata = {
   title: "MoneW - Smart Finance",
   description: "Modern Money Management App",
   manifest: "/manifest.json",
-  viewport: "minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no, user-scalable=no, viewport-fit=cover",
-  themeColor: "#09090b",
   icons: {
     icon: '/monew-logo.png',
     shortcut: '/monew-logo.png',

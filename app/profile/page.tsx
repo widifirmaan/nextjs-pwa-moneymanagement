@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { useSession, signOut } from "next-auth/react"
 import { GlassCard } from "@/components/ui/GlassCard"
-import { LogOut, User, Mail, Shield, Palette, Check, CreditCard } from "lucide-react"
+import { LogOut, User, Mail, Shield, Palette, Check, CreditCard, Trash2 } from "lucide-react"
 import { useState, useEffect } from "react"
 import { useTheme } from "@/context/ThemeContext"
 import { colorSchemes } from "@/context/ThemeContext"
@@ -14,6 +14,7 @@ export default function Profile() {
     const { data: session } = useSession()
     const user = session?.user
     const [isLoggingOut, setIsLoggingOut] = useState(false)
+    const [isResetting, setIsResetting] = useState(false)
     const { colorScheme, setColorScheme } = useTheme()
 
     // Expense Limits State
@@ -165,7 +166,7 @@ export default function Profile() {
                     }
                 }}
                 disabled={isLoggingOut}
-                className="w-full p-4 rounded-xl bg-rose-500/10 text-rose-500 font-semibold border border-rose-500/20 hover:bg-rose-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 shadow-sm hover:shadow-md"
+                className="w-full p-4 rounded-xl bg-secondary text-foreground font-semibold border border-border hover:bg-secondary/80 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 shadow-sm hover:shadow-md mb-4"
             >
                 {isLoggingOut ? (
                     <>
@@ -179,6 +180,40 @@ export default function Profile() {
                     <>
                         <LogOut className="w-5 h-5" />
                         Sign Out
+                    </>
+                )}
+            </button>
+
+            <button
+                onClick={async () => {
+                    if (confirm("WARNING: All your data (wallets, transactions, categories) will be permanently deleted. Are you sure you want to reset and restart setup?")) {
+                        setIsResetting(true)
+                        try {
+                            const res = await fetch('/api/user/reset', { method: 'POST' });
+                            if (res.ok) {
+                                await signOut({ callbackUrl: "/login" });
+                            }
+                        } catch (error) {
+                            console.error(error);
+                            setIsResetting(false);
+                        }
+                    }
+                }}
+                disabled={isResetting}
+                className="w-full p-4 rounded-xl bg-rose-500/10 text-rose-500 font-semibold border border-rose-500/20 hover:bg-rose-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 shadow-sm hover:shadow-md"
+            >
+                {isResetting ? (
+                    <>
+                        <svg className="w-5 h-5 animate-spin" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none" />
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                        </svg>
+                        Resetting Data...
+                    </>
+                ) : (
+                    <>
+                        <Trash2 className="w-5 h-5" />
+                        Reset Data & Restart Setup
                     </>
                 )}
             </button>

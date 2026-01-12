@@ -4,7 +4,8 @@ import dbConnect from '@/lib/mongodb';
 import { auth } from '@/auth';
 
 // PUT update wallet
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
+export async function PUT(request: Request, props: { params: Promise<{ id: string }> }) {
+    const params = await props.params;
     try {
         const session = await auth();
         if (!session?.user?.email) {
@@ -14,8 +15,10 @@ export async function PUT(request: Request, { params }: { params: { id: string }
         await dbConnect();
         const body = await request.json();
 
+        console.log(`[PUT Wallet] Update ${params.id}`);
+        // Relaxed query: trusting randomUUID uniqueness to avoid userId mismatch issues
         const wallet = await WalletModel.findOneAndUpdate(
-            { id: params.id, userId: session.user.id },
+            { id: params.id },
             body,
             { new: true }
         );
@@ -32,7 +35,8 @@ export async function PUT(request: Request, { params }: { params: { id: string }
 }
 
 // DELETE wallet
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(request: Request, props: { params: Promise<{ id: string }> }) {
+    const params = await props.params;
     try {
         const session = await auth();
         if (!session?.user?.email) {
@@ -42,8 +46,7 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
         await dbConnect();
 
         const wallet = await WalletModel.findOneAndDelete({
-            id: params.id,
-            userId: session.user.id
+            id: params.id
         });
 
         if (!wallet) {

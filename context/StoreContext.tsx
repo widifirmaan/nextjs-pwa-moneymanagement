@@ -41,6 +41,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     const [isSetupCompleted, setIsSetupCompleted] = useState(true); // Default true to avoid flash
     const [installPrompt, setInstallPrompt] = useState<any>(null);
     const [isLoaded, setIsLoaded] = useState(false);
+    const isSeeding = React.useRef(false);
 
     useEffect(() => {
         const handleInstallPrompt = (e: any) => {
@@ -59,26 +60,32 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
             try {
                 // Fetch basic data
-                const res = await fetch('/api/data');
+                const res = await fetch('/api/data', { headers: { 'Cache-Control': 'no-cache' } });
                 const data = res.ok ? await res.json() : null;
 
                 // Fetch cards
-                const resCards = await fetch('/api/cards');
+                const resCards = await fetch('/api/cards', { headers: { 'Cache-Control': 'no-cache' } });
                 const dataCards = resCards.ok ? await resCards.json() : [];
 
                 // Fetch Preferences (isSetupCompleted)
-                const resPref = await fetch('/api/user/preferences');
+                const resPref = await fetch('/api/user/preferences', { headers: { 'Cache-Control': 'no-cache' } });
                 const dataPref = resPref.ok ? await resPref.json() : null;
 
                 if (data) {
-                    if (data.categories.length === 0 && data.wallets.length === 0) {
-                        await fetch('/api/seed', { method: 'POST' });
-                        const res2 = await fetch('/api/data');
-                        const data2 = await res2.json();
-                        setCategories(data2.categories);
-                        setWallets(data2.wallets);
-                        setTransactions(data2.transactions);
-                    } else {
+                    // Check if data is empty ONLY if we are not already seeding
+                    if (data.categories.length === 0 && data.wallets.length === 0 && !isSeeding.current) {
+                        isSeeding.current = true;
+                        try {
+                            await fetch('/api/seed', { method: 'POST', headers: { 'Cache-Control': 'no-cache' } });
+                            const res2 = await fetch('/api/data', { headers: { 'Cache-Control': 'no-cache' } });
+                            const data2 = await res2.json();
+                            setCategories(data2.categories);
+                            setWallets(data2.wallets);
+                            setTransactions(data2.transactions);
+                        } finally {
+                            isSeeding.current = false;
+                        }
+                    } else if (data.categories.length > 0 || data.wallets.length > 0) {
                         setCategories(data.categories);
                         setWallets(data.wallets);
                         setTransactions(data.transactions);
@@ -313,7 +320,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
             await fetch(`/api/wallets/${id}`, { method: 'DELETE' });
         } catch (error) {
             console.error("Error deleting wallet:", error);
-            const res = await fetch('/api/data');
+            const res = await fetch('/api/data', { headers: { 'Cache-Control': 'no-cache' } });
             const data = await res.json();
             setWallets(data.wallets);
         }

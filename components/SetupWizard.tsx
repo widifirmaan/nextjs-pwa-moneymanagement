@@ -148,13 +148,17 @@ export function SetupWizard() {
 
                                 <div className="space-y-2">
                                     <label className="text-xs font-medium uppercase text-muted-foreground ml-1">Current Balance</label>
-                                    <input
-                                        type="number"
-                                        value={cashBalance}
-                                        onChange={(e) => setCashBalance(Number(e.target.value))}
-                                        className="w-full text-4xl font-bold bg-transparent border-b border-border focus:border-primary focus:outline-none py-2 text-center"
-                                        placeholder="0"
-                                    />
+                                    <div className="flex items-center justify-center gap-2 border-b border-border focus-within:border-primary transition-colors py-2">
+                                        <span className="text-4xl font-bold text-muted-foreground">Rp</span>
+                                        <input
+                                            type="number"
+                                            value={cashBalance || ''}
+                                            onChange={(e) => setCashBalance(Number(e.target.value))}
+                                            className="w-full text-4xl font-bold bg-transparent focus:outline-none"
+                                            placeholder="0"
+                                            inputMode="numeric"
+                                        />
+                                    </div>
                                 </div>
 
                                 <button onClick={saveWalletBalance} className="w-full py-4 bg-primary text-primary-foreground rounded-xl font-bold mt-auto shadow-lg shadow-primary/20 hover:scale-[1.02] transition-transform">
@@ -324,7 +328,7 @@ export function SetupWizard() {
                         )}
                     </AnimatePresence>
                 </div>
-            </GlassCard>
-        </div>
+            </GlassCard >
+        </div >
     );
 }

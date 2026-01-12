@@ -10,6 +10,9 @@ export async function POST() {
         if (!session || !session.user || !session.user.id) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
+
+        console.log("SEEDING STARTED for user:", session.user.id, "USING UUID LOGIC");
+
         const userId = session.user.id;
 
         await dbConnect();
@@ -20,9 +23,17 @@ export async function POST() {
             return NextResponse.json({ message: 'Data already exists' });
         }
 
-        // Add userId to data
-        const categoriesWithUser = initialCategories.map(c => ({ ...c, userId }));
-        const walletsWithUser = initialWallets.map(w => ({ ...w, userId }));
+        // Add userId to data and Generate Unique IDs to prevent collision
+        const categoriesWithUser = initialCategories.map(c => ({
+            ...c,
+            id: crypto.randomUUID(),
+            userId
+        }));
+        const walletsWithUser = initialWallets.map(w => ({
+            ...w,
+            id: crypto.randomUUID(),
+            userId
+        }));
 
         await CategoryModel.insertMany(categoriesWithUser);
         await WalletModel.insertMany(walletsWithUser);

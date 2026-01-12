@@ -6,6 +6,7 @@ export interface Category {
     icon: string;
     color: string;
     type: TransactionType;
+    userId?: string;
 }
 
 export interface Wallet {
@@ -15,6 +16,7 @@ export interface Wallet {
     balance: number;
     color: string;
     accountNumber?: string;
+    userId?: string;
 }
 
 export interface Transaction {
@@ -25,4 +27,5 @@ export interface Transaction {
     walletId: string;
     date: string;
     note: string;
+    userId?: string;
 }

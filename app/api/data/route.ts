@@ -1,20 +1,23 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import { CategoryModel, WalletModel, TransactionModel } from '@/lib/models';
+import { auth } from '@/auth';
 
 export async function GET() {
     try {
+        const session = await auth();
+        if (!session || !session.user || !session.user.id) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+        const userId = session.user.id;
+
         await dbConnect();
 
         const [categories, wallets, transactions] = await Promise.all([
-            CategoryModel.find({}).lean(),
-            WalletModel.find({}).lean(),
-            TransactionModel.find({}).sort({ date: -1 }).lean(),
+            CategoryModel.find({ userId }).lean(),
+            WalletModel.find({ userId }).lean(),
+            TransactionModel.find({ userId }).sort({ date: -1 }).lean(),
         ]);
-
-        // Remove _id and __v if needed, or mapped. 
-        // Since we used 'id' in schema, we can just return them. 
-        // Mongoose .lean() returns POJOs.
 
         return NextResponse.json({
             categories,

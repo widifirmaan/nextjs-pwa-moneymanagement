@@ -8,6 +8,7 @@ const CategorySchema = new Schema<Category>({
     icon: { type: String, required: true },
     color: { type: String, required: true },
     type: { type: String, enum: ['income', 'expense'], required: true },
+    userId: { type: String, required: true, index: true },
 });
 
 // Wallet Schema
@@ -18,6 +19,7 @@ const WalletSchema = new Schema<Wallet>({
     balance: { type: Number, required: true, default: 0 },
     color: { type: String, required: true },
     accountNumber: { type: String },
+    userId: { type: String, required: true, index: true },
 });
 
 // Transaction Schema
@@ -29,6 +31,7 @@ const TransactionSchema = new Schema<Transaction>({
     walletId: { type: String, required: true },
     date: { type: String, required: true }, // Keeping as string to match interface, usually Date is better
     note: { type: String, default: '' },
+    userId: { type: String, required: true, index: true },
 });
 
 // Prevent compilation errors if models are already defined

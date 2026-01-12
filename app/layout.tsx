@@ -5,6 +5,8 @@ import "./globals.css";
 import MobileLayout from "@/components/layout/MobileLayout";
 import { BottomNav } from "@/components/BottomNav";
 import { DesktopSidebar } from "@/components/DesktopSidebar";
+import Providers from "@/components/Providers";
+import AuthWrapper from "@/components/AuthWrapper";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -24,13 +26,17 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
       <body className={inter.className}>
-        <StoreProvider>
-          <MobileLayout>
-            <DesktopSidebar />
-            {children}
-            <BottomNav />
-          </MobileLayout>
-        </StoreProvider>
+        <Providers>
+          <AuthWrapper>
+            <StoreProvider>
+              <MobileLayout>
+                <DesktopSidebar />
+                {children}
+                <BottomNav />
+              </MobileLayout>
+            </StoreProvider>
+          </AuthWrapper>
+        </Providers>
       </body>
     </html>
   );

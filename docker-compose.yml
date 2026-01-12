@@ -12,7 +12,7 @@ services:
     environment:
       - MONGODB_URI=mongodb://americano-mongo:27017/moneymanagement
       - NODE_ENV=production
-      - AUTH_URL=https://mone.widifirmaan.web.id
+      - AUTH_URL=${AUTH_URL}
       - AUTH_TRUST_HOST=true
       - AUTH_SECRET=${AUTH_SECRET}
       - AUTH_GOOGLE_ID=${AUTH_GOOGLE_ID}

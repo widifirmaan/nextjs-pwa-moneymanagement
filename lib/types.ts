@@ -1,5 +1,5 @@
 export type TransactionType = 'income' | 'expense';
-export type ColorScheme = 'dark' | 'light' | 'blue' | 'purple' | 'green' | 'rose' | 'orange' | 'pink';
+export type ColorScheme = 'dark' | 'light' | 'blue' | 'purple' | 'green' | 'rose' | 'orange' | 'emerald' | 'dark-emerald';
 
 export interface Category {
     id: string;

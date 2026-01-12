@@ -44,15 +44,14 @@ const SavedCardSchema = new Schema<SavedCard>({
 
 // UserPreferences Schema
 const UserPreferencesSchema = new Schema<UserPreferences>({
-    userId: { type: String, required: true, unique: true, index: true }, // Added userId field to schema definition strictly
-    colorScheme: { type: String, default: 'default' },
+    colorScheme: { type: String, default: 'dark' },
     expenseLimits: {
         daily: { type: Number, default: 0 },
         weekly: { type: Number, default: 0 },
         monthly: { type: Number, default: 0 },
     },
     isSetupCompleted: { type: Boolean, default: false },
-}, { strict: false }); // Allow userId injection or flexible schema if needed
+}, { strict: false });
 
 // Transaction Schema
 const TransactionSchema = new Schema<Transaction>({

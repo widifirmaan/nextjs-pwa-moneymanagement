@@ -1,17 +1,24 @@
 {
-    "name": "MoneW - Money Management",
+    "name": "MoneW - Smart Finance",
     "short_name": "MoneW",
-    "description": "MoneW - Smart money management for your daily life",
+    "description": "Smart money management for your daily life. Track expenses, manage wallets, and achieve financial goals.",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#09090b",
     "theme_color": "#09090b",
-    "orientation": "portrait",
+    "orientation": "portrait-primary",
     "icons": [
         {
-            "src": "/icon.png",
+            "src": "/monew-logo.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/monew-logo.png",
             "sizes": "512x512",
-            "type": "image/png"
+            "type": "image/png",
+            "purpose": "any maskable"
         }
     ]
 }

@@ -12,7 +12,8 @@ export default function CardsPage() {
     const { savedCards, addCard, updateCard, deleteCard } = useStore();
     const [showModal, setShowModal] = useState(false);
     const [editingCard, setEditingCard] = useState<SavedCard | null>(null);
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     const [formData, setFormData] = useState<Omit<SavedCard, 'id' | 'userId'>>({
         cardName: "",
@@ -83,7 +84,7 @@ export default function CardsPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setIsSubmitting(true);
+        setIsSaving(true);
         try {
             if (editingCard) {
                 await updateCard(editingCard.id, formData);
@@ -94,21 +95,21 @@ export default function CardsPage() {
         } catch (error) {
             console.error(error);
         } finally {
-            setIsSubmitting(false);
+            setIsSaving(false);
         }
     };
 
     const handleDelete = async () => {
         if (!editingCard) return;
         if (confirm("Are you sure you want to delete this card?")) {
-            setIsSubmitting(true);
+            setIsDeleting(true);
             try {
                 await deleteCard(editingCard.id);
                 setShowModal(false);
             } catch (err) {
                 console.error(err);
             } finally {
-                setIsSubmitting(false);
+                setIsDeleting(false);
             }
         }
     }
@@ -213,20 +214,21 @@ export default function CardsPage() {
                             <button
                                 type="button"
                                 onClick={handleDelete}
-                                className="px-5 py-3 rounded-xl bg-rose-500/10 text-rose-500 font-bold hover:bg-rose-500/20 hover:scale-105 active:scale-95 transition-all text-sm flex items-center gap-2"
+                                disabled={isDeleting || isSaving}
+                                className="px-5 py-3 rounded-xl bg-rose-500/10 text-rose-500 font-bold hover:bg-rose-500/20 hover:scale-105 active:scale-95 transition-all text-sm flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 <Trash2 className="w-4 h-4" />
-                                Delete
+                                {isDeleting ? "Deleting..." : "Delete"}
                             </button>
                         )}
                         <button
                             type="submit"
                             form="card-form"
-                            disabled={isSubmitting}
+                            disabled={isSaving || isDeleting}
                             className="flex-1 px-5 py-3 rounded-xl bg-primary text-primary-foreground font-bold shadow-lg shadow-primary/25 hover:bg-primary/90 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50 text-sm"
                         >
                             <Check className="w-4 h-4" />
-                            {isSubmitting ? "Saving..." : "Save Card"}
+                            {isSaving ? "Saving..." : "Save Card"}
                         </button>
                     </>
                 }

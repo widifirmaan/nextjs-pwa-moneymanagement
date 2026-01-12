@@ -17,11 +17,16 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "MoneW",
-  description: "MoneW - Money Management App",
+  title: "MoneW - Smart Finance",
+  description: "Modern Money Management App",
   manifest: "/manifest.json",
   viewport: "minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no, user-scalable=no, viewport-fit=cover",
   themeColor: "#09090b",
+  icons: {
+    icon: '/monew-logo.png',
+    shortcut: '/monew-logo.png',
+    apple: '/monew-logo.png',
+  },
 };
 
 export default function RootLayout({

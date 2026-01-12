@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 
-type ColorScheme = 'dark' | 'light' | 'blue' | 'purple' | 'green' | 'rose' | 'orange' | 'pink';
+type ColorScheme = 'dark' | 'light' | 'blue' | 'purple' | 'green' | 'rose' | 'orange' | 'emerald';
 
 interface ThemeContextType {
     colorScheme: ColorScheme;
@@ -13,18 +13,18 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const colorSchemes = {
-    pink: {
-        name: 'Soft Pink',
-        background: '#ffc9e5',
-        foreground: '#4a1942',
-        card: '#ffd9ec',
-        cardForeground: '#4a1942',
-        primary: '#e91e8c',
+    emerald: {
+        name: 'Emerald Dream',
+        background: '#ecfdf5',
+        foreground: '#064e3b',
+        card: '#d1fae5',
+        cardForeground: '#064e3b',
+        primary: '#10b981',
         primaryForeground: '#ffffff',
-        secondary: '#ffb3d9',
-        muted: '#ff99cc',
-        accent: '#ff6bb3',
-        border: '#ffcceb',
+        secondary: '#a7f3d0',
+        muted: '#6ee7b7',
+        accent: '#34d399',
+        border: '#a7f3d0',
     },
     dark: {
         name: 'Dark',

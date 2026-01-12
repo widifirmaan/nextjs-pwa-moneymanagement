@@ -1,14 +1,16 @@
 "use client"
-import React, { useRef } from "react"
+import React, { useRef, useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Home, Wallet, Plus, PieChart, User, LogOut } from "lucide-react"
+import { Home, Wallet, Plus, PieChart, User, LogOut, CreditCard } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { motion, useMotionTemplate, useMotionValue, useSpring } from "framer-motion"
+import { signOut } from "next-auth/react"
 
 export function DesktopSidebar() {
     const pathname = usePathname()
     const ref = useRef<HTMLDivElement>(null);
+    const [isLoggingOut, setIsLoggingOut] = useState(false)
 
     const x = useMotionValue(0);
     const y = useMotionValue(0);
@@ -82,8 +84,8 @@ export function DesktopSidebar() {
                         M
                     </div>
                     <div>
-                        <h1 className="font-bold text-2xl tracking-tight text-white">MoneyFlow</h1>
-                        <p className="text-sm text-white/50 font-medium">Finance Manager</p>
+                        <h1 className="font-bold text-2xl tracking-tight text-white">MoneW</h1>
+                        <p className="text-sm text-white/50 font-medium">Money Management</p>
                     </div>
                 </div>
 
@@ -118,9 +120,32 @@ export function DesktopSidebar() {
                 </nav>
 
                 <div className="mt-auto">
-                    <button className="flex items-center gap-4 px-5 py-4 w-full rounded-2xl text-white/60 hover:bg-white/5 hover:text-red-400 transition-colors group/logout">
-                        <LogOut className="w-6 h-6 group-hover/logout:drop-shadow-[0_0_8px_rgba(248,113,113,0.5)]" />
-                        <span className="font-semibold text-[15px]">Log Out</span>
+                    <button
+                        onClick={async () => {
+                            setIsLoggingOut(true)
+                            try {
+                                await signOut({ callbackUrl: "/login" })
+                            } catch (error) {
+                                setIsLoggingOut(false)
+                            }
+                        }}
+                        disabled={isLoggingOut}
+                        className="flex items-center gap-4 px-5 py-4 w-full rounded-2xl text-white/60 hover:bg-white/5 hover:text-red-400 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 group/logout disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                    >
+                        {isLoggingOut ? (
+                            <>
+                                <svg className="w-6 h-6 animate-spin" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none" />
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                                </svg>
+                                <span className="font-semibold text-[15px]">Logging out...</span>
+                            </>
+                        ) : (
+                            <>
+                                <LogOut className="w-6 h-6 group-hover/logout:drop-shadow-[0_0_8px_rgba(248,113,113,0.5)] transition-all" />
+                                <span className="font-semibold text-[15px]">Log Out</span>
+                            </>
+                        )}
                     </button>
                 </div>
             </div>

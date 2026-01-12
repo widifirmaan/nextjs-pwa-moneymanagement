@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { StoreProvider } from "@/context/StoreContext";
+import { ThemeProvider } from "@/context/ThemeContext";
 import "./globals.css";
 import MobileLayout from "@/components/layout/MobileLayout";
 import { BottomNav } from "@/components/BottomNav";
@@ -8,11 +9,16 @@ import { DesktopSidebar } from "@/components/DesktopSidebar";
 import Providers from "@/components/Providers";
 import AuthWrapper from "@/components/AuthWrapper";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+  weight: ["300", "400", "500", "600", "700", "800"],
+});
 
 export const metadata: Metadata = {
-  title: "MoneyFlow",
-  description: "Financial management app",
+  title: "MoneW",
+  description: "MoneW - Money Management App",
   manifest: "/manifest.json",
   viewport: "minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no, user-scalable=no, viewport-fit=cover",
   themeColor: "#09090b",
@@ -28,13 +34,15 @@ export default function RootLayout({
       <body className={inter.className}>
         <Providers>
           <AuthWrapper>
-            <StoreProvider>
-              <MobileLayout>
-                <DesktopSidebar />
-                {children}
-                <BottomNav />
-              </MobileLayout>
-            </StoreProvider>
+            <ThemeProvider>
+              <StoreProvider>
+                <MobileLayout>
+                  <DesktopSidebar />
+                  {children}
+                  <BottomNav />
+                </MobileLayout>
+              </StoreProvider>
+            </ThemeProvider>
           </AuthWrapper>
         </Providers>
       </body>

@@ -10,6 +10,7 @@ export async function GET() {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
         const userId = session.user.id;
+        console.log(`[API/DATA] Fetching data for user: ${session.user.email} (ID: ${userId})`);
 
         await dbConnect();
 

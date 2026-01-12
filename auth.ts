@@ -15,6 +15,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         session({ session, user }) {
             if (session.user) {
                 session.user.id = user.id
+                // Include colorScheme from user object
+                session.user.colorScheme = (user as any).colorScheme || 'dark'
             }
             return session
         },

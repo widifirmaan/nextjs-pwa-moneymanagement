@@ -1,16 +1,27 @@
 "use client"
+
 import { useStore } from "@/context/StoreContext";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { format } from "date-fns";
-import { ArrowUpRight, ArrowDownLeft, Bell, Wallet as WalletIcon, MoreHorizontal } from "lucide-react";
+import { ArrowUpRight, ArrowDownLeft, Wallet as WalletIcon, AlertTriangle, X, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Icon } from "@/components/ui/Icon";
+import { NotificationsBell } from "@/components/ui/NotificationsBell";
+import { SetupWizard } from "@/components/SetupWizard";
+import { useState } from "react";
 
 export default function Home() {
-  const { totalBalance, wallets, transactions, categories } = useStore();
+  const { totalBalance, wallets, transactions, categories, notifications, isPrivacyMode, togglePrivacyMode } = useStore();
+  const [dismissedAlerts, setDismissedAlerts] = useState<string[]>([]);
 
   const recentTransactions = transactions.slice(0, 10);
+
+  const activeLimitAlerts = notifications.filter(n =>
+    !n.read &&
+    (n.type?.startsWith('limit-')) &&
+    !dismissedAlerts.includes(n.id)
+  );
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(amount);
@@ -32,9 +43,29 @@ export default function Home() {
           <p className="text-white/60 text-sm font-semibold tracking-wide uppercase mb-1">Overview</p>
           <h1 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 drop-shadow-sm">Hello, Widifirmaan</h1>
         </div>
-        <button className="p-3 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 transition-colors backdrop-blur-md">
-          <Bell className="w-6 h-6 text-white" />
-        </button>
+        <NotificationsBell />
+      </div>
+
+      {/* Limit Alerts */}
+      <div className="space-y-3">
+        {activeLimitAlerts.map(alert => (
+          <div key={alert.id} className="animate-in slide-in-from-top-2 duration-300">
+            <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-start gap-3 relative overflow-hidden">
+              <div className="absolute left-0 top-0 bottom-0 w-1 bg-rose-500" />
+              <AlertTriangle className="w-5 h-5 text-rose-500 flex-shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <p className="font-semibold text-rose-500 text-sm">{alert.type === 'limit-daily' ? 'Daily Limit Exceeded' : alert.type === 'limit-weekly' ? 'Weekly Limit Exceeded' : 'Monthly Limit Exceeded'}</p>
+                <p className="text-xs text-rose-200/80 mt-1">{alert.message}</p>
+              </div>
+              <button
+                onClick={() => setDismissedAlerts(prev => [...prev, alert.id])}
+                className="text-rose-400 hover:text-rose-200 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+        ))}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10">
@@ -49,8 +80,16 @@ export default function Home() {
               </div>
 
               <div className="relative z-10">
-                <p className="text-white/90 mb-2 font-medium text-lg tracking-wide">Total Net Worth</p>
-                <h2 className="text-5xl md:text-7xl font-bold text-white mb-10 tracking-tight">{formatCurrency(totalBalance)}</h2>
+
+                <div className="flex items-center gap-2 mb-2">
+                  <p className="text-white/90 font-medium text-lg tracking-wide">Total Net Worth</p>
+                  <button onClick={togglePrivacyMode} className="p-1 hover:bg-white/10 rounded-full text-white/70 transition-colors">
+                    {isPrivacyMode ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+                <h2 className="text-5xl md:text-7xl font-bold text-white mb-10 tracking-tight">
+                  {isPrivacyMode ? '••••••••' : formatCurrency(totalBalance)}
+                </h2>
 
                 <div className="flex flex-col sm:flex-row gap-4 max-w-lg">
                   <div className="flex-1 flex items-center gap-4 bg-black/20 backdrop-blur-xl px-6 py-4 rounded-[24px] border border-white/10 hover:bg-black/30 transition-colors">
@@ -59,7 +98,7 @@ export default function Home() {
                     </div>
                     <div>
                       <p className="text-[11px] text-white/50 font-bold uppercase tracking-wider mb-0.5">Income</p>
-                      <p className="text-lg font-bold text-white">{formatCurrency(calculateTotal('income'))}</p>
+                      <p className="text-lg font-bold text-white">{isPrivacyMode ? '••••••' : formatCurrency(calculateTotal('income'))}</p>
                     </div>
                   </div>
                   <div className="flex-1 flex items-center gap-4 bg-black/20 backdrop-blur-xl px-6 py-4 rounded-[24px] border border-white/10 hover:bg-black/30 transition-colors">
@@ -68,7 +107,7 @@ export default function Home() {
                     </div>
                     <div>
                       <p className="text-[11px] text-white/50 font-bold uppercase tracking-wider mb-0.5">Expense</p>
-                      <p className="text-lg font-bold text-white">{formatCurrency(calculateTotal('expense'))}</p>
+                      <p className="text-lg font-bold text-white">{isPrivacyMode ? '••••••' : formatCurrency(calculateTotal('expense'))}</p>
                     </div>
                   </div>
                 </div>
@@ -92,14 +131,11 @@ export default function Home() {
                     <span className="text-white/90 font-semibold text-sm block mb-1">{wallet.name}</span>
                     <span className="text-white/60 text-[10px] uppercase tracking-wider border border-white/20 px-2 py-0.5 rounded-full inline-block">{wallet.type}</span>
                   </div>
-                  <span className="text-white font-bold text-lg relative z-10 truncate">{formatCurrency(wallet.balance).split(',')[0]}</span>
+                  <span className="text-white font-bold text-lg relative z-10 truncate">
+                    {isPrivacyMode ? '••••••' : formatCurrency(wallet.balance).split(',')[0]}
+                  </span>
                 </GlassCard>
               ))}
-              <div className="snap-start min-w-[60px] md:min-w-0 md:h-36 flex items-center justify-center">
-                <button className="w-14 h-14 rounded-full border-2 border-dashed border-zinc-700 hover:border-zinc-500 flex items-center justify-center text-zinc-500 hover:text-zinc-300 transition-colors">
-                  <MoreHorizontal className="w-6 h-6" />
-                </button>
-              </div>
             </div>
           </div>
         </div>
@@ -111,21 +147,25 @@ export default function Home() {
             {recentTransactions.map((t, i) => {
               const cat = getCategory(t.categoryId);
               return (
-                <GlassCard key={t.id} className="flex items-center justify-between p-4 hover:bg-white/5 active:scale-[0.98] transition-all cursor-pointer border-white/5">
-                  <div className="flex items-center gap-4">
-                    <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-lg", cat?.color)}>
+                <GlassCard key={t.id} className="p-4 hover:bg-white/5 active:scale-[0.98] transition-all cursor-pointer border-white/5">
+                  <div className="flex items-start gap-4">
+                    <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-lg flex-shrink-0", cat?.color)}>
                       <Icon name={cat?.icon || 'Circle'} className="w-6 h-6" />
                     </div>
-                    <div>
-                      <p className="font-bold text-sm text-foreground">{cat?.name}</p>
-                      <p className="text-xs text-muted-foreground line-clamp-1">{t.note}</p>
+                    <div className="flex-1 min-w-0">
+                      {/* First Row: Category Name and Amount */}
+                      <div className="flex items-baseline justify-between gap-4">
+                        <p className="font-bold text-sm text-foreground truncate">{cat?.name}</p>
+                        <p className={cn("font-bold text-base whitespace-nowrap flex-shrink-0", t.type === 'income' ? 'text-emerald-500' : 'text-rose-500')}>
+                          {t.type === 'income' ? '+' : '-'}{isPrivacyMode ? '••••••' : formatCurrency(t.amount).split(',')[0]}
+                        </p>
+                      </div>
+                      {/* Second Row: Note and Date */}
+                      <div className="flex items-baseline justify-between gap-4 mt-0.5">
+                        <p className="text-xs text-muted-foreground line-clamp-1">{t.note}</p>
+                        <p className="text-[10px] text-muted-foreground font-medium whitespace-nowrap flex-shrink-0">{format(new Date(t.date), 'dd MMM, HH:mm')}</p>
+                      </div>
                     </div>
-                  </div>
-                  <div className="text-right">
-                    <p className={cn("font-bold text-base", t.type === 'income' ? 'text-emerald-500' : 'text-rose-500')}>
-                      {t.type === 'income' ? '+' : '-'}{formatCurrency(t.amount).split(',')[0]}
-                    </p>
-                    <p className="text-[10px] text-muted-foreground font-medium">{format(new Date(t.date), 'dd MMM, HH:mm')}</p>
                   </div>
                 </GlassCard>
               );
@@ -138,6 +178,7 @@ export default function Home() {
           </div>
         </div>
       </div>
+      <SetupWizard />
     </div>
   );
 }

@@ -23,13 +23,11 @@ export async function POST() {
         // Add userId to data
         const categoriesWithUser = initialCategories.map(c => ({ ...c, userId }));
         const walletsWithUser = initialWallets.map(w => ({ ...w, userId }));
-        // We do NOT seed transactions for new users usually, or we can seed sample ones
-        // Let's seed sample transactions too for demo purposes, but mapped to user
-        const transactionsWithUser = initialTransactions.map(t => ({ ...t, userId }));
 
         await CategoryModel.insertMany(categoriesWithUser);
         await WalletModel.insertMany(walletsWithUser);
-        await TransactionModel.insertMany(transactionsWithUser);
+        // Transactions initially empty for real usage
+        // await TransactionModel.insertMany(transactionsWithUser);
 
         return NextResponse.json({ message: 'Database seeded successfully' });
     } catch (error) {

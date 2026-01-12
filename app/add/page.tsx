@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useStore } from "@/context/StoreContext";
-import { ArrowLeft, Calendar, Check } from "lucide-react";
+import { ArrowLeft, Calendar, Check, Camera, Upload, X } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Icon } from "@/components/ui/Icon";
@@ -17,6 +17,32 @@ export default function AddTransaction() {
     const [walletId, setWalletId] = useState(wallets[0]?.id || '');
     const [note, setNote] = useState('');
     const [date, setDate] = useState('');
+    const [uploading, setUploading] = useState(false);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setUploading(true);
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            const res = await fetch('/api/upload', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await res.json();
+            if (data.url) {
+                setPreviewUrl(data.url);
+            }
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setUploading(false);
+        }
+    };
 
     useEffect(() => {
         setDate(new Date().toISOString().split('T')[0]);
@@ -40,6 +66,7 @@ export default function AddTransaction() {
             walletId,
             date: new Date(date).toISOString(),
             note,
+            receiptUrl: previewUrl || undefined,
         });
 
         router.push('/');
@@ -153,6 +180,41 @@ export default function AddTransaction() {
                         placeholder="Description for this transaction..."
                         className="w-full p-4 rounded-xl bg-secondary/30 border border-border text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/50 h-24 text-foreground"
                     />
+                </div>
+
+                {/* Receipt Upload */}
+                <div className="space-y-2">
+                    <label className="text-xs text-muted-foreground ml-1">Receipt / Proof</label>
+                    <div className="flex gap-4 overflow-x-auto pb-2">
+                        <label className={cn(
+                            "flex flex-col items-center justify-center w-24 h-24 rounded-2xl border-2 border-dashed border-muted-foreground/30 bg-secondary/10 cursor-pointer hover:bg-secondary/20 transition-all",
+                            uploading ? "opacity-50 cursor-not-allowed" : ""
+                        )}>
+                            <div className="w-8 h-8 rounded-full bg-secondary/50 flex items-center justify-center mb-1 text-muted-foreground">
+                                <Camera className="w-4 h-4" />
+                            </div>
+                            <span className="text-[10px] font-medium text-muted-foreground">Add Photo</span>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                onChange={handleFileChange}
+                                disabled={uploading}
+                            />
+                        </label>
+
+                        {previewUrl && (
+                            <div className="relative w-24 h-24 rounded-2xl overflow-hidden border border-border group">
+                                <img src={previewUrl} alt="Receipt" className="w-full h-full object-cover" />
+                                <button
+                                    onClick={() => setPreviewUrl(null)}
+                                    className="absolute top-1 right-1 p-1 bg-black/50 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                                >
+                                    <X className="w-3 h-3" />
+                                </button>
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 <button

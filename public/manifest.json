@@ -1,7 +1,7 @@
 {
-    "name": "MoneyFlow Finance Manager",
-    "short_name": "MoneyFlow",
-    "description": "Smart financial tracking for your daily life",
+    "name": "MoneW - Money Management",
+    "short_name": "MoneW",
+    "description": "MoneW - Smart money management for your daily life",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#09090b",

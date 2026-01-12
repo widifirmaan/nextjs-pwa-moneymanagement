@@ -88,7 +88,7 @@ export default function Home() {
                     {isPrivacyMode ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
-                <h2 className="text-5xl md:text-7xl font-bold text-white mb-10 tracking-tight">
+                <h2 className="text-4xl sm:text-5xl md:text-7xl font-bold text-white mb-8 md:mb-10 tracking-tight truncate">
                   {isPrivacyMode ? '••••••••' : formatCurrency(totalBalance)}
                 </h2>
 

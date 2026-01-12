@@ -354,7 +354,7 @@ export default function WalletsPage() {
                                 onChange={(e) =>
                                     setFormData({ ...formData, name: e.target.value })
                                 }
-                                className="w-full px-4 py-3 bg-secondary/50 border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary text-white placeholder:text-muted-foreground/30 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+                                className="w-full px-4 py-3 bg-secondary/50 border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary text-foreground placeholder:text-muted-foreground/30 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
                                 placeholder="e.g., BCA, GoPay, Cash"
                                 required
                                 maxLength={50}
@@ -372,7 +372,7 @@ export default function WalletsPage() {
                                         type: e.target.value as "bank" | "ewallet" | "cash",
                                     })
                                 }
-                                className="w-full px-4 py-3 bg-secondary/50 border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary appearance-none text-white disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+                                className="w-full px-4 py-3 bg-secondary/50 border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary appearance-none text-foreground disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
                                 disabled={isDefaultCash}
                             >
                                 <option value="bank" className="text-black">Bank</option>
@@ -391,7 +391,7 @@ export default function WalletsPage() {
                                 onChange={(e) =>
                                     setFormData({ ...formData, balance: Number(e.target.value) })
                                 }
-                                className="w-full px-4 py-3 bg-secondary/50 border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary text-white placeholder:text-muted-foreground/30 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+                                className="w-full px-4 py-3 bg-secondary/50 border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary text-foreground placeholder:text-muted-foreground/30 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
                                 placeholder="0"
                                 required
                                 min="0"
@@ -409,7 +409,7 @@ export default function WalletsPage() {
                                 onChange={(e) =>
                                     setFormData({ ...formData, accountNumber: e.target.value })
                                 }
-                                className="w-full px-4 py-3 bg-secondary/50 border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary text-white placeholder:text-muted-foreground/30 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+                                className="w-full px-4 py-3 bg-secondary/50 border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary text-foreground placeholder:text-muted-foreground/30 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
                                 placeholder="1234567890"
                                 maxLength={50}
                                 disabled={isDefaultCash}
@@ -429,7 +429,7 @@ export default function WalletsPage() {
                                             ...formData,
                                             expenseLimits: { ...formData.expenseLimits, daily: Number(e.target.value) }
                                         })}
-                                        className="w-full px-3 py-2 bg-secondary/50 border border-white/10 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="w-full px-3 py-2 bg-secondary/50 border border-white/10 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary text-foreground disabled:opacity-50 disabled:cursor-not-allowed"
                                         placeholder="0"
                                         disabled={isDefaultCash}
                                     />
@@ -444,7 +444,7 @@ export default function WalletsPage() {
                                             ...formData,
                                             expenseLimits: { ...formData.expenseLimits, weekly: Number(e.target.value) }
                                         })}
-                                        className="w-full px-3 py-2 bg-secondary/50 border border-white/10 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="w-full px-3 py-2 bg-secondary/50 border border-white/10 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary text-foreground disabled:opacity-50 disabled:cursor-not-allowed"
                                         placeholder="0"
                                         disabled={isDefaultCash}
                                     />
@@ -459,7 +459,7 @@ export default function WalletsPage() {
                                             ...formData,
                                             expenseLimits: { ...formData.expenseLimits, monthly: Number(e.target.value) }
                                         })}
-                                        className="w-full px-3 py-2 bg-secondary/50 border border-white/10 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="w-full px-3 py-2 bg-secondary/50 border border-white/10 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary text-foreground disabled:opacity-50 disabled:cursor-not-allowed"
                                         placeholder="0"
                                         disabled={isDefaultCash}
                                     />

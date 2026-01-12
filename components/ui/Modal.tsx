@@ -39,20 +39,21 @@ export function Modal({ isOpen, onClose, title, children, footer, className }: M
             <div className="absolute inset-0" onClick={onClose} />
 
             {/* Modal Content */}
+            {/* Modal Content */}
             <div className={cn(
-                "w-full max-w-md flex flex-col bg-[#1a1b2e]/95 backdrop-blur-2xl border border-white/10 rounded-[32px] shadow-2xl overflow-hidden relative z-10 max-h-[90vh] animate-in slide-in-from-bottom-5 duration-300",
+                "w-full max-w-md flex flex-col bg-card/95 backdrop-blur-2xl border border-border rounded-[32px] shadow-2xl overflow-hidden relative z-10 max-h-[90vh] animate-in slide-in-from-bottom-5 duration-300",
                 className
             )}>
                 {/* Header */}
-                <div className="bg-white/5 border-b border-white/10 p-6 flex items-center justify-between shrink-0 shadow-lg shadow-black/5">
-                    <h2 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-white/70">
+                <div className="bg-secondary/20 border-b border-border p-6 flex items-center justify-between shrink-0 shadow-lg shadow-black/5">
+                    <h2 className="text-xl font-bold bg-clip-text text-foreground">
                         {title}
                     </h2>
                     <button
                         onClick={onClose}
-                        className="p-2 rounded-full hover:bg-white/10 transition-colors border border-white/5 hover:border-white/20 active:scale-95"
+                        className="p-2 rounded-full hover:bg-secondary/50 transition-colors border border-border/50 hover:border-border active:scale-95"
                     >
-                        <X className="w-5 h-5 text-white/80" />
+                        <X className="w-5 h-5 text-muted-foreground" />
                     </button>
                 </div>
 
@@ -63,7 +64,7 @@ export function Modal({ isOpen, onClose, title, children, footer, className }: M
 
                 {/* Footer - Fixed at bottom */}
                 {footer && (
-                    <div className="bg-white/5 border-t border-white/10 p-6 flex gap-3 shrink-0 backdrop-blur-xl z-20">
+                    <div className="bg-secondary/20 border-t border-border p-6 flex gap-3 shrink-0 backdrop-blur-xl z-20">
                         {footer}
                     </div>
                 )}

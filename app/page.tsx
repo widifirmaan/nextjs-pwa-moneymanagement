@@ -37,9 +37,9 @@ export default function Home() {
       {/* Header */}
       <div className="flex justify-between items-end animate-in slide-in-from-top-5 duration-500 mb-6 gap-4">
         <div className="min-w-0 flex-1">
-          <p className="text-white/60 text-sm font-semibold tracking-wide uppercase mb-1">Overview</p>
+          <p className="text-muted-foreground text-sm font-semibold tracking-wide uppercase mb-1">Overview</p>
           <h1
-            className="text-3xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 drop-shadow-sm truncate"
+            className="text-3xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary via-accent to-primary drop-shadow-sm truncate"
             title={userName || 'User'}
           >
             Hello, {userName || 'User'}

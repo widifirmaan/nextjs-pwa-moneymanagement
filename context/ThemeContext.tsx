@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 
-type ColorScheme = 'dark' | 'light' | 'blue' | 'purple' | 'green' | 'rose' | 'orange' | 'emerald';
+type ColorScheme = 'dark' | 'light' | 'blue' | 'purple' | 'green' | 'rose' | 'orange' | 'emerald' | 'dark-emerald';
 
 interface ThemeContextType {
     colorScheme: ColorScheme;
@@ -15,16 +15,31 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export const colorSchemes = {
     emerald: {
         name: 'Emerald Dream',
-        background: '#ecfdf5',
-        foreground: '#064e3b',
-        card: '#d1fae5',
+        background: '#ecfdf5', // emerald-50
+        foreground: '#064e3b', // emerald-900
+        card: '#d1fae5',      // emerald-100
         cardForeground: '#064e3b',
-        primary: '#10b981',
+        primary: '#10b981',   // emerald-500
         primaryForeground: '#ffffff',
-        secondary: '#a7f3d0',
-        muted: '#6ee7b7',
-        accent: '#34d399',
+        secondary: '#a7f3d0', // emerald-200
+        muted: '#6ee7b7',     // emerald-300
+        mutedForeground: '#047857', // emerald-700
+        accent: '#34d399',    // emerald-400
         border: '#a7f3d0',
+    },
+    'dark-emerald': {
+        name: 'Dark Emerald',
+        background: '#022c22', // emerald-950
+        foreground: '#ecfdf5', // emerald-50
+        card: '#064e3b',       // emerald-900
+        cardForeground: '#ecfdf5',
+        primary: '#10b981',    // emerald-500
+        primaryForeground: '#ffffff',
+        secondary: '#065f46',  // emerald-800
+        muted: '#047857',      // emerald-700
+        mutedForeground: '#6ee7b7', // emerald-300 (lighter than 700 for dark mode visibility)
+        accent: '#34d399',     // emerald-400
+        border: '#065f46',
     },
     dark: {
         name: 'Dark',
@@ -36,6 +51,7 @@ export const colorSchemes = {
         primaryForeground: '#ffffff',
         secondary: '#27272a',
         muted: '#3f3f46',
+        mutedForeground: '#a1a1aa', // zinc-400
         accent: '#f472b6',
         border: '#27272a',
     },
@@ -48,7 +64,8 @@ export const colorSchemes = {
         primary: '#ec4899',
         primaryForeground: '#ffffff',
         secondary: '#f5f5f5',
-        muted: '#a1a1aa',
+        muted: '#e4e4e7', // zinc-200
+        mutedForeground: '#71717a', // zinc-500
         accent: '#f472b6',
         border: '#e5e5e5',
     },
@@ -62,6 +79,7 @@ export const colorSchemes = {
         primaryForeground: '#ffffff',
         secondary: '#bae6fd',
         muted: '#7dd3fc',
+        mutedForeground: '#0369a1', // sky-700
         accent: '#06b6d4',
         border: '#bae6fd',
     },
@@ -75,6 +93,7 @@ export const colorSchemes = {
         primaryForeground: '#ffffff',
         secondary: '#e9d5ff',
         muted: '#d8b4fe',
+        mutedForeground: '#7e22ce', // purple-700
         accent: '#c084fc',
         border: '#e9d5ff',
     },
@@ -88,6 +107,7 @@ export const colorSchemes = {
         primaryForeground: '#ffffff',
         secondary: '#bbf7d0',
         muted: '#86efac',
+        mutedForeground: '#15803d', // green-700
         accent: '#4ade80',
         border: '#bbf7d0',
     },
@@ -101,6 +121,7 @@ export const colorSchemes = {
         primaryForeground: '#ffffff',
         secondary: '#fed7aa',
         muted: '#fdba74',
+        mutedForeground: '#c2410c', // orange-700
         accent: '#fb923c',
         border: '#fed7aa',
     },
@@ -114,6 +135,7 @@ export const colorSchemes = {
         primaryForeground: '#ffffff',
         secondary: '#fecdd3',
         muted: '#fda4af',
+        mutedForeground: '#be123c', // rose-700
         accent: '#fb7185',
         border: '#fecdd3',
     },
@@ -181,11 +203,19 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         root.style.setProperty('--primary-foreground', scheme.primaryForeground);
         root.style.setProperty('--secondary', scheme.secondary);
         root.style.setProperty('--muted', scheme.muted);
+        root.style.setProperty('--muted-foreground', scheme.mutedForeground);
         root.style.setProperty('--accent', scheme.accent);
         root.style.setProperty('--border', scheme.border);
 
         // Always save to localStorage for offline support
         localStorage.setItem('colorScheme', colorScheme);
+
+        // Toggle dark class for Tailwind
+        if (colorScheme === 'dark' || colorScheme === 'dark-emerald') {
+            root.classList.add('dark');
+        } else {
+            root.classList.remove('dark');
+        }
     }, [colorScheme, mounted]);
 
     const setColorScheme = async (scheme: ColorScheme) => {

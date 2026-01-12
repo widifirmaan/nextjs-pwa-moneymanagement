@@ -17,7 +17,7 @@
   --color-secondary-foreground: #ffffff;
 
   --color-muted: var(--muted, rgba(235, 235, 245, 0.3));
-  --color-muted-foreground: rgba(235, 235, 245, 0.6);
+  --color-muted-foreground: var(--muted-foreground, rgba(235, 235, 245, 0.6));
 
   --color-accent: var(--accent, #5E5CE6);
   --color-accent-foreground: #ffffff;
@@ -116,26 +116,19 @@
 /* Utilities equivalent to standard iOS/Liquid Glass Design */
 
 @utility glass {
-  @apply backdrop-blur-2xl border;
-  background: rgba(255, 255, 255, 0.15);
-  border-color: rgba(255, 255, 255, 0.25);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+  @apply backdrop-blur-2xl border bg-white/15 border-white/25 shadow-sm;
 }
 
 @utility glass-card {
-  @apply backdrop-blur-3xl border shadow-xl;
-  background: rgba(255, 255, 255, 0.2);
-  border-color: rgba(255, 255, 255, 0.3);
+  @apply backdrop-blur-3xl border shadow-xl bg-card/60 border-border/50;
   box-shadow:
     0 4px 6px -1px rgba(0, 0, 0, 0.05),
     0 2px 4px -1px rgba(0, 0, 0, 0.03),
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
 }
 
 @utility glass-panel {
-  @apply backdrop-blur-xl border;
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.15);
+  @apply backdrop-blur-xl border bg-card/40 border-border;
 }
 
 @utility text-gradient {

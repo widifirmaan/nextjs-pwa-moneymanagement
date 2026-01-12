@@ -33,7 +33,7 @@ export default function Home() {
   }
 
   return (
-    <div className="p-6 md:p-8 space-y-8 pt-10 min-h-screen pb-28 xl:pb-10 md:pt-8 xl:max-w-6xl xl:mx-auto xl:ml-[22rem]">
+    <div className="p-6 md:p-8 xl:p-10 space-y-8 pt-10 min-h-screen pb-28 xl:pb-10 md:pt-8 md:max-w-4xl md:mx-auto xl:max-w-6xl xl:ml-[22rem] xl:mr-8">
       {/* Header */}
       <div className="flex justify-between items-end animate-in slide-in-from-top-5 duration-500 mb-6 gap-4">
         <div className="min-w-0 flex-1">
@@ -70,12 +70,12 @@ export default function Home() {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-6 xl:gap-10">
         {/* Left Column: Balance & Wallets */}
         <div className="md:col-span-2 space-y-10">
           {/* Balance Card */}
           <div className="animate-in zoom-in-95 duration-500 delay-100">
-            <GlassCard className="relative overflow-hidden p-8 md:p-12 bg-gradient-to-br from-[#0A84FF] via-[#5E5CE6] to-[#BF5AF2] shadow-2xl shadow-indigo-500/30 ring-1 ring-white/20 group">
+            <GlassCard className="relative overflow-hidden p-8 md:p-10 xl:p-12 bg-gradient-to-br from-[#0A84FF] via-[#5E5CE6] to-[#BF5AF2] shadow-2xl shadow-indigo-500/30 ring-1 ring-white/20 group">
               <div className="absolute top-0 right-0 p-12 opacity-20 rotate-12 group-hover:rotate-6 transition-transform duration-700">
                 <div className="w-64 h-64 bg-white blur-[80px] rounded-full"></div>
               </div>

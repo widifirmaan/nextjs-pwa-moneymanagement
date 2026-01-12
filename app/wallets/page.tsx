@@ -179,7 +179,7 @@ export default function WalletsPage() {
     );
 
     return (
-        <div className="min-h-screen bg-background pb-32 pt-6 px-6 animate-in fade-in duration-500">
+        <div className="min-h-screen bg-background pb-32 xl:pb-10 pt-6 px-6 md:px-8 xl:px-10 animate-in fade-in duration-500 md:max-w-4xl md:mx-auto xl:max-w-6xl xl:ml-[22rem] xl:mr-8">
             <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-4">
                     <Link

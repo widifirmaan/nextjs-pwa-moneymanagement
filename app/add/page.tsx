@@ -77,7 +77,7 @@ export default function AddTransaction() {
     const filteredCategories = categories.filter(c => c.type === activeTab);
 
     return (
-        <div className="min-h-screen bg-background pb-32 pt-6 px-6 animate-in fade-in duration-500">
+        <div className="min-h-screen bg-background pb-32 xl:pb-10 pt-6 px-6 md:px-8 xl:px-10 animate-in fade-in duration-500 md:max-w-4xl md:mx-auto xl:max-w-6xl xl:ml-[22rem] xl:mr-8">
             {/* Header */}
             <div className="flex items-center gap-4 mb-8">
                 <Link href="/" className="p-2 rounded-full bg-secondary/50 hover:bg-secondary transition-colors">

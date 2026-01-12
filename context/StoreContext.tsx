@@ -26,7 +26,6 @@ interface StoreContextType {
     togglePrivacyMode: () => void;
     isSetupCompleted: boolean;
     completeSetup: () => Promise<void>;
-    completeSetup: () => Promise<void>;
     installPrompt: any;
     dismissNotification: (id: string) => void;
     refreshData: () => Promise<void>;

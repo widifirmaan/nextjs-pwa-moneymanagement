@@ -24,7 +24,7 @@ export async function GET() {
         const client = await clientPromise;
         const db = client.db();
 
-        const user = await db.collection('users').findOne(getUserQuery(session.user.id));
+        const user = await db.collection('users').findOne(getUserQuery(session.user.id) as any);
 
         return NextResponse.json({
             colorScheme: user?.colorScheme || 'dark',
@@ -57,7 +57,7 @@ export async function POST(request: Request) {
         const db = client.db();
 
         await db.collection('users').updateOne(
-            getUserQuery(session.user.id),
+            getUserQuery(session.user.id) as any,
             { $set: updateData },
             { upsert: false }
         );

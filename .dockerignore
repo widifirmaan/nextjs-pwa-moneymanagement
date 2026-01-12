@@ -5,3 +5,13 @@ npm-debug.log
 README.md
 .next
 .git
+.gitignore
+.env*.local
+.vscode
+.idea
+*.swp
+*.swo
+*~
+.DS_Store
+coverage
+.nyc_output

@@ -4,8 +4,8 @@ import withPWA from "@ducanh2912/next-pwa";
 const config: NextConfig = {
   output: "standalone",
 
-  // Optimizations
-  swcMinify: true,
+  // Explicitly use webpack for PWA compatibility (until PWA plugin supports Turbopack)
+  turbopack: {},
 
   // Reduce bundle size
   modularizeImports: {

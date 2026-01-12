@@ -1,44 +1,40 @@
 "use client"
+
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { useStore } from "@/context/StoreContext";
-import { ArrowLeft, Calendar, Check, Camera, Upload, X, ArrowRight } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { ArrowLeft, Check, Camera, X } from "lucide-react"; // Import Icons
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Icon } from "@/components/ui/Icon";
 
 export default function AddTransaction() {
-    const router = useRouter();
     const { categories, wallets, addTransaction, refreshData } = useStore();
-
-    const [type, setType] = useState<'income' | 'expense' | 'transfer'>('expense');
+    const router = useRouter();
+    const [activeTab, setActiveTab] = useState<'expense' | 'income' | 'transfer'>('expense');
     const [amount, setAmount] = useState('');
-    const [categoryId, setCategoryId] = useState('');
-    const [walletId, setWalletId] = useState(wallets[0]?.id || '');
-    const [targetWalletId, setTargetWalletId] = useState('');
     const [note, setNote] = useState('');
-    const [date, setDate] = useState('');
+    const [date, setDate] = useState(new Date().toISOString().slice(0, 16));
+    const [selectedCategory, setSelectedCategory] = useState('');
+    const [selectedWallet, setSelectedWallet] = useState('');
+
+    // Transfer states
+    const [targetWalletId, setTargetWalletId] = useState('');
+
     const [uploading, setUploading] = useState(false);
-    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const [receiptUrl, setReceiptUrl] = useState<string | undefined>(undefined);
 
+    // Set default wallet
     useEffect(() => {
-        setDate(new Date().toISOString().split('T')[0]);
-    }, []);
-
-    // Set default wallet if empty
-    useEffect(() => {
-        if (!walletId && wallets.length > 0) {
-            setWalletId(wallets[0].id);
+        if (wallets.length > 0 && !selectedWallet) {
+            const active = wallets.find(w => !w.isFrozen);
+            if (active) setSelectedWallet(active.id);
         }
-    }, [wallets, walletId]);
-
-    // Set default target wallet for transfer (different from source)
-    useEffect(() => {
-        if (type === 'transfer' && wallets.length > 1 && !targetWalletId) {
-            const other = wallets.find(w => w.id !== walletId);
-            if (other) setTargetWalletId(other.id);
+        if (wallets.length > 1 && !targetWalletId) {
+            const activeTarget = wallets.find(w => !w.isFrozen && w.id !== selectedWallet);
+            if (activeTarget) setTargetWalletId(activeTarget.id);
         }
-    }, [type, wallets, walletId, targetWalletId]);
+    }, [wallets, selectedWallet, targetWalletId]);
 
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -55,7 +51,7 @@ export default function AddTransaction() {
             });
             const data = await res.json();
             if (data.url) {
-                setPreviewUrl(data.url);
+                setReceiptUrl(data.url);
             }
         } catch (error) {
             console.error(error);
@@ -64,257 +60,249 @@ export default function AddTransaction() {
         }
     };
 
-    const filteredCategories = categories.filter(c => c.type === type);
-
-    // Set default category
-    useEffect(() => {
-        if (type !== 'transfer' && !categoryId && filteredCategories.length > 0) {
-            setCategoryId(filteredCategories[0].id);
-        }
-    }, [type, filteredCategories, categoryId]);
-
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (type === 'transfer') {
-            if (!amount || !walletId || !targetWalletId) return;
-            if (walletId === targetWalletId) {
-                alert("Source and Target wallets must be different");
-                return;
-            }
+        // Validation moved to form logic, but good double check
+        if (!amount || !selectedWallet) return;
 
-            try {
+        try {
+            if (activeTab === 'transfer') {
+                if (!targetWalletId) return;
                 const res = await fetch('/api/transfer', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        amount: parseFloat(amount),
-                        sourceWalletId: walletId,
+                        sourceWalletId: selectedWallet,
                         targetWalletId: targetWalletId,
+                        amount: Number(amount),
                         date: new Date(date).toISOString(),
                         note
                     })
                 });
 
                 if (res.ok) {
-                    await refreshData();
+                    await refreshData(); // Important: Refresh data to sync balances
                     router.push('/');
                 }
-            } catch (error) {
-                console.error("Transfer failed", error);
-            }
-        } else {
-            if (!amount || !categoryId || !walletId) return;
+            } else {
+                if (!selectedCategory) return;
 
-            addTransaction({
-                amount: parseFloat(amount),
-                type,
-                categoryId,
-                walletId,
-                date: new Date(date).toISOString(),
-                note,
-                receiptUrl: previewUrl || undefined,
-            });
-            router.push('/');
+                await addTransaction({
+                    type: activeTab,
+                    amount: Number(amount),
+                    categoryId: selectedCategory,
+                    walletId: selectedWallet,
+                    date: new Date(date).toISOString(),
+                    note,
+                    receiptUrl
+                });
+                router.push('/');
+            }
+        } catch (error) {
+            console.error("Failed to add transaction", error);
         }
     };
 
+    // Filter categories based on active tab
+    const filteredCategories = categories.filter(c => c.type === activeTab);
+
     return (
-        <div className="min-h-screen bg-background pb-32 animate-in fade-in duration-300">
+        <div className="min-h-screen bg-background pb-32 pt-6 px-6 animate-in fade-in duration-500">
             {/* Header */}
-            <div className="flex items-center p-6 gap-4">
+            <div className="flex items-center gap-4 mb-8">
                 <Link href="/" className="p-2 rounded-full bg-secondary/50 hover:bg-secondary transition-colors">
                     <ArrowLeft className="w-5 h-5" />
                 </Link>
-                <span className="text-lg font-bold">Add Transaction</span>
+                <h1 className="text-2xl font-bold">Add Transaction</h1>
             </div>
 
-            <div className="px-6 space-y-6">
-                {/* Type Switcher */}
-                <div className="grid grid-cols-3 bg-secondary/30 p-1 rounded-2xl">
+            {/* Type Selector */}
+            <div className="flex p-1 bg-secondary/30 rounded-2xl mb-8">
+                {(['expense', 'income', 'transfer'] as const).map((type) => (
                     <button
-                        className={cn("py-3 rounded-xl text-sm font-semibold transition-all", type === 'expense' ? 'bg-background shadow-lg text-rose-500' : 'text-muted-foreground')}
-                        onClick={() => setType('expense')}
+                        key={type}
+                        onClick={() => setActiveTab(type)}
+                        className={cn(
+                            "flex-1 py-3 rounded-xl text-sm font-semibold capitalize transition-all",
+                            activeTab === type
+                                ? type === 'expense' ? "bg-rose-500 text-white shadow-lg shadow-rose-500/20"
+                                    : type === 'income' ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20"
+                                        : "bg-blue-500 text-white shadow-lg shadow-blue-500/20"
+                                : "text-muted-foreground hover:text-foreground"
+                        )}
                     >
-                        Expense
+                        {type}
                     </button>
-                    <button
-                        className={cn("py-3 rounded-xl text-sm font-semibold transition-all", type === 'income' ? 'bg-background shadow-lg text-emerald-500' : 'text-muted-foreground')}
-                        onClick={() => setType('income')}
-                    >
-                        Income
-                    </button>
-                    <button
-                        className={cn("py-3 rounded-xl text-sm font-semibold transition-all", type === 'transfer' ? 'bg-background shadow-lg text-blue-500' : 'text-muted-foreground')}
-                        onClick={() => setType('transfer')}
-                    >
-                        Transfer
-                    </button>
-                </div>
+                ))}
+            </div>
 
+            <form onSubmit={handleSubmit} className="space-y-8">
                 {/* Amount Input */}
-                <div className="space-y-2">
-                    <label className="text-xs text-muted-foreground ml-1">Amount</label>
-                    <div className="relative">
-                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-2xl font-bold text-muted-foreground">Rp</span>
+                <div>
+                    <label className="block text-sm font-semibold mb-3 text-muted-foreground">Amount</label>
+                    <div className="relative group">
+                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-2xl font-bold text-muted-foreground group-focus-within:text-primary transition-colors">Rp</span>
                         <input
                             type="number"
                             value={amount}
                             onChange={(e) => setAmount(e.target.value)}
-                            className="w-full bg-transparent text-4xl font-bold pl-14 py-4 focus:outline-none placeholder:text-muted-foreground/30"
+                            className="w-full bg-secondary/50 border border-white/5 rounded-2xl text-4xl font-bold pl-14 py-6 focus:outline-none focus:ring-2 focus:ring-primary/50 placeholder:text-muted-foreground/20 transition-all"
                             placeholder="0"
                             autoFocus
+                            required
                         />
                     </div>
                 </div>
 
-                {/* Conditional UI based on Type */}
-                {type === 'transfer' ? (
-                    /* Transfer UI: Source -> Target */
-                    <div className="bg-secondary/20 p-4 rounded-2xl space-y-4 border border-border">
+                {/* Transfer Fields */}
+                {activeTab === 'transfer' ? (
+                    <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <label className="text-xs text-muted-foreground ml-1">From Wallet</label>
+                            <label className="block text-sm font-semibold text-muted-foreground">From</label>
                             <select
-                                value={walletId}
-                                onChange={(e) => setWalletId(e.target.value)}
-                                className="w-full p-4 rounded-xl bg-secondary/50 border border-border appearance-none text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/50 text-foreground"
+                                value={selectedWallet}
+                                onChange={(e) => setSelectedWallet(e.target.value)}
+                                className="w-full p-4 rounded-xl bg-secondary/50 border border-white/10 focus:border-primary focus:outline-none appearance-none font-medium"
                             >
-                                {wallets.map(w => (
-                                    <option key={w.id} value={w.id} className="text-black">{w.name} ({new Intl.NumberFormat('id-ID', { compactDisplay: "short", notation: "compact" }).format(w.balance)})</option>
+                                {wallets.map(wallet => (
+                                    <option key={wallet.id} value={wallet.id} className="text-black" disabled={wallet.isFrozen}>
+                                        {wallet.name} {wallet.isFrozen ? '(Frozen)' : `(${new Intl.NumberFormat('id-ID', { compactDisplay: "short", notation: "compact" }).format(wallet.balance)})`}
+                                    </option>
                                 ))}
                             </select>
                         </div>
-
-                        <div className="flex justify-center -my-2 relative z-10">
-                            <div className="bg-background p-2 rounded-full border border-border shadow-sm">
-                                <ArrowRight className="w-4 h-4 text-muted-foreground rotate-90" />
-                            </div>
-                        </div>
-
                         <div className="space-y-2">
-                            <label className="text-xs text-muted-foreground ml-1">To Wallet</label>
+                            <label className="block text-sm font-semibold text-muted-foreground">To</label>
                             <select
                                 value={targetWalletId}
                                 onChange={(e) => setTargetWalletId(e.target.value)}
-                                className="w-full p-4 rounded-xl bg-secondary/50 border border-border appearance-none text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/50 text-foreground"
+                                className="w-full p-4 rounded-xl bg-secondary/50 border border-white/10 focus:border-primary focus:outline-none appearance-none font-medium"
                             >
-                                <option value="" disabled>Select Target Wallet</option>
-                                {wallets.filter(w => w.id !== walletId).map(w => (
-                                    <option key={w.id} value={w.id} className="text-black">{w.name} ({new Intl.NumberFormat('id-ID', { compactDisplay: "short", notation: "compact" }).format(w.balance)})</option>
+                                {wallets.map(wallet => (
+                                    <option key={wallet.id} value={wallet.id} className="text-black" disabled={wallet.isFrozen || wallet.id === selectedWallet}>
+                                        {wallet.name} {wallet.isFrozen ? '(Frozen)' : `(${new Intl.NumberFormat('id-ID', { compactDisplay: "short", notation: "compact" }).format(wallet.balance)})`}
+                                    </option>
                                 ))}
                             </select>
                         </div>
                     </div>
                 ) : (
-                    /* Standard UI: Category & Wallet */
-                    <>
-                        {/* Category Grid */}
-                        <div className="space-y-3">
-                            <label className="text-xs text-muted-foreground ml-1">Category</label>
-                            <div className="grid grid-cols-4 gap-3">
-                                {filteredCategories.map(cat => (
-                                    <button
-                                        key={cat.id}
-                                        onClick={() => setCategoryId(cat.id)}
-                                        className={cn(
-                                            "flex flex-col items-center gap-2 p-3 rounded-2xl border transition-all",
-                                            categoryId === cat.id ? "bg-secondary border-primary/50 ring-2 ring-primary/20" : "bg-secondary/20 border-transparent hover:bg-secondary/40"
-                                        )}
-                                    >
-                                        <div className={cn("w-10 h-10 rounded-full flex items-center justify-center text-white", cat.color)}>
-                                            <Icon name={cat.icon} className="w-5 h-5" />
-                                        </div>
-                                        <span className="text-[10px] font-medium truncate w-full text-center text-muted-foreground">{cat.name}</span>
-                                    </button>
-                                ))}
-                            </div>
+                    /* Category Grid */
+                    <div>
+                        <label className="block text-sm font-semibold mb-3 text-muted-foreground">Category</label>
+                        <div className="grid grid-cols-4 gap-3">
+                            {filteredCategories.map(cat => (
+                                <button
+                                    key={cat.id}
+                                    type="button"
+                                    onClick={() => setSelectedCategory(cat.id)}
+                                    className={cn(
+                                        "flex flex-col items-center gap-2 p-3 rounded-2xl border transition-all active:scale-95",
+                                        selectedCategory === cat.id
+                                            ? "bg-secondary border-primary/50 ring-2 ring-primary/20"
+                                            : "bg-secondary/20 border-transparent hover:bg-secondary/40"
+                                    )}
+                                >
+                                    <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-lg transition-transform text-2xl", cat.color, selectedCategory === cat.id && "scale-110")}>
+                                        <Icon name={cat.icon} className="w-6 h-6" />
+                                    </div>
+                                    <span className="text-[10px] font-medium truncate w-full text-center text-muted-foreground">{cat.name}</span>
+                                </button>
+                            ))}
                         </div>
+                    </div>
+                )}
 
-                        {/* Wallet Selection */}
-                        <div className="space-y-2">
-                            <label className="text-xs text-muted-foreground ml-1">Wallet</label>
+                {/* Additional Details */}
+                <div className="space-y-4 pt-4 border-t border-white/5">
+                    {/* Only show single wallet select if NOT transfer */}
+                    {activeTab !== 'transfer' && (
+                        <div>
+                            <label className="block text-sm font-semibold mb-2 text-muted-foreground">Wallet</label>
                             <select
-                                value={walletId}
-                                onChange={(e) => setWalletId(e.target.value)}
-                                className="w-full p-4 rounded-xl bg-secondary/30 border border-border appearance-none text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/50 text-foreground"
+                                value={selectedWallet}
+                                onChange={(e) => setSelectedWallet(e.target.value)}
+                                className="w-full p-4 rounded-xl bg-secondary/50 border border-white/10 focus:border-primary focus:outline-none appearance-none font-medium"
                             >
-                                {wallets.map(w => (
-                                    <option key={w.id} value={w.id} className="text-black">{w.name} ({new Intl.NumberFormat('id-ID', { compactDisplay: "short", notation: "compact" }).format(w.balance)})</option>
+                                {wallets.map(wallet => (
+                                    <option key={wallet.id} value={wallet.id} className="text-black" disabled={wallet.isFrozen}>
+                                        {wallet.name} {wallet.isFrozen ? '(Frozen)' : `(${new Intl.NumberFormat('id-ID', { compactDisplay: "short", notation: "compact" }).format(wallet.balance)})`}
+                                    </option>
                                 ))}
                             </select>
                         </div>
-                    </>
-                )}
+                    )}
 
-                {/* Common Fields: Date & Note */}
-                <div className="space-y-2">
-                    <label className="text-xs text-muted-foreground ml-1">Date</label>
-                    <div className="relative">
-                        <input
-                            type="date"
-                            value={date}
-                            onChange={(e) => setDate(e.target.value)}
-                            className="w-full p-4 rounded-xl bg-secondary/30 border border-border text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/50 text-foreground"
-                        />
-                        <Calendar className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
-                    </div>
-                </div>
-
-                {/* Note */}
-                <div className="space-y-2">
-                    <label className="text-xs text-muted-foreground ml-1">Note (Optional)</label>
-                    <textarea
-                        value={note}
-                        onChange={(e) => setNote(e.target.value)}
-                        placeholder={type === 'transfer' ? "Transfer details..." : "Description for this transaction..."}
-                        className="w-full p-4 rounded-xl bg-secondary/30 border border-border text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/50 h-24 text-foreground"
-                    />
-                </div>
-
-                {/* Receipt Upload (Hide for Transfer? Or keep it? Usually transfer confirms have screenshots. Keep it.) */}
-                <div className="space-y-2">
-                    <label className="text-xs text-muted-foreground ml-1">Receipt / Proof</label>
-                    <div className="flex gap-4 overflow-x-auto pb-2">
-                        <label className={cn(
-                            "flex flex-col items-center justify-center w-24 h-24 rounded-2xl border-2 border-dashed border-muted-foreground/30 bg-secondary/10 cursor-pointer hover:bg-secondary/20 transition-all",
-                            uploading ? "opacity-50 cursor-not-allowed" : ""
-                        )}>
-                            <div className="w-8 h-8 rounded-full bg-secondary/50 flex items-center justify-center mb-1 text-muted-foreground">
-                                <Camera className="w-4 h-4" />
-                            </div>
-                            <span className="text-[10px] font-medium text-muted-foreground">Add Photo</span>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm font-semibold mb-2 text-muted-foreground">Date</label>
                             <input
-                                type="file"
-                                accept="image/*"
-                                className="hidden"
-                                onChange={handleFileChange}
-                                disabled={uploading}
+                                type="datetime-local"
+                                value={date}
+                                onChange={(e) => setDate(e.target.value)}
+                                className="w-full p-4 rounded-xl bg-secondary/50 border border-white/10 focus:border-primary focus:outline-none font-medium min-h-[58px]"
                             />
-                        </label>
-
-                        {previewUrl && (
-                            <div className="relative w-24 h-24 rounded-2xl overflow-hidden border border-border group">
-                                <img src={previewUrl} alt="Receipt" className="w-full h-full object-cover" />
-                                <button
-                                    onClick={() => setPreviewUrl(null)}
-                                    className="absolute top-1 right-1 p-1 bg-black/50 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity"
-                                >
-                                    <X className="w-3 h-3" />
-                                </button>
+                        </div>
+                        {/* Receipt Upload */}
+                        <div>
+                            <label className="block text-sm font-semibold mb-2 text-muted-foreground">Receipt</label>
+                            <div className="relative">
+                                <label className={cn(
+                                    "flex items-center justify-center w-full h-[58px] rounded-xl border border-dashed border-white/10 bg-secondary/20 cursor-pointer hover:bg-secondary/30 transition-all",
+                                    uploading && "opacity-50"
+                                )}>
+                                    {receiptUrl ? (
+                                        <div className="flex items-center gap-2 text-emerald-500 font-medium text-sm">
+                                            <Check className="w-4 h-4" />
+                                            Uploaded
+                                        </div>
+                                    ) : (
+                                        <div className="flex items-center gap-2 text-muted-foreground text-sm">
+                                            <Camera className="w-4 h-4" />
+                                            <span>{uploading ? "..." : "Add Photo"}</span>
+                                        </div>
+                                    )}
+                                    <input type="file" accept="image/*" className="hidden" onChange={handleFileChange} disabled={uploading} />
+                                </label>
+                                {receiptUrl && (
+                                    <button
+                                        type="button"
+                                        onClick={(e) => { e.preventDefault(); setReceiptUrl(undefined); }}
+                                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-lg hover:scale-110 transition-transform"
+                                    >
+                                        <X className="w-3 h-3" />
+                                    </button>
+                                )}
                             </div>
-                        )}
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-semibold mb-2 text-muted-foreground">Note (Optional)</label>
+                        <textarea
+                            value={note}
+                            onChange={(e) => setNote(e.target.value)}
+                            className="w-full p-4 rounded-xl bg-secondary/50 border border-white/10 focus:border-primary focus:outline-none resize-none min-h-[100px]"
+                            placeholder="Add a note..."
+                        />
                     </div>
                 </div>
 
+                {/* Submit Button */}
                 <button
-                    onClick={handleSubmit}
-                    className="w-full py-4 rounded-xl bg-primary text-primary-foreground font-bold text-lg shadow-lg shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                    type="submit"
+                    className={cn(
+                        "w-full py-4 rounded-2xl font-bold text-lg shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2",
+                        activeTab === 'expense' ? "bg-rose-500 shadow-rose-500/25 hover:bg-rose-600" :
+                            activeTab === 'income' ? "bg-emerald-500 shadow-emerald-500/25 hover:bg-emerald-600" :
+                                "bg-blue-500 shadow-blue-500/25 hover:bg-blue-600"
+                    )}
                 >
-                    <Check className="w-5 h-5" />
-                    {type === 'transfer' ? 'Transfer Funds' : 'Save Transaction'}
+                    <Check className="w-6 h-6" />
+                    Save Transaction
                 </button>
-            </div>
+            </form>
         </div>
     );
 }

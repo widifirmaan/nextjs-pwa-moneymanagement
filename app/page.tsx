@@ -9,18 +9,15 @@ import { cn } from "@/lib/utils";
 import { Icon } from "@/components/ui/Icon";
 import { NotificationsBell } from "@/components/ui/NotificationsBell";
 import { SetupWizard } from "@/components/SetupWizard";
-import { useState } from "react";
 
 export default function Home() {
-  const { totalBalance, wallets, transactions, categories, notifications, isPrivacyMode, togglePrivacyMode } = useStore();
-  const [dismissedAlerts, setDismissedAlerts] = useState<string[]>([]);
+  const { totalBalance, wallets, transactions, categories, notifications, isPrivacyMode, togglePrivacyMode, dismissNotification } = useStore();
 
   const recentTransactions = transactions.slice(0, 10);
 
   const activeLimitAlerts = notifications.filter(n =>
     !n.read &&
-    (n.type?.startsWith('limit-')) &&
-    !dismissedAlerts.includes(n.id)
+    (n.type?.startsWith('limit-'))
   );
 
   const formatCurrency = (amount: number) => {
@@ -58,7 +55,7 @@ export default function Home() {
                 <p className="text-xs text-rose-200/80 mt-1">{alert.message}</p>
               </div>
               <button
-                onClick={() => setDismissedAlerts(prev => [...prev, alert.id])}
+                onClick={() => dismissNotification(alert.id)}
                 className="text-rose-400 hover:text-rose-200 transition-colors"
               >
                 <X className="w-5 h-5" />
@@ -71,7 +68,6 @@ export default function Home() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10">
         {/* Left Column: Balance & Wallets */}
         <div className="md:col-span-2 space-y-10">
-          {/* Balance Card */}
           {/* Balance Card */}
           <div className="animate-in zoom-in-95 duration-500 delay-100">
             <GlassCard className="relative overflow-hidden p-8 md:p-12 bg-gradient-to-br from-[#0A84FF] via-[#5E5CE6] to-[#BF5AF2] shadow-2xl shadow-indigo-500/30 ring-1 ring-white/20 group">

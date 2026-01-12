@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Transaction, Category, Wallet } from "@/lib/types";
-import { Trash2, Save, Camera, X } from "lucide-react";
+import { Trash2, Save, Camera, X, Snowflake } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Icon } from "./Icon";
 import { format } from "date-fns";
@@ -75,7 +75,11 @@ export function EditTransactionModal({
 
     if (!transaction) return null;
 
+    const currentWallet = wallets.find(w => w.id === transaction.walletId);
+    const isFrozen = currentWallet?.isFrozen;
+
     const handleSave = async () => {
+        if (isFrozen) return;
         setIsSaving(true);
         try {
             await onSave(transaction.id, formData);
@@ -88,6 +92,7 @@ export function EditTransactionModal({
     };
 
     const handleDelete = async () => {
+        if (isFrozen) return;
         if (!confirm("Are you sure you want to delete this transaction?")) return;
 
         setIsDeleting(true);
@@ -105,8 +110,8 @@ export function EditTransactionModal({
         <>
             <button
                 onClick={handleDelete}
-                disabled={isDeleting || isSaving}
-                className="flex-1 p-4 rounded-xl bg-rose-500/10 text-rose-500 font-semibold border border-rose-500/20 hover:bg-rose-500/20 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                disabled={isDeleting || isSaving || isFrozen}
+                className="flex-1 p-4 rounded-xl bg-rose-500/10 text-rose-500 font-semibold border border-rose-500/20 hover:bg-rose-500/20 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
                 {isDeleting ? (
                     <>
@@ -125,8 +130,8 @@ export function EditTransactionModal({
             </button>
             <button
                 onClick={handleSave}
-                disabled={isDeleting || isSaving}
-                className="flex-1 p-4 rounded-xl bg-gradient-to-tr from-violet-600 to-fuchsia-600 text-white font-semibold shadow-lg shadow-violet-500/30 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                disabled={isDeleting || isSaving || isFrozen}
+                className="flex-1 p-4 rounded-xl bg-gradient-to-tr from-violet-600 to-fuchsia-600 text-white font-semibold shadow-lg shadow-violet-500/30 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
                 {isSaving ? (
                     <>
@@ -154,14 +159,24 @@ export function EditTransactionModal({
             footer={footerButtons}
         >
             <div className="space-y-6">
+                {isFrozen && (
+                    <div className="bg-cyan-500/10 border border-cyan-500/20 rounded-xl p-3 flex gap-3 items-center">
+                        <Snowflake className="w-5 h-5 text-cyan-500 shrink-0" />
+                        <p className="text-xs text-cyan-500">
+                            This transaction belongs to a <b>Frozen Wallet</b> ({currentWallet?.name}). Unfreeze the wallet to edit or delete this transaction.
+                        </p>
+                    </div>
+                )}
+
                 {/* Type Selector */}
                 <div>
                     <label className="block text-sm font-semibold mb-3 text-muted-foreground">Type</label>
                     <div className="grid grid-cols-2 gap-3">
                         <button
                             onClick={() => setFormData({ ...formData, type: 'income' })}
+                            disabled={isFrozen}
                             className={cn(
-                                "p-4 rounded-xl border-2 transition-all font-semibold",
+                                "p-4 rounded-xl border-2 transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed",
                                 formData.type === 'income'
                                     ? "border-emerald-500 bg-emerald-500/10 text-emerald-500"
                                     : "border-white/10 hover:border-emerald-500/50"
@@ -171,8 +186,9 @@ export function EditTransactionModal({
                         </button>
                         <button
                             onClick={() => setFormData({ ...formData, type: 'expense' })}
+                            disabled={isFrozen}
                             className={cn(
-                                "p-4 rounded-xl border-2 transition-all font-semibold",
+                                "p-4 rounded-xl border-2 transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed",
                                 formData.type === 'expense'
                                     ? "border-rose-500 bg-rose-500/10 text-rose-500"
                                     : "border-white/10 hover:border-rose-500/50"
@@ -192,7 +208,8 @@ export function EditTransactionModal({
                             type="number"
                             value={formData.amount || ''}
                             onChange={(e) => setFormData({ ...formData, amount: Number(e.target.value) })}
-                            className="w-full bg-secondary/50 border border-white/10 rounded-xl text-3xl font-bold pl-14 py-4 focus:outline-none focus:ring-2 focus:ring-primary/50 text-white placeholder:text-muted-foreground/30"
+                            disabled={isFrozen}
+                            className="w-full bg-secondary/50 border border-white/10 rounded-xl text-3xl font-bold pl-14 py-4 focus:outline-none focus:ring-2 focus:ring-primary/50 text-white placeholder:text-muted-foreground/30 disabled:opacity-50 disabled:cursor-not-allowed"
                             placeholder="0"
                         />
                     </div>
@@ -208,8 +225,9 @@ export function EditTransactionModal({
                                 <button
                                     key={cat.id}
                                     onClick={() => setFormData({ ...formData, categoryId: cat.id })}
+                                    disabled={isFrozen}
                                     className={cn(
-                                        "flex flex-col items-center gap-2 p-3 rounded-2xl border transition-all",
+                                        "flex flex-col items-center gap-2 p-3 rounded-2xl border transition-all disabled:opacity-50 disabled:cursor-not-allowed",
                                         formData.categoryId === cat.id
                                             ? "bg-secondary border-primary/50 ring-2 ring-primary/20"
                                             : "bg-secondary/20 border-transparent hover:bg-secondary/40"
@@ -230,11 +248,12 @@ export function EditTransactionModal({
                     <select
                         value={formData.walletId || ''}
                         onChange={(e) => setFormData({ ...formData, walletId: e.target.value })}
-                        className="w-full p-4 rounded-xl bg-secondary/50 border border-white/10 focus:border-primary focus:outline-none appearance-none font-medium text-white"
+                        disabled={isFrozen}
+                        className="w-full p-4 rounded-xl bg-secondary/50 border border-white/10 focus:border-primary focus:outline-none appearance-none font-medium text-white disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {wallets.map(wallet => (
-                            <option key={wallet.id} value={wallet.id} className="text-black">
-                                {wallet.name} ({new Intl.NumberFormat('id-ID', { compactDisplay: "short", notation: "compact" }).format(wallet.balance)})
+                            <option key={wallet.id} value={wallet.id} className="text-black" disabled={wallet.isFrozen && wallet.id !== formData.walletId}>
+                                {wallet.name} {wallet.isFrozen ? '(Frozen)' : `(${new Intl.NumberFormat('id-ID', { compactDisplay: "short", notation: "compact" }).format(wallet.balance)})`}
                             </option>
                         ))}
                     </select>
@@ -247,7 +266,8 @@ export function EditTransactionModal({
                         type="datetime-local"
                         value={formData.date ? format(new Date(formData.date), "yyyy-MM-dd'T'HH:mm") : ''}
                         onChange={(e) => setFormData({ ...formData, date: new Date(e.target.value).toISOString() })}
-                        className="w-full p-4 rounded-xl bg-secondary/50 border border-white/10 focus:border-primary focus:outline-none font-medium text-white"
+                        disabled={isFrozen}
+                        className="w-full p-4 rounded-xl bg-secondary/50 border border-white/10 focus:border-primary focus:outline-none font-medium text-white disabled:opacity-50 disabled:cursor-not-allowed"
                     />
                 </div>
 
@@ -257,7 +277,8 @@ export function EditTransactionModal({
                     <textarea
                         value={formData.note || ''}
                         onChange={(e) => setFormData({ ...formData, note: e.target.value })}
-                        className="w-full p-4 rounded-xl bg-secondary/50 border border-white/10 focus:border-primary focus:outline-none resize-none text-white"
+                        disabled={isFrozen}
+                        className="w-full p-4 rounded-xl bg-secondary/50 border border-white/10 focus:border-primary focus:outline-none resize-none text-white disabled:opacity-50 disabled:cursor-not-allowed"
                         rows={3}
                         placeholder="Add a note..."
                     />
@@ -269,7 +290,7 @@ export function EditTransactionModal({
                     <div className="flex gap-4 overflow-x-auto pb-2">
                         <label className={cn(
                             "flex flex-col items-center justify-center w-24 h-24 rounded-2xl border-2 border-dashed border-white/10 bg-secondary/10 cursor-pointer hover:bg-secondary/20 transition-all",
-                            uploading ? "opacity-50 cursor-not-allowed" : ""
+                            (uploading || isFrozen) ? "opacity-50 cursor-not-allowed" : ""
                         )}>
                             <div className="w-8 h-8 rounded-full bg-secondary/50 flex items-center justify-center mb-1 text-muted-foreground">
                                 <Camera className="w-4 h-4" />
@@ -280,7 +301,7 @@ export function EditTransactionModal({
                                 accept="image/*"
                                 className="hidden"
                                 onChange={handleFileChange}
-                                disabled={uploading}
+                                disabled={uploading || isFrozen}
                             />
                         </label>
 
@@ -289,10 +310,15 @@ export function EditTransactionModal({
                                 <img src={previewUrl} alt="Receipt" className="w-full h-full object-cover" />
                                 <button
                                     onClick={() => {
+                                        if (isFrozen) return;
                                         setPreviewUrl(null);
                                         setFormData(prev => ({ ...prev, receiptUrl: undefined }));
                                     }}
-                                    className="absolute top-1 right-1 p-1 bg-black/50 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                                    disabled={isFrozen}
+                                    className={cn(
+                                        "absolute top-1 right-1 p-1 bg-black/50 rounded-full text-white transition-opacity",
+                                        isFrozen ? "opacity-0" : "opacity-0 group-hover:opacity-100"
+                                    )}
                                 >
                                     <X className="w-3 h-3" />
                                 </button>

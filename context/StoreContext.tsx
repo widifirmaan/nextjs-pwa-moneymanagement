@@ -28,6 +28,7 @@ interface StoreContextType {
     completeSetup: () => Promise<void>;
     completeSetup: () => Promise<void>;
     installPrompt: any;
+    dismissNotification: (id: string) => void;
     refreshData: () => Promise<void>;
 }
 
@@ -38,6 +39,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     const [wallets, setWallets] = useState<Wallet[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
     const [notifications, setNotifications] = useState<Notification[]>([]);
+    const [dismissedIds, setDismissedIds] = useState<Set<string>>(new Set());
     const [savedCards, setSavedCards] = useState<SavedCard[]>([]);
     const [isPrivacyMode, setIsPrivacyMode] = useState(false);
     const [isSetupCompleted, setIsSetupCompleted] = useState(true); // Default true to avoid flash
@@ -139,9 +141,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
                 .filter(t => isAfter(new Date(t.date), startMth))
                 .reduce((acc, t) => acc + t.amount, 0);
 
-            if (limits.daily > 0 && dailyExpense > limits.daily) {
+            const dailyId = `limit-daily-${wallet.id}`;
+            if (limits.daily > 0 && dailyExpense > limits.daily && !dismissedIds.has(dailyId)) {
                 newNotifications.push({
-                    id: `limit-daily-${wallet.id}`,
+                    id: dailyId,
                     type: 'limit-daily',
                     message: `${wallet.name}: Daily limit exceeded (${new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(limits.daily)})`,
                     date: now.toISOString(),
@@ -149,9 +152,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
                 });
             }
 
-            if (limits.weekly > 0 && weeklyExpense > limits.weekly) {
+            const weeklyId = `limit-weekly-${wallet.id}`;
+            if (limits.weekly > 0 && weeklyExpense > limits.weekly && !dismissedIds.has(weeklyId)) {
                 newNotifications.push({
-                    id: `limit-weekly-${wallet.id}`,
+                    id: weeklyId,
                     type: 'limit-weekly',
                     message: `${wallet.name}: Weekly limit exceeded (${new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(limits.weekly)})`,
                     date: now.toISOString(),
@@ -159,9 +163,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
                 });
             }
 
-            if (limits.monthly > 0 && monthlyExpense > limits.monthly) {
+            const monthlyId = `limit-monthly-${wallet.id}`;
+            if (limits.monthly > 0 && monthlyExpense > limits.monthly && !dismissedIds.has(monthlyId)) {
                 newNotifications.push({
-                    id: `limit-monthly-${wallet.id}`,
+                    id: monthlyId,
                     type: 'limit-monthly',
                     message: `${wallet.name}: Monthly limit exceeded (${new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(limits.monthly)})`,
                     date: now.toISOString(),
@@ -171,9 +176,15 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         });
 
         setNotifications(newNotifications);
-    }, [transactions, wallets, isLoaded]);
+    }, [transactions, wallets, isLoaded, dismissedIds]);
 
     const addTransaction = async (t: Omit<Transaction, 'id'>) => {
+        const wallet = wallets.find(w => w.id === t.walletId);
+        if (wallet?.isFrozen) {
+            alert(`Wallet "${wallet.name}" is frozen. You cannot add transactions to it.`);
+            return;
+        }
+
         const newTransaction = { ...t, id: crypto.randomUUID() };
         setTransactions(prev => [newTransaction, ...prev]);
         setWallets(prev => prev.map(w => {
@@ -200,6 +211,20 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     const updateTransaction = async (id: string, updates: Partial<Transaction>) => {
         const oldTransaction = transactions.find(tx => tx.id === id);
         if (!oldTransaction) return;
+
+        const oldWallet = wallets.find(w => w.id === oldTransaction.walletId);
+        if (oldWallet?.isFrozen) {
+            alert(`Wallet "${oldWallet.name}" is frozen. Transactions cannot be modified.`);
+            return;
+        }
+
+        if (updates.walletId && updates.walletId !== oldTransaction.walletId) {
+            const newWallet = wallets.find(w => w.id === updates.walletId);
+            if (newWallet?.isFrozen) {
+                alert(`Target wallet "${newWallet.name}" is frozen. Cannot move transaction to it.`);
+                return;
+            }
+        }
 
         const updatedTransaction = { ...oldTransaction, ...updates };
         setTransactions(prev => prev.map(tx => tx.id === id ? updatedTransaction : tx));
@@ -254,6 +279,12 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     const deleteTransaction = async (id: string) => {
         const t = transactions.find(tx => tx.id === id);
         if (!t) return;
+
+        const wallet = wallets.find(w => w.id === t.walletId);
+        if (wallet?.isFrozen) {
+            alert(`Wallet "${wallet.name}" is frozen. Transactions cannot be deleted.`);
+            return;
+        }
 
         setTransactions(prev => prev.filter(tx => tx.id !== id));
         setWallets(prev => prev.map(w => {
@@ -328,6 +359,17 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
     const markNotificationRead = (id: string) => {
         setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+    };
+
+    const dismissNotification = (id: string) => {
+        setDismissedIds(prev => {
+            const next = new Set(prev);
+            next.add(id);
+            return next;
+        });
+        // We don't need to manually filter notifications here because the useEffect dependency on 'dismissedIds'
+        // will trigger a re-calculation and filter clean. BUT, for instant UI feedback, we can:
+        setNotifications(prev => prev.filter(n => n.id !== id));
     };
 
     const addCard = async (cardData: Omit<SavedCard, 'id' | 'userId'>) => {
@@ -424,7 +466,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
             isSetupCompleted,
             completeSetup,
             installPrompt,
-            refreshData
+            refreshData,
+            dismissNotification
         }}>
             {children}
         </StoreContext.Provider>

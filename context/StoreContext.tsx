@@ -30,6 +30,8 @@ interface StoreContextType {
     installPrompt: any;
     dismissNotification: (id: string) => void;
     refreshData: () => Promise<void>;
+    userName: string;
+    updateUserName: (name: string) => Promise<void>;
 }
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
@@ -41,6 +43,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [dismissedIds, setDismissedIds] = useState<Set<string>>(new Set());
     const [savedCards, setSavedCards] = useState<SavedCard[]>([]);
+    const [userName, setUserName] = useState('');
     const [isPrivacyMode, setIsPrivacyMode] = useState(false);
     const [isSetupCompleted, setIsSetupCompleted] = useState(true); // Default true to avoid flash
     const [installPrompt, setInstallPrompt] = useState<any>(null);
@@ -76,6 +79,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
                         setCategories(data2.categories);
                         setWallets(data2.wallets);
                         setTransactions(data2.transactions);
+                        if (data2.user?.name) setUserName(data2.user.name);
                     } finally {
                         isSeeding.current = false;
                     }
@@ -83,6 +87,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
                     setCategories(data.categories);
                     setWallets(data.wallets);
                     setTransactions(data.transactions);
+                    if (data.user?.name) setUserName(data.user.name);
                 }
             }
 
@@ -376,6 +381,19 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         setNotifications(prev => prev.filter(n => n.id !== id));
     };
 
+    const updateUserName = async (name: string) => {
+        setUserName(name);
+        try {
+            await fetch('/api/user/profile', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name }),
+            });
+        } catch (error) {
+            console.error("Error updating name:", error);
+        }
+    };
+
     const addCard = async (cardData: Omit<SavedCard, 'id' | 'userId'>) => {
         const newCard = { ...cardData, id: crypto.randomUUID(), userId: '' } as SavedCard; // UserId handled by backend
         setSavedCards(prev => [...prev, newCard]);
@@ -467,11 +485,12 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
             togglePrivacyMode,
             isSetupCompleted,
             completeSetup,
-            isSetupCompleted,
-            completeSetup,
+
             installPrompt,
             refreshData,
-            dismissNotification
+            dismissNotification,
+            userName,
+            updateUserName
         }}>
             {children}
         </StoreContext.Provider>

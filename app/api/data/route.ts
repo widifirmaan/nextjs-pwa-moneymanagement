@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
-import { CategoryModel, WalletModel, TransactionModel } from '@/lib/models';
+import { CategoryModel, WalletModel, TransactionModel, UserModel } from '@/lib/models';
 import { auth } from '@/auth';
 
 export async function GET() {
@@ -10,22 +10,24 @@ export async function GET() {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
         const userId = session.user.id;
-        console.log(`[API/DATA] Fetching data for user: ${session.user.email} (ID: ${userId})`);
 
         await dbConnect();
 
-        const [categories, wallets, transactions] = await Promise.all([
+        const [categories, wallets, transactions, userProfile] = await Promise.all([
             CategoryModel.find({ userId }).lean(),
             WalletModel.find({ userId }).lean(),
             TransactionModel.find({ userId }).sort({ date: -1 }).lean(),
+            UserModel.findById(userId).select('name').lean(),
         ]);
 
         return NextResponse.json({
             categories,
             wallets,
             transactions,
+            user: { name: userProfile?.name || session.user.name || 'User' }
         });
     } catch (error) {
+        console.error("API Data Error:", error);
         return NextResponse.json({ error: 'Failed to fetch data' }, { status: 500 });
     }
 }

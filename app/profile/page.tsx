@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { useSession, signOut } from "next-auth/react"
 import { GlassCard } from "@/components/ui/GlassCard"
-import { LogOut, User, Mail, Shield, Palette, Check, CreditCard, Trash2 } from "lucide-react"
+import { LogOut, User, Mail, Shield, Palette, Check, CreditCard, Trash2, Pencil, X, Check as CheckIcon } from "lucide-react"
 import { useState, useEffect } from "react"
 import { useTheme } from "@/context/ThemeContext"
 import { colorSchemes } from "@/context/ThemeContext"
@@ -17,8 +17,20 @@ export default function Profile() {
     const [isResetting, setIsResetting] = useState(false)
     const { colorScheme, setColorScheme } = useTheme()
 
-    // Expense Limits State
-    const { savedCards } = useStore()
+    // Store Access
+    const { savedCards, userName, updateUserName } = useStore()
+
+    // Edit Name State
+    const [isEditingName, setIsEditingName] = useState(false);
+    const [tempName, setTempName] = useState('');
+
+    const displayName = userName || user?.name || "User";
+
+    const handleSaveName = async () => {
+        if (!tempName.trim()) return;
+        await updateUserName(tempName);
+        setIsEditingName(false);
+    };
 
     return (
         <div className="p-6 space-y-8 pt-10 min-h-screen pb-28 md:pb-10 md:pt-8 md:max-w-xl md:mx-auto animate-in slide-in-from-bottom-5 duration-500">
@@ -30,16 +42,51 @@ export default function Profile() {
                 <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-violet-600 to-fuchsia-600 p-[2px] shadow-xl shadow-fuchsia-500/20">
                     {user?.image ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img src={user.image} alt={user.name || "User"} className="w-full h-full rounded-full object-cover border-4 border-background" />
+                        <img src={user.image} alt={displayName} className="w-full h-full rounded-full object-cover border-4 border-background" />
                     ) : (
                         <div className="w-full h-full rounded-full bg-secondary flex items-center justify-center border-4 border-background">
                             <User className="w-10 h-10 text-muted-foreground" />
                         </div>
                     )}
                 </div>
-                <div className="text-center">
-                    <h2 className="text-xl font-bold">{user?.name}</h2>
-                    <p className="text-sm text-muted-foreground">{user?.email}</p>
+
+                {/* Name Edit Section */}
+                <div className="text-center w-full max-w-[250px] relative min-h-[60px] flex flex-col items-center justify-center">
+                    {isEditingName ? (
+                        <div className="flex items-center gap-2 w-full animate-in zoom-in-95 duration-200">
+                            <input
+                                value={tempName}
+                                onChange={(e) => setTempName(e.target.value)}
+                                maxLength={20}
+                                className="w-full bg-secondary border border-primary/50 rounded-xl px-3 py-2 text-center font-bold focus:outline-none focus:ring-2 focus:ring-primary/50"
+                                autoFocus
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') handleSaveName();
+                                    if (e.key === 'Escape') setIsEditingName(false);
+                                }}
+                            />
+                            <div className="flex gap-1">
+                                <button
+                                    onClick={handleSaveName}
+                                    className="p-2 rounded-lg bg-emerald-500/20 text-emerald-500 hover:bg-emerald-500/30 transition-colors"
+                                >
+                                    <CheckIcon className="w-4 h-4" />
+                                </button>
+                                <button
+                                    onClick={() => setIsEditingName(false)}
+                                    className="p-2 rounded-lg bg-rose-500/20 text-rose-500 hover:bg-rose-500/30 transition-colors"
+                                >
+                                    <X className="w-4 h-4" />
+                                </button>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="group flex items-center gap-2 justify-center hover:bg-white/5 px-4 py-2 rounded-xl transition-all cursor-pointer" onClick={() => { setTempName(displayName); setIsEditingName(true); }}>
+                            <h2 className="text-xl font-bold truncate max-w-[200px]" title={displayName}>{displayName}</h2>
+                            <Pencil className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </div>
+                    )}
+                    <p className="text-sm text-muted-foreground mt-1">{user?.email}</p>
                 </div>
             </div>
 
@@ -47,14 +94,15 @@ export default function Profile() {
                 <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider ml-1">General</h3>
 
                 <GlassCard className="p-0 overflow-hidden divide-y divide-white/5">
-                    <div className="flex items-center gap-4 p-4 hover:bg-white/5 transition-colors">
+                    <div className="flex items-center gap-4 p-4 hover:bg-white/5 transition-colors cursor-pointer" onClick={() => { setTempName(displayName); setIsEditingName(true); }}>
                         <div className="p-2 rounded-lg bg-blue-500/10 text-blue-500">
                             <User className="w-5 h-5" />
                         </div>
                         <div className="flex-1">
                             <p className="font-medium">Name</p>
-                            <p className="text-xs text-muted-foreground">{user?.name}</p>
+                            <p className="text-xs text-muted-foreground">{displayName}</p>
                         </div>
+                        <Pencil className="w-4 h-4 text-muted-foreground/50" />
                     </div>
                     <div className="flex items-center gap-4 p-4 hover:bg-white/5 transition-colors">
                         <div className="p-2 rounded-lg bg-purple-500/10 text-purple-500">
@@ -116,7 +164,7 @@ export default function Profile() {
                             >
                                 {isSelected && (
                                     <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-primary flex items-center justify-center shadow-lg">
-                                        <Check className="w-4 h-4 text-white" />
+                                        <CheckIcon className="w-4 h-4 text-white" />
                                     </div>
                                 )}
 

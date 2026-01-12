@@ -67,13 +67,14 @@ const TransactionSchema = new Schema<Transaction>({
     userId: { type: String, required: true, index: true },
 });
 
+// User Schema (Minimal for manual interaction)
+// Use strict: false to allow NextAuth fields to exist without definition
+const UserSchema = new Schema({}, { strict: false, collection: 'users' });
+
 // Prevent compilation errors if models are already defined
 export const CategoryModel = (mongoose.models.Category as Model<Category>) || mongoose.model<Category>('Category', CategorySchema);
 export const WalletModel = (mongoose.models.Wallet as Model<Wallet>) || mongoose.model<Wallet>('Wallet', WalletSchema);
 export const TransactionModel = (mongoose.models.Transaction as Model<Transaction>) || mongoose.model<Transaction>('Transaction', TransactionSchema);
 export const SavedCardModel = (mongoose.models.SavedCard as Model<SavedCard>) || mongoose.model<SavedCard>('SavedCard', SavedCardSchema);
-// Define UserPreferences model logic securely
-// Note: UserPreferences usually accessed by userId, so we need to ensure the schema matches usage.
-// In existing code 'userId' is often omitted from Types interface but present in DB.
-// Let's ensure UserPreferencesModel is exported correctly.
 export const UserPreferencesModel = (mongoose.models.UserPreferences as Model<any>) || mongoose.model('UserPreferences', UserPreferencesSchema);
+export const UserModel = (mongoose.models.User as Model<any>) || mongoose.model('User', UserSchema);

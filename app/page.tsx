@@ -11,7 +11,7 @@ import { NotificationsBell } from "@/components/ui/NotificationsBell";
 import { SetupWizard } from "@/components/SetupWizard";
 
 export default function Home() {
-  const { totalBalance, wallets, transactions, categories, notifications, isPrivacyMode, togglePrivacyMode, dismissNotification } = useStore();
+  const { totalBalance, wallets, transactions, categories, notifications, isPrivacyMode, togglePrivacyMode, dismissNotification, userName } = useStore();
 
   const recentTransactions = transactions.slice(0, 10);
 
@@ -35,10 +35,15 @@ export default function Home() {
   return (
     <div className="p-6 space-y-8 pt-10 min-h-screen pb-28 md:pb-10 md:pt-8 md:max-w-6xl md:mx-auto">
       {/* Header */}
-      <div className="flex justify-between items-end animate-in slide-in-from-top-5 duration-500 mb-6">
-        <div>
+      <div className="flex justify-between items-end animate-in slide-in-from-top-5 duration-500 mb-6 gap-4">
+        <div className="min-w-0 flex-1">
           <p className="text-white/60 text-sm font-semibold tracking-wide uppercase mb-1">Overview</p>
-          <h1 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 drop-shadow-sm">Hello, Widifirmaan</h1>
+          <h1
+            className="text-3xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 drop-shadow-sm truncate"
+            title={userName || 'User'}
+          >
+            Hello, {userName || 'User'}
+          </h1>
         </div>
         <NotificationsBell />
       </div>

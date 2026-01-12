@@ -140,10 +140,10 @@ export async function GET(request: Request) {
         }
 
         // 7. Insert All Data
-        if (wallets.length > 0) await db.collection('wallets').insertMany(wallets);
-        if (categories.length > 0) await db.collection('categories').insertMany(categories);
-        if (cardsToInsert.length > 0) await db.collection('cards').insertMany(cardsToInsert);
-        if (transactions.length > 0) await db.collection('transactions').insertMany(transactions);
+        if (wallets.length > 0) await db.collection('wallets').insertMany(wallets as any);
+        if (categories.length > 0) await db.collection('categories').insertMany(categories as any);
+        if (cardsToInsert.length > 0) await db.collection('cards').insertMany(cardsToInsert as any);
+        if (transactions.length > 0) await db.collection('transactions').insertMany(transactions as any);
 
         // 8. Update User Preferences (Expense Limits)
         await db.collection('users').updateOne(

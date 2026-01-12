@@ -26,7 +26,9 @@ interface StoreContextType {
     togglePrivacyMode: () => void;
     isSetupCompleted: boolean;
     completeSetup: () => Promise<void>;
+    completeSetup: () => Promise<void>;
     installPrompt: any;
+    refreshData: () => Promise<void>;
 }
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
@@ -43,6 +45,58 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     const [isLoaded, setIsLoaded] = useState(false);
     const isSeeding = React.useRef(false);
 
+    const refreshData = async () => {
+        // Load Privacy Mode
+        const storedPrivacy = localStorage.getItem('isPrivacyMode');
+        if (storedPrivacy) setIsPrivacyMode(storedPrivacy === 'true');
+
+        try {
+            // Fetch basic data
+            const res = await fetch('/api/data', { headers: { 'Cache-Control': 'no-cache' } });
+            const data = res.ok ? await res.json() : null;
+
+            // Fetch cards
+            const resCards = await fetch('/api/cards', { headers: { 'Cache-Control': 'no-cache' } });
+            const dataCards = resCards.ok ? await resCards.json() : [];
+
+            // Fetch Preferences (isSetupCompleted)
+            const resPref = await fetch('/api/user/preferences', { headers: { 'Cache-Control': 'no-cache' } });
+            const dataPref = resPref.ok ? await resPref.json() : null;
+
+            if (data) {
+                // Check if data is empty ONLY if we are not already seeding
+                if (data.categories.length === 0 && data.wallets.length === 0 && !isSeeding.current) {
+                    isSeeding.current = true;
+                    try {
+                        await fetch('/api/seed', { method: 'POST', headers: { 'Cache-Control': 'no-cache' } });
+                        const res2 = await fetch('/api/data', { headers: { 'Cache-Control': 'no-cache' } });
+                        const data2 = await res2.json();
+                        setCategories(data2.categories);
+                        setWallets(data2.wallets);
+                        setTransactions(data2.transactions);
+                    } finally {
+                        isSeeding.current = false;
+                    }
+                } else if (data.categories.length > 0 || data.wallets.length > 0) {
+                    setCategories(data.categories);
+                    setWallets(data.wallets);
+                    setTransactions(data.transactions);
+                }
+            }
+
+            if (dataCards) {
+                setSavedCards(dataCards);
+            }
+
+            if (dataPref) {
+                setIsSetupCompleted(!!dataPref.isSetupCompleted);
+            }
+        } catch (error) {
+            console.error("Error loading data:", error);
+        }
+        setIsLoaded(true);
+    };
+
     useEffect(() => {
         const handleInstallPrompt = (e: any) => {
             e.preventDefault();
@@ -53,61 +107,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     }, []);
 
     useEffect(() => {
-        const loadData = async () => {
-            // Load Privacy Mode
-            const storedPrivacy = localStorage.getItem('isPrivacyMode');
-            if (storedPrivacy) setIsPrivacyMode(storedPrivacy === 'true');
-
-            try {
-                // Fetch basic data
-                const res = await fetch('/api/data', { headers: { 'Cache-Control': 'no-cache' } });
-                const data = res.ok ? await res.json() : null;
-
-                // Fetch cards
-                const resCards = await fetch('/api/cards', { headers: { 'Cache-Control': 'no-cache' } });
-                const dataCards = resCards.ok ? await resCards.json() : [];
-
-                // Fetch Preferences (isSetupCompleted)
-                const resPref = await fetch('/api/user/preferences', { headers: { 'Cache-Control': 'no-cache' } });
-                const dataPref = resPref.ok ? await resPref.json() : null;
-
-                if (data) {
-                    // Check if data is empty ONLY if we are not already seeding
-                    if (data.categories.length === 0 && data.wallets.length === 0 && !isSeeding.current) {
-                        isSeeding.current = true;
-                        try {
-                            await fetch('/api/seed', { method: 'POST', headers: { 'Cache-Control': 'no-cache' } });
-                            const res2 = await fetch('/api/data', { headers: { 'Cache-Control': 'no-cache' } });
-                            const data2 = await res2.json();
-                            setCategories(data2.categories);
-                            setWallets(data2.wallets);
-                            setTransactions(data2.transactions);
-                        } finally {
-                            isSeeding.current = false;
-                        }
-                    } else if (data.categories.length > 0 || data.wallets.length > 0) {
-                        setCategories(data.categories);
-                        setWallets(data.wallets);
-                        setTransactions(data.transactions);
-                    }
-                }
-
-                if (dataCards) {
-                    setSavedCards(dataCards);
-                }
-
-                if (dataPref) {
-                    // If isSetupCompleted explicitly false or undefined in DB, it will be false here if we logic correctly.
-                    // But init state is true.
-                    // If new user, dataPref.isSetupCompleted is false (default).
-                    setIsSetupCompleted(!!dataPref.isSetupCompleted);
-                }
-            } catch (error) {
-                console.error("Error loading data:", error);
-            }
-            setIsLoaded(true);
-        };
-        loadData();
+        refreshData();
     }, []);
 
     // Calculate Alerts based on Per-Wallet Limits
@@ -421,7 +421,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
             togglePrivacyMode,
             isSetupCompleted,
             completeSetup,
-            installPrompt
+            isSetupCompleted,
+            completeSetup,
+            installPrompt,
+            refreshData
         }}>
             {children}
         </StoreContext.Provider>

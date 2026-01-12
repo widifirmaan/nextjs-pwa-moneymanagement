@@ -185,22 +185,27 @@ export function SetupWizard() {
 
                                 <div className="space-y-4">
                                     {['Daily', 'Weekly', 'Monthly'].map(period => (
-                                        <div key={period}>
+                                        <div key={period} className="space-y-2">
                                             <label className="text-xs font-medium uppercase text-muted-foreground ml-1">{period} Limit</label>
-                                            <input
-                                                type="number"
-                                                value={(limits as any)[period.toLowerCase()]}
-                                                onChange={(e) => setLimits(prev => ({ ...prev, [period.toLowerCase()]: Number(e.target.value) }))}
-                                                className="w-full p-3 bg-secondary rounded-xl font-medium focus:ring-2 focus:ring-primary focus:outline-none"
-                                                placeholder="0 (No Limit)"
-                                            />
+                                            <div className="relative">
+                                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground font-medium">Rp</span>
+                                                <input
+                                                    type="number"
+                                                    value={(limits as any)[period.toLowerCase()]}
+                                                    onChange={(e) => setLimits(prev => ({ ...prev, [period.toLowerCase()]: Number(e.target.value) }))}
+                                                    className="w-full pl-12 pr-4 py-3 bg-secondary/50 border border-border rounded-xl font-medium focus:ring-2 focus:ring-primary focus:outline-none text-foreground placeholder:text-muted-foreground/40 transition-all"
+                                                    placeholder="0 = No Limit"
+                                                    inputMode="numeric"
+                                                    min="0"
+                                                />
+                                            </div>
                                         </div>
                                     ))}
                                 </div>
 
                                 <div className="mt-auto flex gap-3">
-                                    <button onClick={handleNext} className="flex-1 py-3 text-muted-foreground hover:text-foreground">Skip</button>
-                                    <button onClick={saveLimits} className="flex-1 py-3 bg-primary text-primary-foreground rounded-xl font-bold shadow-lg shadow-primary/20">Save</button>
+                                    <button onClick={handleNext} className="flex-1 py-3 text-muted-foreground hover:text-foreground transition-colors font-medium">Skip</button>
+                                    <button onClick={saveLimits} className="flex-1 py-3 bg-primary text-primary-foreground rounded-xl font-bold shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-transform">Save Limits</button>
                                 </div>
                             </motion.div>
                         )}
@@ -221,19 +226,47 @@ export function SetupWizard() {
                                     <p className="text-sm text-muted-foreground">Optional: Add a debit/credit card.</p>
                                 </div>
 
-                                <div className="space-y-4">
-                                    <input placeholder="Card Name (e.g. Genius)" value={cardData.cardName} onChange={e => setCardData({ ...cardData, cardName: e.target.value })} className="w-full p-3 bg-secondary rounded-xl" />
-                                    <input placeholder="Card Number" value={cardData.cardNumber} onChange={e => setCardData({ ...cardData, cardNumber: e.target.value })} className="w-full p-3 bg-secondary rounded-xl" />
+                                <div className="space-y-3">
+                                    <input
+                                        placeholder="Card Name (e.g. Jenius)"
+                                        value={cardData.cardName}
+                                        onChange={e => setCardData({ ...cardData, cardName: e.target.value })}
+                                        className="w-full p-3 bg-secondary/50 border border-border rounded-xl text-foreground placeholder:text-muted-foreground/40 focus:ring-2 focus:ring-primary focus:outline-none transition-all"
+                                    />
+                                    <input
+                                        placeholder="Card Number"
+                                        value={cardData.cardNumber}
+                                        onChange={e => setCardData({ ...cardData, cardNumber: e.target.value })}
+                                        className="w-full p-3 bg-secondary/50 border border-border rounded-xl text-foreground placeholder:text-muted-foreground/40 focus:ring-2 focus:ring-primary focus:outline-none transition-all"
+                                        inputMode="numeric"
+                                    />
                                     <div className="flex gap-2">
-                                        <input placeholder="MM/YY" value={cardData.expiryDate} onChange={e => setCardData({ ...cardData, expiryDate: e.target.value })} className="w-1/2 p-3 bg-secondary rounded-xl" />
-                                        <input placeholder="CVV" value={cardData.cvv} onChange={e => setCardData({ ...cardData, cvv: e.target.value })} className="w-1/2 p-3 bg-secondary rounded-xl" />
+                                        <input
+                                            placeholder="MM/YY"
+                                            value={cardData.expiryDate}
+                                            onChange={e => setCardData({ ...cardData, expiryDate: e.target.value })}
+                                            className="w-1/2 p-3 bg-secondary/50 border border-border rounded-xl text-foreground placeholder:text-muted-foreground/40 focus:ring-2 focus:ring-primary focus:outline-none transition-all"
+                                        />
+                                        <input
+                                            placeholder="CVV"
+                                            value={cardData.cvv}
+                                            onChange={e => setCardData({ ...cardData, cvv: e.target.value })}
+                                            className="w-1/2 p-3 bg-secondary/50 border border-border rounded-xl text-foreground placeholder:text-muted-foreground/40 focus:ring-2 focus:ring-primary focus:outline-none transition-all"
+                                            inputMode="numeric"
+                                            maxLength={3}
+                                        />
                                     </div>
-                                    <input placeholder="Holder Name" value={cardData.cardHolderName} onChange={e => setCardData({ ...cardData, cardHolderName: e.target.value })} className="w-full p-3 bg-secondary rounded-xl" />
+                                    <input
+                                        placeholder="Holder Name"
+                                        value={cardData.cardHolderName}
+                                        onChange={e => setCardData({ ...cardData, cardHolderName: e.target.value })}
+                                        className="w-full p-3 bg-secondary/50 border border-border rounded-xl text-foreground placeholder:text-muted-foreground/40 focus:ring-2 focus:ring-primary focus:outline-none transition-all uppercase"
+                                    />
                                 </div>
 
                                 <div className="mt-auto flex gap-3">
-                                    <button onClick={handleNext} className="flex-1 py-3 text-muted-foreground hover:text-foreground">Skip</button>
-                                    <button onClick={saveCard} disabled={!cardData.cardNumber} className="flex-1 py-3 bg-primary text-primary-foreground rounded-xl font-bold shadow-lg shadow-primary/20 disabled:opacity-50">Add Card</button>
+                                    <button onClick={handleNext} className="flex-1 py-3 text-muted-foreground hover:text-foreground transition-colors font-medium">Skip</button>
+                                    <button onClick={saveCard} disabled={!cardData.cardNumber} className="flex-1 py-3 bg-primary text-primary-foreground rounded-xl font-bold shadow-lg shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.02] active:scale-95 transition-transform enabled:hover:shadow-primary/30">Add Card</button>
                                 </div>
                             </motion.div>
                         )}

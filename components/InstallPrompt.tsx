@@ -75,11 +75,11 @@ export function InstallPrompt() {
     return (
         <AnimatePresence>
             <motion.div
-                initial={{ y: 100, opacity: 0 }}
+                initial={{ y: -50, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                exit={{ y: 100, opacity: 0 }}
+                exit={{ y: -50, opacity: 0 }}
                 transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-                className="fixed bottom-20 md:bottom-6 left-4 right-4 md:left-auto md:right-6 md:w-96 z-[90] pointer-events-auto"
+                className="fixed top-20 right-4 bottom-auto z-[100] w-[calc(100%-2rem)] md:w-96 md:top-6 md:right-6 pointer-events-auto"
             >
                 <div className="bg-card/95 backdrop-blur-xl border border-border rounded-2xl shadow-2xl overflow-hidden">
                     {/* Close button */}
@@ -97,7 +97,7 @@ export function InstallPrompt() {
                                 <span className="text-2xl font-bold text-primary-foreground">M</span>
                             </div>
                             <div className="flex-1 min-w-0">
-                                <h3 className="font-bold text-foreground text-base mb-1">Install MoneW</h3>
+                                <h3 className="font-bold text-foreground text-base mb-1">Install MoneW App</h3>
                                 <p className="text-xs text-muted-foreground leading-relaxed">
                                     Get quick access and a better experience
                                 </p>

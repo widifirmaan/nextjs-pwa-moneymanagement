@@ -91,6 +91,15 @@ export function SetupWizard() {
                 </div>
 
                 <div className="p-8 flex-1 flex flex-col relative z-20">
+                    {step > 1 && (
+                        <button
+                            onClick={handlePrev}
+                            className="absolute top-8 left-8 p-2 rounded-full hover:bg-white/10 text-muted-foreground hover:text-white transition-colors z-30"
+                        >
+                            <ArrowRight className="w-5 h-5 rotate-180" />
+                        </button>
+                    )}
+
                     <AnimatePresence mode="wait">
                         {step === 1 && (
                             <motion.div
@@ -119,7 +128,7 @@ export function SetupWizard() {
                                 initial={{ opacity: 0, x: 20 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 exit={{ opacity: 0, x: -20 }}
-                                className="flex-1 flex flex-col space-y-6"
+                                className="flex-1 flex flex-col space-y-6 pt-8"
                             >
                                 <div className="text-center mb-4">
                                     <div className="w-16 h-16 mx-auto rounded-2xl bg-green-500/10 flex items-center justify-center text-green-500 mb-4">
@@ -156,7 +165,7 @@ export function SetupWizard() {
                                 initial={{ opacity: 0, x: 20 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 exit={{ opacity: 0, x: -20 }}
-                                className="flex-1 flex flex-col space-y-6"
+                                className="flex-1 flex flex-col space-y-6 pt-8"
                             >
                                 <div className="text-center mb-4">
                                     <div className="w-16 h-16 mx-auto rounded-2xl bg-orange-500/10 flex items-center justify-center text-orange-500 mb-4">
@@ -167,23 +176,51 @@ export function SetupWizard() {
                                 </div>
 
                                 <div className="space-y-4">
-                                    {['Daily', 'Weekly', 'Monthly'].map(period => (
-                                        <div key={period} className="space-y-2">
-                                            <label className="text-xs font-medium uppercase text-muted-foreground ml-1">{period} Limit</label>
-                                            <div className="relative">
-                                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground font-medium">Rp</span>
-                                                <input
-                                                    type="number"
-                                                    value={(limits as any)[period.toLowerCase()]}
-                                                    onChange={(e) => setLimits(prev => ({ ...prev, [period.toLowerCase()]: Number(e.target.value) }))}
-                                                    className="w-full pl-12 pr-4 py-3 bg-secondary/50 border border-border rounded-xl font-medium focus:ring-2 focus:ring-primary focus:outline-none text-foreground placeholder:text-muted-foreground/40 transition-all"
-                                                    placeholder="0 = No Limit"
-                                                    inputMode="numeric"
-                                                    min="0"
-                                                />
-                                            </div>
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-medium uppercase text-muted-foreground ml-1">Daily Limit</label>
+                                        <div className="flex items-center justify-center gap-2 border-b border-border focus-within:border-primary transition-colors py-2">
+                                            <span className="text-sm font-bold text-muted-foreground">Rp</span>
+                                            <input
+                                                type="number"
+                                                value={limits.daily || ''}
+                                                onChange={(e) => setLimits(prev => ({ ...prev, daily: Number(e.target.value) }))}
+                                                className="w-full text-xl font-medium bg-transparent focus:outline-none"
+                                                placeholder="0"
+                                                inputMode="numeric"
+                                                min="0"
+                                            />
                                         </div>
-                                    ))}
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-medium uppercase text-muted-foreground ml-1">Weekly Limit</label>
+                                        <div className="flex items-center justify-center gap-2 border-b border-border focus-within:border-primary transition-colors py-2">
+                                            <span className="text-sm font-bold text-muted-foreground">Rp</span>
+                                            <input
+                                                type="number"
+                                                value={limits.weekly || ''}
+                                                onChange={(e) => setLimits(prev => ({ ...prev, weekly: Number(e.target.value) }))}
+                                                className="w-full text-xl font-medium bg-transparent focus:outline-none"
+                                                placeholder="0"
+                                                inputMode="numeric"
+                                                min="0"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-medium uppercase text-muted-foreground ml-1">Monthly Limit</label>
+                                        <div className="flex items-center justify-center gap-2 border-b border-border focus-within:border-primary transition-colors py-2">
+                                            <span className="text-sm font-bold text-muted-foreground">Rp</span>
+                                            <input
+                                                type="number"
+                                                value={limits.monthly || ''}
+                                                onChange={(e) => setLimits(prev => ({ ...prev, monthly: Number(e.target.value) }))}
+                                                className="w-full text-xl font-medium bg-transparent focus:outline-none"
+                                                placeholder="0"
+                                                inputMode="numeric"
+                                                min="0"
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div className="mt-auto flex gap-3">
@@ -200,7 +237,7 @@ export function SetupWizard() {
                                 initial={{ opacity: 0, x: 20 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 exit={{ opacity: 0, x: -20 }}
-                                className="flex-1 flex flex-col space-y-6"
+                                className="flex-1 flex flex-col space-y-6 pt-8"
                             >
                                 <div className="text-center mb-4">
                                     <div className="w-16 h-16 mx-auto rounded-2xl bg-yellow-500/10 flex items-center justify-center text-yellow-500 mb-4">
@@ -244,7 +281,7 @@ export function SetupWizard() {
                                 initial={{ opacity: 0, x: 20 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 exit={{ opacity: 0, x: -20 }}
-                                className="flex-1 flex flex-col space-y-6"
+                                className="flex-1 flex flex-col space-y-6 pt-8"
                             >
                                 <div className="text-center mb-4">
                                     <div className="w-16 h-16 mx-auto rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-500 mb-4">

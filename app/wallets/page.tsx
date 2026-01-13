@@ -416,11 +416,11 @@ export default function WalletsPage() {
                             />
                         </div>
 
-                        <div className="space-y-3 pt-2">
-                            <p className="text-sm font-medium border-t border-white/10 pt-4 text-muted-foreground">Spending Limits (0 for no limit)</p>
-                            <div className="grid grid-cols-3 gap-3">
+                        <div className="space-y-4 pt-4 border-t border-white/10">
+                            <h3 className="text-sm font-bold text-muted-foreground">Spending Limits (0 for no limit)</h3>
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                 <div>
-                                    <label className="block text-xs text-muted-foreground mb-1">Daily</label>
+                                    <label className="block text-sm font-medium mb-2 text-muted-foreground">Daily</label>
                                     <input
                                         type="number"
                                         min="0"
@@ -429,13 +429,13 @@ export default function WalletsPage() {
                                             ...formData,
                                             expenseLimits: { ...formData.expenseLimits, daily: Number(e.target.value) }
                                         })}
-                                        className="w-full px-3 py-2 bg-secondary/50 border border-white/10 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary text-foreground disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="w-full px-4 py-3 bg-secondary/50 border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary text-foreground placeholder:text-muted-foreground/30 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
                                         placeholder="0"
                                         disabled={isDefaultCash}
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-xs text-muted-foreground mb-1">Weekly</label>
+                                    <label className="block text-sm font-medium mb-2 text-muted-foreground">Weekly</label>
                                     <input
                                         type="number"
                                         min="0"
@@ -444,13 +444,13 @@ export default function WalletsPage() {
                                             ...formData,
                                             expenseLimits: { ...formData.expenseLimits, weekly: Number(e.target.value) }
                                         })}
-                                        className="w-full px-3 py-2 bg-secondary/50 border border-white/10 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary text-foreground disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="w-full px-4 py-3 bg-secondary/50 border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary text-foreground placeholder:text-muted-foreground/30 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
                                         placeholder="0"
                                         disabled={isDefaultCash}
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-xs text-muted-foreground mb-1">Monthly</label>
+                                    <label className="block text-sm font-medium mb-2 text-muted-foreground">Monthly</label>
                                     <input
                                         type="number"
                                         min="0"
@@ -459,7 +459,7 @@ export default function WalletsPage() {
                                             ...formData,
                                             expenseLimits: { ...formData.expenseLimits, monthly: Number(e.target.value) }
                                         })}
-                                        className="w-full px-3 py-2 bg-secondary/50 border border-white/10 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary text-foreground disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="w-full px-4 py-3 bg-secondary/50 border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary text-foreground placeholder:text-muted-foreground/30 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
                                         placeholder="0"
                                         disabled={isDefaultCash}
                                     />

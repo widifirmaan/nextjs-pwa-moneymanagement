@@ -8,13 +8,15 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Icon } from "@/components/ui/Icon";
 
+import { IOSDatePicker } from "@/components/ui/IOSDatePicker";
+
 export default function AddTransaction() {
     const { categories, wallets, addTransaction } = useStore();
     const router = useRouter();
     const [activeTab, setActiveTab] = useState<'expense' | 'income'>('expense');
     const [amount, setAmount] = useState('');
     const [note, setNote] = useState('');
-    const [date, setDate] = useState(new Date().toISOString().slice(0, 16));
+    const [date, setDate] = useState<Date>(new Date());
     const [selectedCategory, setSelectedCategory] = useState('');
     const [selectedWallet, setSelectedWallet] = useState('');
 
@@ -64,7 +66,7 @@ export default function AddTransaction() {
                 amount: Number(amount),
                 categoryId: selectedCategory,
                 walletId: selectedWallet,
-                date: new Date(date).toISOString(),
+                date: date.toISOString(),
                 note,
                 receiptUrl
             });
@@ -167,12 +169,11 @@ export default function AddTransaction() {
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-semibold mb-2 text-muted-foreground">Date</label>
-                            <input
-                                type="datetime-local"
+                            <IOSDatePicker
+                                label="Date"
                                 value={date}
-                                onChange={(e) => setDate(e.target.value)}
-                                className="w-full p-4 rounded-xl bg-secondary/50 border border-white/10 focus:border-primary focus:outline-none font-medium min-h-[58px]"
+                                onChange={setDate}
+                                includeTime
                             />
                         </div>
                         {/* Receipt Upload */}

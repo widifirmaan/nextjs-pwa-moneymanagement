@@ -58,6 +58,7 @@
 
 @layer base {
   :root {
+    color-scheme: dark;
     --background: #0a0a0a;
     --foreground: #fafafa;
     --card: #1a1a1a;
@@ -146,4 +147,16 @@
 
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* Hide spin buttons for numbers - Global Override */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none !important;
+  margin: 0 !important;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield !important;
+  appearance: textfield !important;
 }

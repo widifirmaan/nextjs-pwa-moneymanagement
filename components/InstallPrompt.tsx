@@ -20,12 +20,12 @@ export function InstallPrompt() {
         const dismissedTime = dismissed ? parseInt(dismissed) : 0;
         const daysSinceDismiss = (Date.now() - dismissedTime) / (1000 * 60 * 60 * 24);
 
-        // Show again after 7 days
-        if (dismissed && daysSinceDismiss < 7) return;
+        // Show again after 7 days (Disable for testing)
+        // if (dismissed && daysSinceDismiss < 7) return;
 
         // Detect platform
         const userAgent = window.navigator.userAgent.toLowerCase();
-        const ios = /iphone|ipad|ipod/.test(userAgent);
+        const ios = /iphone|ipad|ipod/.test(userAgent) || (window.navigator.platform === 'MacIntel' && window.navigator.maxTouchPoints > 1);
         const android = /android/.test(userAgent);
 
         setIsIOS(ios);
@@ -106,38 +106,54 @@ export function InstallPrompt() {
 
                         {/* iOS Instructions */}
                         {isIOS && (
-                            <div className="space-y-3 mb-4">
-                                <div className="flex items-start gap-3 text-xs">
-                                    <div className="mt-0.5 p-1.5 rounded-lg bg-blue-500/10 text-blue-500 flex-shrink-0">
-                                        <Share className="w-4 h-4" />
+                            <>
+                                <div className="space-y-3 mb-4">
+                                    <div className="flex items-start gap-3 text-xs">
+                                        <div className="mt-0.5 p-1.5 rounded-lg bg-blue-500/10 text-blue-500 flex-shrink-0">
+                                            <Share className="w-4 h-4" />
+                                        </div>
+                                        <div className="flex-1">
+                                            <p className="text-muted-foreground">
+                                                1. Tap the <span className="font-semibold text-foreground">Share</span> button <span className="text-blue-400">(⬆)</span> at the bottom
+                                            </p>
+                                        </div>
                                     </div>
-                                    <div className="flex-1">
-                                        <p className="text-muted-foreground">
-                                            1. Tap the <span className="font-semibold text-foreground">Share</span> button <span className="text-blue-400">(⬆)</span> at the bottom
-                                        </p>
+                                    <div className="flex items-start gap-3 text-xs">
+                                        <div className="mt-0.5 p-1.5 rounded-lg bg-green-500/10 text-green-500 flex-shrink-0">
+                                            <Plus className="w-4 h-4" />
+                                        </div>
+                                        <div className="flex-1">
+                                            <p className="text-muted-foreground">
+                                                2. Scroll down and select <span className="font-semibold text-foreground">"Add to Home Screen"</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-start gap-3 text-xs">
+                                        <div className="mt-0.5 p-1.5 rounded-lg bg-emerald-500/10 text-emerald-500 flex-shrink-0">
+                                            <Plus className="w-4 h-4" />
+                                        </div>
+                                        <div className="flex-1">
+                                            <p className="text-muted-foreground">
+                                                3. Tap <span className="font-semibold text-foreground">"Add"</span> to confirm
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
-                                <div className="flex items-start gap-3 text-xs">
-                                    <div className="mt-0.5 p-1.5 rounded-lg bg-green-500/10 text-green-500 flex-shrink-0">
-                                        <Plus className="w-4 h-4" />
-                                    </div>
-                                    <div className="flex-1">
-                                        <p className="text-muted-foreground">
-                                            2. Scroll down and select <span className="font-semibold text-foreground">"Add to Home Screen"</span>
-                                        </p>
-                                    </div>
+
+                                {/* Legacy Profile Install (Fake Cydia Style) */}
+                                <div className="mt-4 pt-4 border-t border-white/5">
+                                    <p className="text-xs text-muted-foreground mb-2 text-center">Or use the legacy profile method</p>
+                                    <a
+                                        href="/api/ios-profile"
+                                        className="block w-full py-2.5 px-4 bg-secondary/30 border border-white/10 text-white rounded-xl font-semibold hover:bg-secondary/50 transition-colors text-center text-xs"
+                                    >
+                                        Download Profile (Config)
+                                    </a>
+                                    <p className="text-[10px] text-muted-foreground mt-2 text-center">
+                                        Requires going to Settings &gt; Profile Downloaded to finish.
+                                    </p>
                                 </div>
-                                <div className="flex items-start gap-3 text-xs">
-                                    <div className="mt-0.5 p-1.5 rounded-lg bg-emerald-500/10 text-emerald-500 flex-shrink-0">
-                                        <Plus className="w-4 h-4" />
-                                    </div>
-                                    <div className="flex-1">
-                                        <p className="text-muted-foreground">
-                                            3. Tap <span className="font-semibold text-foreground">"Add"</span> to confirm
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
+                            </>
                         )}
 
                         {/* Android/Chrome Button */}

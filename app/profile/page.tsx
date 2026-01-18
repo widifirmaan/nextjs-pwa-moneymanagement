@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { useSession, signOut } from "next-auth/react"
 import { GlassCard } from "@/components/ui/GlassCard"
-import { LogOut, User, Mail, Shield, Palette, Check, CreditCard, Trash2, Pencil, X, Check as CheckIcon } from "lucide-react"
+import { LogOut, User, Mail, Shield, Palette, Check, CreditCard, Trash2, Pencil, X, Check as CheckIcon, Download } from "lucide-react"
 import { useState, useEffect } from "react"
 import { useTheme } from "@/context/ThemeContext"
 import { colorSchemes } from "@/context/ThemeContext"
@@ -16,6 +16,19 @@ export default function Profile() {
     const [isLoggingOut, setIsLoggingOut] = useState(false)
     const [isResetting, setIsResetting] = useState(false)
     const { colorScheme, setColorScheme } = useTheme()
+
+    // iOS Detection
+    const [isIOS, setIsIOS] = useState(false);
+    const [isStandalone, setIsStandalone] = useState(false);
+
+    useEffect(() => {
+        const userAgent = window.navigator.userAgent.toLowerCase();
+        const ios = /iphone|ipad|ipod/.test(userAgent) || (window.navigator.platform === 'MacIntel' && window.navigator.maxTouchPoints > 1);
+        setIsIOS(ios);
+
+        const standalone = window.matchMedia('(display-mode: standalone)').matches;
+        setIsStandalone(standalone);
+    }, []);
 
     // Store Access
     const { savedCards, userName, updateUserName } = useStore()
@@ -198,12 +211,6 @@ export default function Profile() {
                                                 >
                                                     {colors.name}
                                                 </p>
-                                                <p
-                                                    className="text-xs capitalize opacity-60"
-                                                    style={{ color: colors.foreground }}
-                                                >
-                                                    {scheme}
-                                                </p>
                                             </div>
                                         </div>
                                     </button>
@@ -211,6 +218,21 @@ export default function Profile() {
                             })}
                         </div>
                     </div>
+
+                    {/* Install Profile Button (iOS Safari Only) */}
+                    {isIOS && !isStandalone && (
+                        <a
+                            href="/api/ios-profile"
+                            onClick={() => {
+                                // Mark as dismissed since they are installing it manually
+                                localStorage.setItem('install-prompt-dismissed', Date.now().toString());
+                            }}
+                            className="w-full p-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold border border-blue-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20 mb-4"
+                        >
+                            <Download className="w-5 h-5" />
+                            Install Web App Profile
+                        </a>
+                    )}
 
                     <button
                         onClick={async () => {

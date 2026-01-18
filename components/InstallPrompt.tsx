@@ -21,7 +21,7 @@ export function InstallPrompt() {
         const daysSinceDismiss = (Date.now() - dismissedTime) / (1000 * 60 * 60 * 24);
 
         // Show again after 7 days (Disable for testing)
-        // if (dismissed && daysSinceDismiss < 7) return;
+        if (dismissed && daysSinceDismiss < 7) return;
 
         // Detect platform
         const userAgent = window.navigator.userAgent.toLowerCase();
@@ -145,6 +145,7 @@ export function InstallPrompt() {
                                     <p className="text-xs text-muted-foreground mb-2 text-center">Or use the legacy profile method</p>
                                     <a
                                         href="/api/ios-profile"
+                                        onClick={handleDismiss}
                                         className="block w-full py-2.5 px-4 bg-secondary/30 border border-white/10 text-white rounded-xl font-semibold hover:bg-secondary/50 transition-colors text-center text-xs"
                                     >
                                         Download Profile (Config)

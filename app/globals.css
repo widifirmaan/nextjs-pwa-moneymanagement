@@ -59,21 +59,30 @@
 @layer base {
   :root {
     color-scheme: dark;
-    --background: #0a0a0a;
-    --foreground: #fafafa;
-    --card: #1a1a1a;
-    --card-foreground: #fafafa;
-    --primary: #ec4899;
+    /* Coklat Jawa Theme */
+    --background: #1e1b18;
+    /* Dark brown-black background */
+    --foreground: #fcf8f2;
+    /* Creamy white text */
+    --card: #2c2520;
+    /* Deep brown card background */
+    --card-foreground: #fcf8f2;
+    --primary: #5D4037;
+    /* Dark Chocolate (Coklat Jawa) */
     --primary-foreground: #ffffff;
-    --secondary: #27272a;
-    --muted: #3f3f46;
-    --accent: #f472b6;
-    --border: #27272a;
+    --secondary: #3E2723;
+    /* Darker brown for secondary */
+    --muted: #4e342e;
+    /* Muted brown */
+    --accent: #8D6E63;
+    /* Lighter brown accent */
+    --border: #4e342e;
+    /* Brownish border */
 
-    /* Liquid Glass Variables */
-    --glass-border: rgba(255, 255, 255, 0.2);
-    --glass-surface: rgba(255, 255, 255, 0.1);
-    --glass-highlight: rgba(255, 255, 255, 0.15);
+    /* Liquid Glass Variables - Adjusted for Coklat Theme */
+    --glass-border: rgba(255, 248, 240, 0.15);
+    --glass-surface: rgba(93, 64, 55, 0.1);
+    --glass-highlight: rgba(255, 248, 240, 0.1);
   }
 
   * {
@@ -133,7 +142,7 @@
 }
 
 @utility text-gradient {
-  @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-400;
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-[var(--primary)] to-[var(--accent)];
 }
 
 @utility text-balance-ios {

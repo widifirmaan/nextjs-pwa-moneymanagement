@@ -98,18 +98,18 @@ export const colorSchemes = {
         border: '#e9d5ff',
     },
     green: {
-        name: 'Forest Green',
-        background: '#dcfce7',
-        foreground: '#14532d',
-        card: '#f0fdf4',
-        cardForeground: '#14532d',
-        primary: '#22c55e',
+        name: 'Coklat Jawa',
+        background: '#1e1b18', // Dark brown-black background
+        foreground: '#fcf8f2', // Creamy white text
+        card: '#2c2520', // Deep brown card background
+        cardForeground: '#fcf8f2',
+        primary: '#5D4037', // Dark Chocolate (Coklat Jawa)
         primaryForeground: '#ffffff',
-        secondary: '#bbf7d0',
-        muted: '#86efac',
-        mutedForeground: '#15803d', // green-700
-        accent: '#4ade80',
-        border: '#bbf7d0',
+        secondary: '#3E2723', // Darker brown for secondary
+        muted: '#4e342e', // Muted brown
+        mutedForeground: '#d7ccc8', // Light brown-grey for muted text
+        accent: '#8D6E63', // Lighter brown accent
+        border: '#4e342e', // Brownish border
     },
     orange: {
         name: 'Sunset Orange',
@@ -211,7 +211,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         localStorage.setItem('colorScheme', colorScheme);
 
         // Toggle dark class for Tailwind
-        if (colorScheme === 'dark' || colorScheme === 'dark-emerald') {
+        if (colorScheme === 'dark' || colorScheme === 'dark-emerald' || colorScheme === 'green') {
             root.classList.add('dark');
         } else {
             root.classList.remove('dark');

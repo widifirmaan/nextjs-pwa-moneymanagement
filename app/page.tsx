@@ -3,7 +3,10 @@
 import { useStore } from "@/context/StoreContext";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { format } from "date-fns";
-import { ArrowUpRight, ArrowDownLeft, Wallet as WalletIcon, AlertTriangle, X, Eye, EyeOff } from "lucide-react";
+import { ArrowUpRight, ArrowDownLeft, Wallet as WalletIcon, AlertTriangle, X, Eye, EyeOff, Edit, Trash2, Snowflake } from "lucide-react";
+import { useState } from "react";
+import { Modal } from "@/components/ui/Modal";
+import { Wallet } from "@/lib/types";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Icon } from "@/components/ui/Icon";
@@ -11,9 +14,53 @@ import { NotificationsBell } from "@/components/ui/NotificationsBell";
 import { SetupWizard } from "@/components/SetupWizard";
 
 export default function Home() {
-  const { totalBalance, wallets, transactions, categories, notifications, isPrivacyMode, togglePrivacyMode, dismissNotification, userName } = useStore();
+  const { totalBalance, wallets, transactions, categories, notifications, isPrivacyMode, togglePrivacyMode, dismissNotification, userName, addWallet, updateWallet, deleteWallet } = useStore();
 
-  const recentTransactions = transactions.slice(0, 10);
+  // Modal State
+  const [showModal, setShowModal] = useState(false);
+  const [editingWallet, setEditingWallet] = useState<Wallet | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [activeTab, setActiveTab] = useState<'details' | 'transactions'>('details');
+  const [formData, setFormData] = useState({
+    name: "", type: "bank" as "bank" | "ewallet" | "cash", balance: 0, color: "bg-blue-600", accountNumber: "",
+    expenseLimits: { daily: 0, weekly: 0, monthly: 0 }
+  });
+
+  const colors = ["bg-blue-600", "bg-cyan-500", "bg-green-600", "bg-orange-500", "bg-purple-600", "bg-pink-500", "bg-red-500", "bg-indigo-600"];
+
+  const handleOpenModal = (wallet?: Wallet) => {
+    if (wallet) {
+      setEditingWallet(wallet);
+      setFormData({
+        name: wallet.name, type: wallet.type, balance: wallet.balance, color: wallet.color,
+        accountNumber: wallet.accountNumber || "", expenseLimits: wallet.expenseLimits || { daily: 0, weekly: 0, monthly: 0 },
+      });
+    } else {
+      setEditingWallet(null);
+      setFormData({ name: "", type: "bank", balance: 0, color: "bg-blue-600", accountNumber: "", expenseLimits: { daily: 0, weekly: 0, monthly: 0 } });
+    }
+    setActiveTab('details');
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => { setShowModal(false); setEditingWallet(null); };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const nameExists = wallets.some(w => w.name.trim().toLowerCase() === formData.name.trim().toLowerCase() && w.id !== editingWallet?.id);
+    if (nameExists) { alert("Wallet name exists."); return; }
+    setIsSubmitting(true);
+    try {
+      if (editingWallet) await updateWallet(editingWallet.id, formData);
+      else await addWallet(formData);
+      handleCloseModal();
+    } catch (error) { console.error(error); } finally { setIsSubmitting(false); }
+  };
+
+  const isDefaultCash = editingWallet?.type === 'cash' && editingWallet?.name === 'Cash';
+  const walletTransactions = editingWallet ? transactions.filter(t => t.walletId === editingWallet.id).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()) : [];
+
+  const recentTransactions = transactions.slice(0, 5);
 
   const activeLimitAlerts = notifications.filter(n =>
     !n.read &&
@@ -124,7 +171,7 @@ export default function Home() {
             </div>
             <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide -mx-2 px-2 md:mx-0 md:px-0 md:overflow-visible md:grid md:grid-cols-2 md:gap-4 md:pb-0 xl:grid-cols-3 md:snap-none snap-x">
               {wallets.map(wallet => (
-                <GlassCard key={wallet.id} className={cn("snap-start min-w-[160px] p-5 flex flex-col justify-between h-36 relative overflow-hidden", wallet.color)}>
+                <GlassCard key={wallet.id} onClick={() => handleOpenModal(wallet)} className={cn("snap-start min-w-[160px] p-5 flex flex-col justify-between h-36 relative overflow-hidden cursor-pointer active:scale-[0.98] transition-transform shadow-lg", wallet.color)}>
                   <div className="absolute -right-6 -bottom-6 opacity-20 rotate-12">
                     <WalletIcon className="w-24 h-24 text-white" />
                   </div>
@@ -143,7 +190,10 @@ export default function Home() {
 
         {/* Right Column: Transactions */}
         <div className="space-y-4 animate-in slide-in-from-bottom-10 duration-500 delay-300 pb-20 md:pb-0">
-          <h3 className="text-lg font-bold tracking-tight px-1">Recent Transactions</h3>
+          <div className="flex justify-between items-center mb-3 px-1">
+            <h3 className="text-lg font-bold tracking-tight">Recent Transactions</h3>
+            <Link href="/stats" className="text-xs font-semibold text-primary hover:text-primary/80 transition-colors">View All</Link>
+          </div>
           <div className="space-y-3">
             {recentTransactions.map((t, i) => {
               const cat = getCategory(t.categoryId);
@@ -179,6 +229,78 @@ export default function Home() {
           </div>
         </div>
       </div>
+      <Modal
+        isOpen={showModal}
+        onClose={handleCloseModal}
+        title={isDefaultCash ? "Wallet Details" : "Edit Wallet"}
+        footer={
+          activeTab === 'details' ? (
+            <>
+              {!isDefaultCash && (
+                <button type="button" onClick={async () => {
+                  if (confirm("Delete wallet?")) {
+                    await deleteWallet(editingWallet!.id);
+                    handleCloseModal();
+                  }
+                }} className="mr-auto px-4 py-3 bg-rose-500/10 text-rose-500 rounded-xl font-semibold hover:bg-rose-500/20 text-sm flex items-center gap-2">
+                  <Trash2 className="w-4 h-4" /> Delete
+                </button>
+              )}
+              <button type="button" onClick={handleCloseModal} className="px-4 py-3 bg-secondary/20 text-white/70 rounded-xl font-semibold hover:bg-secondary/40 text-sm">Cancel</button>
+              <button onClick={handleSubmit} disabled={isSubmitting || isDefaultCash} className="px-4 py-3 bg-primary text-primary-foreground rounded-xl font-semibold hover:bg-primary/90 disabled:opacity-50 shadow-lg shadow-primary/20 text-sm">
+                {isSubmitting ? "Saving..." : "Update"}
+              </button>
+            </>
+          ) : (
+            <button type="button" onClick={handleCloseModal} className="w-full px-4 py-3 bg-secondary/20 text-white/70 rounded-xl font-semibold hover:bg-secondary/40 text-sm">Close</button>
+          )
+        }
+      >
+        {editingWallet && (
+          <div className="flex gap-2 mb-6 bg-secondary/30 p-1 rounded-xl">
+            <button className={cn("flex-1 py-2.5 rounded-lg text-sm font-bold transition-all", activeTab === 'details' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-muted-foreground hover:bg-white/5 hover:text-white')} onClick={() => setActiveTab('details')}>Details</button>
+            <button className={cn("flex-1 py-2.5 rounded-lg text-sm font-bold transition-all", activeTab === 'transactions' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-muted-foreground hover:bg-white/5 hover:text-white')} onClick={() => setActiveTab('transactions')}>Transactions</button>
+          </div>
+        )}
+
+        {activeTab === 'details' ? (
+          <form className="space-y-4">
+            {isDefaultCash && <div className="bg-yellow-500/10 p-3 rounded-xl text-yellow-500 text-xs flex gap-2"><Snowflake className="w-4 h-4" /> Default wallet cannot be edited.</div>}
+            <div>
+              <label className="block text-sm font-medium mb-1 text-muted-foreground">Name</label>
+              <input value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} className="w-full p-3 bg-secondary/50 rounded-xl border border-white/10" disabled={isDefaultCash} />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1 text-muted-foreground">Balance</label>
+              <input type="number" value={formData.balance} onChange={e => setFormData({ ...formData, balance: Number(e.target.value) })} className="w-full p-3 bg-secondary/50 rounded-xl border border-white/10" disabled={isDefaultCash} />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1 text-muted-foreground">Account Number</label>
+              <input value={formData.accountNumber} onChange={e => setFormData({ ...formData, accountNumber: e.target.value })} className="w-full p-3 bg-secondary/50 rounded-xl border border-white/10" disabled={isDefaultCash} placeholder="Optional" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2 text-muted-foreground">Color</label>
+              <div className="grid grid-cols-4 gap-2">
+                {colors.map(c => (
+                  <button key={c} type="button" onClick={() => setFormData({ ...formData, color: c })} className={cn("h-10 rounded-lg", c, formData.color === c && "ring-2 ring-white scale-110")} disabled={isDefaultCash} />
+                ))}
+              </div>
+            </div>
+          </form>
+        ) : (
+          <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2">
+            {walletTransactions.length === 0 ? <p className="text-center text-muted-foreground py-10">No transactions.</p> : walletTransactions.map(t => (
+              <div key={t.id} className="flex justify-between p-3 bg-secondary/30 rounded-xl">
+                <div className="flex flex-col">
+                  <span className="text-sm font-medium">{categories.find(c => c.id === t.categoryId)?.name || 'Unknown'}</span>
+                  <span className="text-xs text-muted-foreground">{format(new Date(t.date), 'dd MMM')}</span>
+                </div>
+                <span className={t.type === 'income' ? 'text-emerald-500' : 'text-rose-500'}>{t.type === 'income' ? '+' : '-'}{t.amount.toLocaleString('id-ID')}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </Modal>
       <SetupWizard />
     </div>
   );

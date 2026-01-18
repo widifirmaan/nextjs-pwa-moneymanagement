@@ -125,7 +125,7 @@ export default function CardsPage() {
     };
 
     return (
-        <div className="min-h-screen pb-32 pt-6 px-6 animate-in fade-in duration-500">
+        <div className="min-h-screen pb-32 pt-6 px-6">
             <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-4">
                     <Link

@@ -46,7 +46,7 @@ export default function Profile() {
     };
 
     return (
-        <div className="p-6 md:p-8 xl:p-10 space-y-8 pt-10 min-h-screen pb-28 xl:pb-10 md:pt-8 md:max-w-4xl md:mx-auto xl:max-w-6xl xl:ml-[22rem] xl:mr-8 animate-in slide-in-from-bottom-5 duration-500">
+        <div className="p-6 md:p-8 xl:p-10 space-y-8 pt-10 min-h-screen pb-28 xl:pb-10 md:pt-8 md:max-w-4xl md:mx-auto xl:max-w-6xl xl:ml-[22rem] xl:mr-8">
             <div className="text-center space-y-2">
                 <h1 className="text-2xl font-bold">Profile</h1>
             </div>

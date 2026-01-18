@@ -28,7 +28,7 @@ export default function StatsPage() {
 
     // Pagination
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 20;
+    const itemsPerPage = 10;
 
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(amount);
@@ -199,7 +199,7 @@ export default function StatsPage() {
             <div className="animate-in slide-in-from-top-5 duration-500 space-y-4">
                 <div>
                     <p className="text-muted-foreground text-sm font-semibold tracking-wide uppercase mb-1">Analytics</p>
-                    <h1 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 drop-shadow-sm">
+                    <h1 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary via-accent to-primary drop-shadow-sm">
                         Financial Overview
                     </h1>
                     <p className="text-sm text-muted-foreground mt-2">
@@ -283,9 +283,9 @@ export default function StatsPage() {
             </div>
 
             {/* Overview Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-in slide-in-from-bottom-5 duration-500 delay-100">
+            <div className="grid grid-cols-2 gap-3 md:gap-4 animate-in slide-in-from-bottom-5 duration-500 delay-100">
                 {/* Total Income */}
-                <GlassCard className="p-6 relative overflow-hidden">
+                <GlassCard className="p-4 md:p-6 relative overflow-hidden">
                     <div className="absolute -right-4 -top-4 opacity-10">
                         <ArrowDownLeft className="w-32 h-32 text-emerald-500" />
                     </div>
@@ -307,7 +307,7 @@ export default function StatsPage() {
                 </GlassCard>
 
                 {/* Total Expense */}
-                <GlassCard className="p-6 relative overflow-hidden">
+                <GlassCard className="p-4 md:p-6 relative overflow-hidden">
                     <div className="absolute -right-4 -top-4 opacity-10">
                         <ArrowUpRight className="w-32 h-32 text-rose-500" />
                     </div>
@@ -334,13 +334,13 @@ export default function StatsPage() {
             {/* Top Categories */}
             <div className="animate-in slide-in-from-bottom-5 duration-500 delay-300">
                 <h3 className="text-lg font-bold mb-4 px-1">Top Spending Categories</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
                     {topCategories.map((cat, index) => {
                         const category = categories.find(c => c.name === cat.name);
                         const percentage = totalExpense > 0 ? (cat.value / totalExpense) * 100 : 0;
 
                         return (
-                            <GlassCard key={cat.name} className="p-5 relative overflow-hidden">
+                            <GlassCard key={cat.name} className="p-4 md:p-5 relative overflow-hidden">
                                 <div className="absolute -right-2 -bottom-2 opacity-5">
                                     <div className="text-8xl font-black">#{index + 1}</div>
                                 </div>

@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  app-dev:
+    container_name: moneymanagement-dev
+    image: node:20-slim
+    working_dir: /app
+    ports:
+      - "8086:3000"
+    environment:
+      - MONGODB_URI=mongodb://americano-mongo:27017/moneymanagement
+      - NODE_ENV=development
+      - AUTH_URL=${AUTH_URL}
+      - AUTH_TRUST_HOST=true
+      - AUTH_SECRET=${AUTH_SECRET}
+      - AUTH_GOOGLE_ID=${AUTH_GOOGLE_ID}
+      - AUTH_GOOGLE_SECRET=${AUTH_GOOGLE_SECRET}
+    volumes:
+      - .:/app
+    # Install dependencies if missing, then start dev server
+    command: sh -c "if [ ! -d node_modules ]; then npm install; fi && npm run dev"
+    networks:
+      - root_default
+
+networks:
+  root_default:
+    external: true

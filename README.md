@@ -8,7 +8,7 @@ A modern, comprehensive Progressive Web Application (PWA) for personal finance m
 
 Access the live application here: **[mone.widifirmaan.web.id](https://mone.widifirmaan.web.id)**
 
-## ✨ key Features
+## ✨ Key Features
 
 -   **Dashboard Overview**: Get a quick snapshot of your financial health with real-time balance updates and recent transactions.
 -   **Transaction Tracking**: Easily add income and expenses with categorized details.

@@ -9,12 +9,14 @@ import { useTheme } from "@/context/ThemeContext"
 import { colorSchemes } from "@/context/ThemeContext"
 import { cn } from "@/lib/utils"
 import { useStore } from "@/context/StoreContext"
+import { ConfirmModal } from "@/components/ui/ConfirmModal"
 
 export default function Profile() {
     const { data: session } = useSession()
     const user = session?.user
     const [isLoggingOut, setIsLoggingOut] = useState(false)
     const [isResetting, setIsResetting] = useState(false)
+    const [showResetConfirm, setShowResetConfirm] = useState(false)
     const { colorScheme, setColorScheme } = useTheme()
 
     // iOS Detection
@@ -263,20 +265,7 @@ export default function Profile() {
                     </button>
 
                     <button
-                        onClick={async () => {
-                            if (confirm("WARNING: All your data (wallets, transactions, categories) will be permanently deleted. Are you sure you want to reset and restart setup?")) {
-                                setIsResetting(true)
-                                try {
-                                    const res = await fetch('/api/user/reset', { method: 'POST' });
-                                    if (res.ok) {
-                                        await signOut({ callbackUrl: "/login" });
-                                    }
-                                } catch (error) {
-                                    console.error(error);
-                                    setIsResetting(false);
-                                }
-                            }
-                        }}
+                        onClick={() => setShowResetConfirm(true)}
                         disabled={isResetting}
                         className="w-full p-4 rounded-xl bg-rose-500/10 text-rose-500 font-semibold border border-rose-500/20 hover:bg-rose-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 shadow-sm hover:shadow-md"
                     >
@@ -295,6 +284,28 @@ export default function Profile() {
                             </>
                         )}
                     </button>
+
+                    <ConfirmModal
+                        isOpen={showResetConfirm}
+                        onClose={() => setShowResetConfirm(false)}
+                        onConfirm={async () => {
+                            setIsResetting(true);
+                            setShowResetConfirm(false);
+                            try {
+                                const res = await fetch('/api/user/reset', { method: 'POST' });
+                                if (res.ok) {
+                                    await signOut({ callbackUrl: "/login" });
+                                }
+                            } catch (error) {
+                                console.error(error);
+                                setIsResetting(false);
+                            }
+                        }}
+                        title="Reset All Data?"
+                        message="WARNING: All your data (wallets, transactions, categories) will be permanently deleted. This action cannot be undone. Are you sure you want to reset and restart setup?"
+                        confirmText="Yes, Delete Everything"
+                        isDestructive={true}
+                    />
 
                     <div className="text-center text-xs text-muted-foreground mt-8">
                         <p>MoneW v0.1.0</p>

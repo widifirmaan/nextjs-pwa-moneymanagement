@@ -67,10 +67,20 @@ Follow these steps to set up the project locally.
     Create a `.env` file in the root directory and configure the following:
 
     ```env
-    DATABASE_URL=your_mongodb_connection_string
-    AUTH_SECRET=your_nextauth_secret
+    # Database
+    MONGODB_URI=your_mongodb_connection_string
+    DATABASE_URL=your_mongodb_connection_string # Legacy/Alternative
+
+    # Auth.js (NextAuth v5)
+    AUTH_SECRET=your_nextauth_secret # Generate with: openssl rand -base64 33
     AUTH_URL=http://localhost:3000
-    # Add other provider keys if necessary (e.g., Google Client ID/Secret)
+    
+    # OAuth Providers
+    AUTH_GOOGLE_ID=your_google_client_id
+    AUTH_GOOGLE_SECRET=your_google_client_secret
+
+    # Vercel Production
+    AUTH_TRUST_HOST=true
     ```
 
 4.  **Run the development server**
@@ -103,7 +113,7 @@ Follow these steps to set up the project locally.
 
 ## 🤝 Contributing
 
-Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/yourusername/nextjs-pwa-moneymanagement/issues).
+Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/widifirmaan/nextjs-pwa-moneymanagement/issues).
 
 ## 📄 License
 

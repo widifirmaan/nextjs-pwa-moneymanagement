@@ -11,6 +11,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             clientSecret: process.env.AUTH_GOOGLE_SECRET,
         }),
     ],
+    trustHost: true, // Tambahkan ini agar Auth.js otomatis mendeteksi host di Vercel
     callbacks: {
         session({ session, user }) {
             if (session.user) {

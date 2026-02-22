@@ -6,7 +6,7 @@ A modern, comprehensive Progressive Web Application (PWA) for personal finance m
 
 ## 📱 Live Demo
 
-Access the live application here: **[mone.widifirmaan.web.id](https://mone.widifirmaan.web.id)**
+Access the live application here: **https://nextjs-pwa-moneymanagement.vercel.app/**
 
 ## ✨ Key Features
 

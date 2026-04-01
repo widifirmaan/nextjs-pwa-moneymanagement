@@ -102,15 +102,21 @@ npm install
 Create a `.env` file in the root directory:
 ```env
 # Database
-MONGODB_URI=your_mongodb_connection_string
+MONGODB_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/<dbname>?retryWrites=true&w=majority
 
 # Auth.js (NextAuth v5)
 AUTH_SECRET=your_nextauth_secret
+NEXTAUTH_URL=http://localhost:3000
 AUTH_URL=http://localhost:3000
+AUTH_TRUST_HOST=true
 
-# OAuth Providers
+# OAuth Providers (Google)
 AUTH_GOOGLE_ID=your_google_client_id
 AUTH_GOOGLE_SECRET=your_google_client_secret
+
+# Optional (development bypass login)
+DEV_SKIP_AUTH=true
+NEXT_PUBLIC_DEV_SKIP_AUTH=true
 ```
 
 ### 3. Run Development

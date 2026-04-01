@@ -32,6 +32,14 @@ export default function AddTransaction() {
         }
     }, [wallets, selectedWallet]);
 
+    // Set default category based on activeTab
+    useEffect(() => {
+        const filteredCategories = categories.filter(c => c.type === activeTab);
+        if (filteredCategories.length > 0) {
+            setSelectedCategory(filteredCategories[0].id);
+        }
+    }, [categories, activeTab]);
+
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;

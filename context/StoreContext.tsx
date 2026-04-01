@@ -461,6 +461,16 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
     const totalBalance = wallets.reduce((acc, curr) => acc + curr.balance, 0);
 
+    if (!isLoaded) {
+        return (
+            <div className="min-h-screen flex flex-col items-center justify-center bg-background text-white">
+                <div className="animate-spin h-12 w-12 border-4 border-primary border-t-transparent rounded-full" />
+                <p className="mt-4 text-lg font-semibold">Connecting to database...</p>
+                <p className="text-sm text-muted-foreground mt-2">Please wait while we load your data.</p>
+            </div>
+        );
+    }
+
     return (
         <StoreContext.Provider value={{
             transactions,

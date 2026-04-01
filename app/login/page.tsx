@@ -1,9 +1,20 @@
 "use client"
 import { signIn } from "next-auth/react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
+
+const isDevBypass =
+    process.env.NEXT_PUBLIC_DEV_SKIP_AUTH === "true" &&
+    (typeof window !== "undefined" &&
+        ["localhost", "127.0.0.1", "::1"].includes(window.location.hostname))
 
 export default function Login() {
     const [isLoading, setIsLoading] = useState(false)
+
+    useEffect(() => {
+        if (isDevBypass) {
+            signIn("dev-credentials", { callbackUrl: "/" })
+        }
+    }, [])
 
     const handleSignIn = async () => {
         setIsLoading(true)

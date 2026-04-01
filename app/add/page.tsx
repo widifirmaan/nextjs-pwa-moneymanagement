@@ -21,6 +21,7 @@ export default function AddTransaction() {
     const [selectedWallet, setSelectedWallet] = useState('');
 
     const [uploading, setUploading] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [receiptUrl, setReceiptUrl] = useState<string | undefined>(undefined);
 
     // Set default wallet
@@ -60,6 +61,8 @@ export default function AddTransaction() {
 
         if (!amount || !selectedWallet || !selectedCategory) return;
 
+        setIsSubmitting(true);
+
         try {
             await addTransaction({
                 type: activeTab,
@@ -73,6 +76,8 @@ export default function AddTransaction() {
             router.push('/');
         } catch (error) {
             console.error("Failed to add transaction", error);
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -224,14 +229,16 @@ export default function AddTransaction() {
                 {/* Submit Button */}
                 <button
                     type="submit"
+                    disabled={isSubmitting}
                     className={cn(
-                        "w-full py-4 rounded-2xl font-bold text-lg shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2",
+                        "w-full py-4 rounded-2xl font-bold text-lg shadow-xl active:scale-[0.98] transition-all flex items-center justify-center gap-2",
+                        isSubmitting ? "opacity-70 cursor-not-allowed" : "hover:scale-[1.02]",
                         activeTab === 'expense' ? "bg-rose-500 shadow-rose-500/25 hover:bg-rose-600" :
                             "bg-emerald-500 shadow-emerald-500/25 hover:bg-emerald-600"
                     )}
                 >
                     <Check className="w-6 h-6" />
-                    Save Transaction
+                    {isSubmitting ? "Saving..." : "Save Transaction"}
                 </button>
             </form>
         </div>

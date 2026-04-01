@@ -22,13 +22,13 @@ export default function WalletsPage() {
     const [formData, setFormData] = useState({
         name: "",
         type: "bank" as "bank" | "ewallet" | "cash",
-        balance: 0,
+        balance: "" as number | "",
         color: "bg-blue-600",
         accountNumber: "",
         expenseLimits: {
-            daily: 0,
-            weekly: 0,
-            monthly: 0,
+            daily: "" as number | "",
+            weekly: "" as number | "",
+            monthly: "" as number | "",
         }
     });
 
@@ -60,17 +60,21 @@ export default function WalletsPage() {
                 balance: wallet.balance,
                 color: wallet.color,
                 accountNumber: wallet.accountNumber || "",
-                expenseLimits: wallet.expenseLimits || { daily: 0, weekly: 0, monthly: 0 },
+                expenseLimits: {
+                    daily: wallet.expenseLimits?.daily ?? "",
+                    weekly: wallet.expenseLimits?.weekly ?? "",
+                    monthly: wallet.expenseLimits?.monthly ?? "",
+                },
             });
         } else {
             setEditingWallet(null);
             setFormData({
                 name: "",
                 type: "bank",
-                balance: 0,
+                balance: "",
                 color: "bg-blue-600",
                 accountNumber: "",
-                expenseLimits: { daily: 0, weekly: 0, monthly: 0 },
+                expenseLimits: { daily: "", weekly: "", monthly: "" },
             });
         }
         setActiveTab('details');
@@ -100,10 +104,20 @@ export default function WalletsPage() {
         setIsSubmitting(true);
 
         try {
+            const payload = {
+                ...formData,
+                balance: formData.balance === "" ? 0 : Number(formData.balance),
+                expenseLimits: {
+                    daily: formData.expenseLimits.daily === "" ? 0 : Number(formData.expenseLimits.daily),
+                    weekly: formData.expenseLimits.weekly === "" ? 0 : Number(formData.expenseLimits.weekly),
+                    monthly: formData.expenseLimits.monthly === "" ? 0 : Number(formData.expenseLimits.monthly),
+                },
+            }
+
             if (editingWallet) {
-                await updateWallet(editingWallet.id, formData);
+                await updateWallet(editingWallet.id, payload);
             } else {
-                await addWallet(formData);
+                await addWallet(payload);
             }
             handleCloseModal();
         } catch (error) {
@@ -385,18 +399,24 @@ export default function WalletsPage() {
                             <label className="block text-sm font-medium mb-2 text-muted-foreground">
                                 Initial Balance
                             </label>
-                            <input
-                                type="number"
-                                value={formData.balance}
-                                onChange={(e) =>
-                                    setFormData({ ...formData, balance: Number(e.target.value) })
-                                }
-                                className="w-full px-4 py-3 bg-secondary/50 border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary text-foreground placeholder:text-muted-foreground/30 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
-                                placeholder="0"
-                                required
-                                min="0"
-                                disabled={isDefaultCash}
-                            />
+                            <div className="flex items-center justify-center gap-2 border-b border-border focus-within:border-primary transition-colors py-2">
+                                <span className="text-sm font-bold text-muted-foreground">Rp</span>
+                                <input
+                                    type="number"
+                                    value={formData.balance}
+                                    onChange={(e) =>
+                                        setFormData({
+                                            ...formData,
+                                            balance: e.target.value === "" ? "" : Number(e.target.value),
+                                        })
+                                    }
+                                    className="w-full text-lg font-semibold bg-transparent focus:outline-none"
+                                    placeholder="0"
+                                    min="0"
+                                    inputMode="numeric"
+                                    disabled={isDefaultCash}
+                                />
+                            </div>
                         </div>
 
                         <div>
@@ -420,49 +440,70 @@ export default function WalletsPage() {
                             <h3 className="text-sm font-bold text-muted-foreground">Spending Limits (0 for no limit)</h3>
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium mb-2 text-muted-foreground">Daily</label>
-                                    <input
-                                        type="number"
-                                        min="0"
-                                        value={formData.expenseLimits.daily}
-                                        onChange={(e) => setFormData({
-                                            ...formData,
-                                            expenseLimits: { ...formData.expenseLimits, daily: Number(e.target.value) }
-                                        })}
-                                        className="w-full px-4 py-3 bg-secondary/50 border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary text-foreground placeholder:text-muted-foreground/30 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
-                                        placeholder="0"
-                                        disabled={isDefaultCash}
-                                    />
+                                    <label className="block text-xs font-medium uppercase text-muted-foreground ml-1">Daily</label>
+                                    <div className="flex items-center justify-center gap-2 border-b border-border focus-within:border-primary transition-colors py-2">
+                                        <span className="text-sm font-bold text-muted-foreground">Rp</span>
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            value={formData.expenseLimits.daily}
+                                            onChange={(e) => setFormData({
+                                                ...formData,
+                                                expenseLimits: {
+                                                    ...formData.expenseLimits,
+                                                    daily: e.target.value === "" ? "" : Number(e.target.value),
+                                                },
+                                            })}
+                                            className="w-full text-xl font-medium bg-transparent focus:outline-none"
+                                            placeholder="0"
+                                            inputMode="numeric"
+                                            disabled={isDefaultCash}
+                                        />
+                                    </div>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium mb-2 text-muted-foreground">Weekly</label>
-                                    <input
-                                        type="number"
-                                        min="0"
-                                        value={formData.expenseLimits.weekly}
-                                        onChange={(e) => setFormData({
-                                            ...formData,
-                                            expenseLimits: { ...formData.expenseLimits, weekly: Number(e.target.value) }
-                                        })}
-                                        className="w-full px-4 py-3 bg-secondary/50 border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary text-foreground placeholder:text-muted-foreground/30 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
-                                        placeholder="0"
-                                        disabled={isDefaultCash}
-                                    />
+                                    <label className="block text-xs font-medium uppercase text-muted-foreground ml-1">Weekly</label>
+                                    <div className="flex items-center justify-center gap-2 border-b border-border focus-within:border-primary transition-colors py-2">
+                                        <span className="text-sm font-bold text-muted-foreground">Rp</span>
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            value={formData.expenseLimits.weekly}
+                                            onChange={(e) => setFormData({
+                                                ...formData,
+                                                expenseLimits: {
+                                                    ...formData.expenseLimits,
+                                                    weekly: e.target.value === "" ? "" : Number(e.target.value),
+                                                },
+                                            })}
+                                            className="w-full text-xl font-medium bg-transparent focus:outline-none"
+                                            placeholder="0"
+                                            inputMode="numeric"
+                                            disabled={isDefaultCash}
+                                        />
+                                    </div>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium mb-2 text-muted-foreground">Monthly</label>
-                                    <input
-                                        type="number"
-                                        min="0"
-                                        value={formData.expenseLimits.monthly}
-                                        onChange={(e) => setFormData({
-                                            ...formData,
-                                            expenseLimits: { ...formData.expenseLimits, monthly: Number(e.target.value) }
-                                        })}
-                                        className="w-full px-4 py-3 bg-secondary/50 border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary text-foreground placeholder:text-muted-foreground/30 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
-                                        placeholder="0"
-                                        disabled={isDefaultCash}
-                                    />
+                                    <label className="block text-xs font-medium uppercase text-muted-foreground ml-1">Monthly</label>
+                                    <div className="flex items-center justify-center gap-2 border-b border-border focus-within:border-primary transition-colors py-2">
+                                        <span className="text-sm font-bold text-muted-foreground">Rp</span>
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            value={formData.expenseLimits.monthly}
+                                            onChange={(e) => setFormData({
+                                                ...formData,
+                                                expenseLimits: {
+                                                    ...formData.expenseLimits,
+                                                    monthly: e.target.value === "" ? "" : Number(e.target.value),
+                                                },
+                                            })}
+                                            className="w-full text-xl font-medium bg-transparent focus:outline-none"
+                                            placeholder="0"
+                                            inputMode="numeric"
+                                            disabled={isDefaultCash}
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         </div>

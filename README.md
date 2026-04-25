@@ -14,10 +14,11 @@ Explore the comprehensive features of **MoneW** through our gallery.
 
 | | |
 |:---:|:---:|
-| ![Dashboard](screenshot/dashboard.png)<br>**Main Dashboard** | ![Mobile View](screenshot/mobile.png)<br>**Mobile Interface (PWA)** |
-| ![Finance](screenshot/finance.png)<br>**Financial Analysis** | ![Add Transaction](screenshot/add-transaction.png)<br>**Transaction Entry** |
-| ![Add Wallet](screenshot/add-new-wallet.png)<br>**Wallet Management** | ![Setup Wizard](screenshot/setup-wizard.png)<br>**Initial Configuration** |
-| ![Profile](screenshot/profile.png)<br>**User Profile** | ![Setup PWA](screenshot/setup-pwa.png)<br>**PWA Installation** |
+| ![Dashboard](screenshot/dashboard.png)<br>**Main Dashboard** | ![Finance](screenshot/finance.png)<br>**Financial Analysis** |
+| ![Add Transaction](screenshot/add-transaction.png)<br>**Transaction Entry** | ![Add Wallet](screenshot/add-new-wallet.png)<br>**Wallet Management** |
+| ![Setup Wizard](screenshot/setup-wizard.png)<br>**Initial Configuration** | ![Profile](screenshot/profile.png)<br>**User Profile** |
+| ![Setup PWA](screenshot/setup-pwa.png)<br>**PWA Installation** | |
+| <img src="screenshot/mobile.png" width="280" alt="Mobile View" /><br>**Mobile Interface (PWA)** | |
 
 ---
 

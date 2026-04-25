@@ -110,7 +110,7 @@ AUTH_GOOGLE_SECRET=your_google_client_secret
 ---
 
 ## 👥 Authors
-Developed with ❤️ by **Widi Firmaan**.
+Developed with ❤️ by **Widi Firmansyah**.
 
 ---
 

@@ -1,8 +1,19 @@
 "use client"
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { Category, Transaction, Wallet, ExpenseLimits, Notification, SavedCard } from '@/lib/types';
 import { startOfDay, startOfWeek, startOfMonth, isAfter, format } from 'date-fns';
+
+function apiFetch(url: string, options: RequestInit = {}): Promise<Response> {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('monew_token') : null;
+    if (token) {
+        options.headers = {
+            ...options.headers,
+            'Authorization': `Bearer ${token}`,
+        } as Record<string, string>;
+    }
+    return fetch(url, options);
+}
 
 interface StoreContextType {
     transactions: Transaction[];
@@ -56,15 +67,15 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
         try {
             // Fetch basic data
-            const res = await fetch('/api/data', { headers: { 'Cache-Control': 'no-cache' } });
+            const res = await apiFetch('/api/data', { headers: { 'Cache-Control': 'no-cache' } });
             const data = res.ok ? await res.json() : null;
 
             // Fetch cards
-            const resCards = await fetch('/api/cards', { headers: { 'Cache-Control': 'no-cache' } });
+            const resCards = await apiFetch('/api/cards', { headers: { 'Cache-Control': 'no-cache' } });
             const dataCards = resCards.ok ? await resCards.json() : [];
 
             // Fetch Preferences (isSetupCompleted)
-            const resPref = await fetch('/api/user/preferences', { headers: { 'Cache-Control': 'no-cache' } });
+            const resPref = await apiFetch('/api/user/preferences', { headers: { 'Cache-Control': 'no-cache' } });
             const dataPref = resPref.ok ? await resPref.json() : null;
 
             if (data) {
@@ -72,8 +83,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
                 if (data.categories.length === 0 && data.wallets.length === 0 && !isSeeding.current) {
                     isSeeding.current = true;
                     try {
-                        await fetch('/api/seed', { method: 'POST', headers: { 'Cache-Control': 'no-cache' } });
-                        const res2 = await fetch('/api/data', { headers: { 'Cache-Control': 'no-cache' } });
+                        await apiFetch('/api/seed', { method: 'POST', headers: { 'Cache-Control': 'no-cache' } });
+                        const res2 = await apiFetch('/api/data', { headers: { 'Cache-Control': 'no-cache' } });
                         const data2 = await res2.json();
                         setCategories(data2.categories);
                         setWallets(data2.wallets);
@@ -206,7 +217,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         }));
 
         try {
-            await fetch('/api/transactions', {
+            await apiFetch('/api/transactions', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(newTransaction),
@@ -268,13 +279,13 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         }
 
         try {
-            const res = await fetch(`/api/transactions/${id}`, {
+            const res = await apiFetch(`/api/transactions/${id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(updatedTransaction),
             });
             if (!res.ok) {
-                const res2 = await fetch('/api/data');
+                const res2 = await apiFetch('/api/data');
                 const data = await res2.json();
                 setTransactions(data.transactions);
                 setWallets(data.wallets);
@@ -306,7 +317,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         }));
 
         try {
-            await fetch(`/api/transactions/${id}`, { method: 'DELETE' });
+            await apiFetch(`/api/transactions/${id}`, { method: 'DELETE' });
         } catch (error) {
             console.error("Error deleting transaction:", error);
         }
@@ -321,7 +332,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         setWallets(prev => [newWallet, ...prev]);
 
         try {
-            const res = await fetch('/api/wallets', {
+            const res = await apiFetch('/api/wallets', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(newWallet),
@@ -338,13 +349,13 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     const updateWallet = async (id: string, updates: Partial<Wallet>) => {
         setWallets(prev => prev.map(w => w.id === id ? { ...w, ...updates } : w));
         try {
-            const res = await fetch(`/api/wallets/${id}`, {
+            const res = await apiFetch(`/api/wallets/${id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(updates),
             });
             if (!res.ok) {
-                const res2 = await fetch('/api/data');
+                const res2 = await apiFetch('/api/data');
                 const data = await res2.json();
                 setWallets(data.wallets);
             }
@@ -356,10 +367,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     const deleteWallet = async (id: string) => {
         setWallets(prev => prev.filter(w => w.id !== id));
         try {
-            await fetch(`/api/wallets/${id}`, { method: 'DELETE' });
+            await apiFetch(`/api/wallets/${id}`, { method: 'DELETE' });
         } catch (error) {
             console.error("Error deleting wallet:", error);
-            const res = await fetch('/api/data', { headers: { 'Cache-Control': 'no-cache' } });
+            const res = await apiFetch('/api/data', { headers: { 'Cache-Control': 'no-cache' } });
             const data = await res.json();
             setWallets(data.wallets);
         }
@@ -383,7 +394,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     const updateUserName = async (name: string) => {
         setUserName(name);
         try {
-            await fetch('/api/user/profile', {
+            await apiFetch('/api/user/profile', {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name }),
@@ -398,7 +409,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         setSavedCards(prev => [...prev, newCard]);
 
         try {
-            const res = await fetch('/api/cards', {
+            const res = await apiFetch('/api/cards', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ ...cardData, id: newCard.id }),
@@ -415,7 +426,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     const updateCard = async (id: string, updates: Partial<SavedCard>) => {
         setSavedCards(prev => prev.map(c => c.id === id ? { ...c, ...updates } : c));
         try {
-            await fetch(`/api/cards/${id}`, {
+            await apiFetch(`/api/cards/${id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(updates),
@@ -428,11 +439,11 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     const deleteCard = async (id: string) => {
         setSavedCards(prev => prev.filter(c => c.id !== id));
         try {
-            await fetch(`/api/cards/${id}`, { method: 'DELETE' });
+            await apiFetch(`/api/cards/${id}`, { method: 'DELETE' });
         } catch (error) {
             console.error("Error deleting card:", error);
             // Revert on error
-            const res = await fetch('/api/cards');
+            const res = await apiFetch('/api/cards');
             const data = await res.json();
             setSavedCards(data);
         }
@@ -449,7 +460,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     const completeSetup = async () => {
         setIsSetupCompleted(true);
         try {
-            await fetch('/api/user/preferences', {
+            await apiFetch('/api/user/preferences', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ isSetupCompleted: true }),

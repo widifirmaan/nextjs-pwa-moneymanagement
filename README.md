@@ -1,12 +1,13 @@
 # 💰 MoneW - Next.js 16 PWA Finance Management
 
-**MoneW** is a full-stack Progressive Web Application for personal finance management, built on **Next.js 16 App Router** with **React 19** and **TypeScript**. It utilizes **MongoDB** as the primary data store (via Mongoose), **NextAuth.js v5 (Auth.js)** for authentication with Google OAuth and credential providers, and **Tailwind CSS v4** for styling. The architecture prioritizes performance through **React Server Components (RSC)**, optimized API route handlers, and a robust PWA configuration for offline-first capabilities.
+**MoneW** is a full-stack Progressive Web Application for personal finance management, built on **Next.js 16 App Router** with **React 19** and **TypeScript**. It runs on **Cloudflare Pages** with a **Cloudflare Workers** API backend and **D1 database** for storage. Authentication is handled via custom **JWT** tokens, and **Tailwind CSS v4** handles styling. The architecture prioritizes performance through static generation, optimized client components, and a robust PWA configuration for offline-first capabilities.
 
 ![Status](https://img.shields.io/badge/Status-Active-success?style=for-the-badge)
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?style=for-the-badge&logo=next.js)
 ![React](https://img.shields.io/badge/React-19-blue?style=for-the-badge&logo=react)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4-38B2AC?style=for-the-badge&logo=tailwind-css)
-![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-forestgreen?style=for-the-badge&logo=mongodb)
+![Cloudflare](https://img.shields.io/badge/Cloudflare-Pages+Workers-F38020?style=for-the-badge&logo=cloudflare)
+![D1](https://img.shields.io/badge/Database-D1-003D7A?style=for-the-badge&logo=cloudflare)
 
 ---
 
@@ -23,10 +24,12 @@ Explore the comprehensive features of **MoneW** through our gallery.
 ---
 
 ### 🏗️ Technical Architecture
-*   **Next.js App Router**: Optimized rendering using **Server Components (RSC)** for minimal client-side JS and **Client Components** for rich interactivity.
-*   **API Route Handlers**: Secure CRUD operations for transactions, wallets, and cards located in `app/api/`, protected by session middleware.
-*   **Auth.js (NextAuth v5)**: Stateless session management using **JWT**, supporting Google OAuth and secure email/password authentication via bcrypt.
-*   **Database Singleton**: Efficient MongoDB connection management in `lib/db.ts` to prevent connection leaks in serverless environments.
+*   **Next.js + Cloudflare Pages**: Static site generation with client-side interactivity, deployed globally via Cloudflare's edge network.
+*   **Workers API Backend**: All API logic lives in a single Cloudflare Worker (`worker.js`) handling auth, CRUD, file uploads, and data aggregation.
+*   **D1 Database**: Cloudflare's serverless SQLite database for transactions, wallets, cards, and user data.
+*   **R2 Object Storage**: Cloudflare R2 for storing receipt images and card photos.
+*   **Custom JWT Auth**: Stateless authentication using `hs256` tokens stored in `localStorage` with PBKDF2 password hashing.
+*   **PWA First**: Fully installable with offline support via Workbox service worker.
 
 ### 💳 Financial Management
 *   **Multi-Wallet System**: Manage multiple cash, bank, or digital wallets with real-time balance synchronization.
@@ -43,31 +46,29 @@ Explore the comprehensive features of **MoneW** through our gallery.
 ---
 
 ### 🛠️ Tech Stack
-*   **Framework**: Next.js 16 (App Router)
+*   **Framework**: Next.js 16 (App Router) — static export
 *   **Styling**: Tailwind CSS v4, Framer Motion
-*   **Database**: MongoDB Atlas (Mongoose ODM)
-*   **Authentication**: NextAuth.js v5 (Auth.js)
+*   **Database**: Cloudflare D1 (SQLite)
+*   **Object Storage**: Cloudflare R2
+*   **Authentication**: Custom JWT (hs256) with PBKDF2
 *   **Charts**: Recharts
 *   **Icons**: Lucide React
-*   **Deployment**: Vercel (Edge Network)
+*   **Deployment**: Cloudflare Pages + Workers
 
 ---
 
 ### 📂 Project Structure
 ```bash
 /
-├── app/
-│   ├── (auth)/          # Auth routes: login, register
-│   ├── api/             # API Route Handlers
-│   ├── stats/           # Analytics & Recharts
-│   ├── wallets/         # Wallet management
-│   ├── cards/           # Card management
-│   └── layout.tsx       # Root layout (SessionProvider)
-├── components/          # Shared UI components
-├── context/             # React Context (Theme, User State)
-├── lib/                 # Core logic (DB singleton, Auth config)
-├── public/              # PWA assets (manifest, sw.js)
-└── screenshot/          # Documentation screenshots
+├── app/                  # Next.js App Router pages
+├── components/           # Shared UI components
+├── context/              # React Context (Auth, Store, Theme)
+├── lib/                  # Utility types and helpers
+├── public/               # PWA assets, icons, service worker
+├── screenshot/           # Documentation screenshots
+├── worker.js             # Cloudflare Workers API backend
+├── schema.sql            # D1 database schema
+└── wrangler.jsonc        # Cloudflare Pages/Wrangler config
 ```
 
 ---
@@ -76,7 +77,7 @@ Explore the comprehensive features of **MoneW** through our gallery.
 
 **Prerequisites**
 *   **Node.js 18+**
-*   **MongoDB** instance (Local or Atlas)
+*   **Cloudflare account** with D1 and R2 enabled
 
 **Installation**
 ```bash
@@ -90,22 +91,26 @@ npm install
 npm run dev
 ```
 
+**Deploy to Cloudflare**
+```bash
+# Build static export
+npm run build
+
+# Deploy pages + worker
+npx wrangler deploy
+npx wrangler pages deploy out --branch production
+```
+
 ---
 
 ### 🔐 Environment Variables
 Create a `.env` file in the root directory:
 ```env
-MONGODB_URI=mongodb+srv://<user>:<pass>@<cluster>.mongodb.net/<db>
-
-# Auth.js (NextAuth v5)
-AUTH_SECRET=your_random_secret_min_32_chars
-AUTH_URL=http://localhost:3000
-AUTH_TRUST_HOST=true
-
-# Google OAuth
-AUTH_GOOGLE_ID=your_google_client_id
-AUTH_GOOGLE_SECRET=your_google_client_secret
+# JWT Secret (must match the secret in worker.js)
+JWT_SECRET=your_random_secret_min_32_chars
 ```
+
+> Database schema is managed via `schema.sql` and deployed with `npx wrangler d1 execute monew-db --file=schema.sql`.
 
 ---
 

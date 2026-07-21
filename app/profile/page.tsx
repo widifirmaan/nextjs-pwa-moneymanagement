@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useSession, signOut } from "next-auth/react"
+import { useAuth } from "@/context/AuthContext"
 import { GlassCard } from "@/components/ui/GlassCard"
 import { LogOut, User, Mail, Shield, Palette, Check, CreditCard, Trash2, Pencil, X, Check as CheckIcon, Download } from "lucide-react"
 import { useState, useEffect } from "react"
@@ -12,8 +12,7 @@ import { useStore } from "@/context/StoreContext"
 import { ConfirmModal } from "@/components/ui/ConfirmModal"
 
 export default function Profile() {
-    const { data: session } = useSession()
-    const user = session?.user
+    const { user, logout } = useAuth()
     const [isLoggingOut, setIsLoggingOut] = useState(false)
     const [isResetting, setIsResetting] = useState(false)
     const [showResetConfirm, setShowResetConfirm] = useState(false)
@@ -59,14 +58,9 @@ export default function Profile() {
                 <div className="space-y-8">
                     <div className="flex flex-col items-center gap-4">
                         <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-violet-600 to-fuchsia-600 p-[2px] shadow-xl shadow-fuchsia-500/20">
-                            {user?.image ? (
-                                // eslint-disable-next-line @next/next/no-img-element
-                                <img src={user.image} alt={displayName} className="w-full h-full rounded-full object-cover border-4 border-background" />
-                            ) : (
-                                <div className="w-full h-full rounded-full bg-secondary flex items-center justify-center border-4 border-background">
-                                    <User className="w-10 h-10 text-muted-foreground" />
-                                </div>
-                            )}
+                            <div className="w-full h-full rounded-full bg-secondary flex items-center justify-center border-4 border-background">
+                                <User className="w-10 h-10 text-muted-foreground" />
+                            </div>
                         </div>
 
                         {/* Name Edit Section */}
@@ -239,11 +233,8 @@ export default function Profile() {
                     <button
                         onClick={async () => {
                             setIsLoggingOut(true)
-                            try {
-                                await signOut({ callbackUrl: "/login" })
-                            } catch (error) {
-                                setIsLoggingOut(false)
-                            }
+                            logout()
+                            setIsLoggingOut(false)
                         }}
                         disabled={isLoggingOut}
                         className="w-full p-4 rounded-xl bg-secondary text-foreground font-semibold border border-border hover:bg-secondary/80 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 shadow-sm hover:shadow-md mb-4"
@@ -292,9 +283,9 @@ export default function Profile() {
                             setIsResetting(true);
                             setShowResetConfirm(false);
                             try {
-                                const res = await fetch('/api/user/reset', { method: 'POST' });
+                                const res = await fetch('/api/user/reset', { method: 'POST', headers: { Authorization: `Bearer ${localStorage.getItem('monew_token')}` } });
                                 if (res.ok) {
-                                    await signOut({ callbackUrl: "/login" });
+                                    logout();
                                 }
                             } catch (error) {
                                 console.error(error);

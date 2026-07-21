@@ -1,7 +1,7 @@
 "use client"
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { useSession } from 'next-auth/react';
+import { useAuth } from '@/context/AuthContext';
 
 type ColorScheme = 'dark' | 'light' | 'blue' | 'purple' | 'green' | 'rose' | 'orange' | 'emerald' | 'dark-emerald';
 
@@ -142,31 +142,30 @@ export const colorSchemes = {
 };
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-    const { data: session, status } = useSession();
+    const { user, token } = useAuth();
     const [colorScheme, setColorSchemeState] = useState<ColorScheme>('dark');
     const [mounted, setMounted] = useState(false);
     const [isInitialized, setIsInitialized] = useState(false);
 
-    // Load theme from database when user is authenticated
     useEffect(() => {
         setMounted(true);
 
         const loadTheme = async () => {
-            if (status === 'authenticated' && session?.user?.id && !isInitialized) {
+            if (user?.id && token && !isInitialized) {
                 try {
-                    const response = await fetch('/api/user/preferences');
+                    const response = await fetch('/api/user/preferences', {
+                        headers: { Authorization: `Bearer ${token}` }
+                    });
                     if (response.ok) {
                         const data = await response.json();
                         const dbScheme = data.colorScheme as ColorScheme;
                         if (dbScheme && colorSchemes[dbScheme]) {
                             setColorSchemeState(dbScheme);
-                            // Also save to localStorage for offline support
                             localStorage.setItem('colorScheme', dbScheme);
                         }
                     }
                 } catch (error) {
                     console.error('Failed to load theme from database:', error);
-                    // Fallback to localStorage
                     const saved = localStorage.getItem('colorScheme') as ColorScheme;
                     if (saved && colorSchemes[saved]) {
                         setColorSchemeState(saved);
@@ -174,8 +173,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
                 } finally {
                     setIsInitialized(true);
                 }
-            } else if (status === 'unauthenticated') {
-                // Use localStorage for non-authenticated users
+            } else if (!user) {
                 const saved = localStorage.getItem('colorScheme') as ColorScheme;
                 if (saved && colorSchemes[saved]) {
                     setColorSchemeState(saved);
@@ -185,7 +183,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         };
 
         loadTheme();
-    }, [status, session?.user?.id, isInitialized]);
+    }, [user, token, isInitialized]);
 
     // Apply theme styles
     useEffect(() => {
@@ -221,13 +219,13 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const setColorScheme = async (scheme: ColorScheme) => {
         setColorSchemeState(scheme);
 
-        // Save to database if user is authenticated
-        if (status === 'authenticated' && session?.user?.id) {
+        if (user?.id && token) {
             try {
                 await fetch('/api/user/preferences', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`,
                     },
                     body: JSON.stringify({ colorScheme: scheme }),
                 });

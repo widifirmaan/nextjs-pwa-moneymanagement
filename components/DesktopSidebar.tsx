@@ -5,9 +5,10 @@ import { usePathname } from "next/navigation"
 import { Home, Wallet, Plus, PieChart, User, LogOut } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { motion, useMotionTemplate, useMotionValue, useSpring } from "framer-motion"
-import { signOut } from "next-auth/react"
+import { useAuth } from "@/context/AuthContext"
 
 export function DesktopSidebar() {
+    const { logout } = useAuth()
     const pathname = usePathname()
     const ref = useRef<HTMLDivElement>(null);
     const [isLoggingOut, setIsLoggingOut] = useState(false)
@@ -123,11 +124,8 @@ export function DesktopSidebar() {
                     <button
                         onClick={async () => {
                             setIsLoggingOut(true)
-                            try {
-                                await signOut({ callbackUrl: "/login" })
-                            } catch (error) {
-                                setIsLoggingOut(false)
-                            }
+                            logout()
+                            setIsLoggingOut(false)
                         }}
                         disabled={isLoggingOut}
                         className="flex items-center gap-4 px-5 py-4 w-full rounded-2xl text-muted-foreground hover:bg-rose-500/10 hover:text-rose-500 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 group/logout disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"

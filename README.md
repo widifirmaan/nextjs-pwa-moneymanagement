@@ -2,7 +2,7 @@
 
 > Modern progressive web app (PWA) for personal finance management, expense tracking, and visual analytics.
 
-MoneW is an offline-capable, mobile-first progressive web application engineered for intuitive personal financial control. Built with Next.js 16 (App Router), React 19, Tailwind CSS 4, and Recharts, MoneW empowers users to monitor account balances, manage multiple payment cards and digital wallets, log categorised transactions, and analyze monthly cash flow with interactive visual charts.
+MoneW is an installable Progressive Web App (PWA) for personal expense tracking and financial analysis, built with Next.js 16 (App Router), React 19, Tailwind CSS 4, and Recharts. Deployed as a static export on Cloudflare Pages via a custom Edge Worker bridge (`worker.js`), it features offline local storage persistence, multi-wallet and card tracking, visual category analytics, and customizable color themes.
 
 [![Live Demo](https://img.shields.io/badge/Demo-nextjs--pwa--moneymanagement.vercel.app-10B981?style=flat-square&logo=vercel&logoColor=white)](https://nextjs-pwa-moneymanagement.vercel.app/)
 [![Next.js](https://img.shields.io/badge/Next.js-16.1.1-black?style=flat-square&logo=nextdotjs)](https://nextjs.org/)
@@ -36,14 +36,14 @@ MoneW is an offline-capable, mobile-first progressive web application engineered
 
 ## Features
 
-- **Consolidated Real-Time Balance Ledger (`/`)**: Dynamic total net worth calculation with aggregated monthly income vs expenses breakdown and chronological transaction feed.
-- **Interactive SVG Financial Visualizations (`/stats`)**: Monthly expenditure trends and category distribution charts powered by Recharts with custom tooltips and percentage breakdowns.
-- **Multi-Account & Wallet Architecture (`/wallets`)**: Granular account ledgers supporting bank savings accounts, cash registers, and Indonesian digital e-wallets (GoPay, OVO, DANA, ShopeePay) with inter-wallet balance transfers.
-- **Payment Card Sub-Ledgers (`/cards`)**: Visual credit and debit card management displaying card networks, billing cycles, available credit lines, and linked expenditure totals.
-- **Fast Transaction Entry Flow (`/add`)**: Streamlined form flow with immediate type toggling (Expense / Income / Transfer), category pickers, iOS-style wheel date picker, and memo attachments.
+- **Consolidated Balance Ledger (`/`)**: Total balance tracking with monthly income versus expenses totals, recent transaction feeds, and category filter chips.
+- **Interactive Financial Visualizations (`/stats`)**: Monthly expenditure trends and category distribution charts powered by Recharts with custom tooltips and percentage breakdowns.
+- **Multi-Wallet Accounts (`/wallets`)**: Separate account ledgers for cash, bank savings, and digital e-wallets (GoPay, OVO, DANA, ShopeePay) with inter-wallet balance transfers.
+- **Payment Card Sub-Ledgers (`/cards`)**: Credit and debit card manager tracking card networks, billing cycles, available credit lines, and linked expenditure totals.
+- **Quick Transaction Entry (`/add`)**: Transaction entry form supporting Expense, Income, and Transfer types with category selection, iOS wheel date picker, and notes.
 - **Onboarding Setup Wizard (`SetupWizard.tsx`)**: First-launch onboarding wizard to configure base currency (IDR, USD, EUR, etc.), initial wallet balances, and primary accounts.
-- **Client-Side Privacy Shield**: Instant balance obscuring mode toggling asterisks (`••••••`) across financial figures for safe usage in public spaces.
-- **Multi-Color Theme Accents & Dark Mode (`ThemeContext.tsx`)**: Dynamic CSS theme engine supporting system dark/light switching and customizable accent color schemes (Emerald, Violet, Blue, Amber, Rose).
+- **Privacy Mode**: 1-click balance obscuring mode toggling asterisks (`••••••`) across financial figures for safe usage in public spaces.
+- **Multi-Color Theme Accents (`ThemeContext.tsx`)**: Dynamic CSS theme engine supporting system dark/light switching and customizable accent color schemes (Emerald, Violet, Blue, Amber, Rose).
 - **Installable Progressive Web App (PWA)**: Offline service worker caching, instant shell delivery, standalone application manifest, and native install prompt banner.
 - **Data Backup & Profile Portability (`/profile`)**: Complete offline data export and restore in JSON format, along with user profile settings and account reset capability.
 
@@ -53,13 +53,13 @@ MoneW is an offline-capable, mobile-first progressive web application engineered
 
 | Category | Technologies | Purpose |
 | :--- | :--- | :--- |
-| **Core Framework** | Next.js `16.1.1`, React `19.2.3` | App Router architecture, React Server Components, and client state orchestration |
-| **Styling & Theme** | Tailwind CSS `4.0` | High-performance atomic utility styling with native CSS variable color schemes |
-| **Data Visualization** | Recharts `3.6.0` | Responsive SVG chart primitives for spending category breakdowns and monthly velocity |
-| **Micro-Interactions** | Framer Motion `12.25.0` | Smooth gesture-aware bottom sheet drawer and page transitions |
-| **Date Utilities** | Date-fns `4.1.0` | Lightweight and immutable date parsing, interval calculations, and formatting |
-| **Iconography** | Lucide React `0.562.0` | Consistent vector iconography across navigational drawers and category badges |
-| **Deployment** | Vercel Edge Runtime | Static asset pre-rendering and edge CDN distribution |
+| **Core Framework** | Next.js `16.1.1`, React `19.2.3` | App Router architecture, static output export, and client state orchestration |
+| **Styling & Theme** | Tailwind CSS `4.0` | Utility-first styling with native CSS variable color schemes |
+| **Data Visualization** | Recharts `3.6.0` | SVG chart components for spending category breakdowns and monthly trends |
+| **Transitions** | Framer Motion `12.25.0` | Smooth drawer transitions and modal overlays |
+| **Date Utilities** | Date-fns `4.1.0` | Date parsing, interval calculations, and formatting |
+| **Iconography** | Lucide React `0.562.0` | Vector line icons across navigation tabs and category badges |
+| **Hosting** | Cloudflare Pages, Worker | Static edge hosting with custom Worker bridge (`worker.js`) |
 
 ---
 
@@ -110,11 +110,14 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) in your web browser.
 
-### Production Build
+### Production Build & Deployment
 
 ```bash
-# Build optimized static and server bundle
+# Build optimized static export and copy Cloudflare worker bridge
 npm run build
+
+# Deploy to Cloudflare Pages via Wrangler CLI
+npm run deploy
 ```
 
 ---

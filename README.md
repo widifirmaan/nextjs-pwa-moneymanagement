@@ -59,7 +59,6 @@ MoneW is an installable Progressive Web App (PWA) for personal expense tracking 
 | **Transitions** | Framer Motion `12.25.0` | Smooth drawer transitions and modal overlays |
 | **Date Utilities** | Date-fns `4.1.0` | Date parsing, interval calculations, and formatting |
 | **Iconography** | Lucide React `0.562.0` | Vector line icons across navigation tabs and category badges |
-| **Hosting** | Cloudflare Pages, Worker | Static edge hosting with custom Worker bridge (`worker.js`) |
 
 ---
 

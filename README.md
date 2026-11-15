@@ -35,36 +35,37 @@ MoneW is an offline-capable, mobile-first progressive web application engineered
 
 ---
 
-## Core Features
+## Features
 
-- **Consolidated Financial Overview (`/`)**: Real-time net balance calculations, monthly income and expense metrics, and chronological transaction ledger.
-- **Visual Cash Flow Analytics (`/stats`)**: Interactive monthly spending breakdown powered by Recharts with donut category charts and historical trends.
-- **Card & Account Management (`/cards`, `/wallets`)**: Dedicated sub-ledgers for multiple physical debit/credit cards and e-wallet services (GoPay, OVO, Dana, Bank).
-- **Streamlined Transaction Entry (`/add`)**: Clean expense and income modal with automatic date picking, dynamic category tagging, and note attachments.
-- **Privacy Mode**: One-tap balance concealing toggle to obscure sensitive currency figures in public environments.
-- **Installable PWA Architecture**: Native application feel with service worker caching, instant offline asset delivery, and mobile viewport optimizations.
-- **Fluid Theme Engine**: Dark, Light, and System themes with instant switching and persistent `localStorage` synchronization.
+- **Consolidated Real-Time Balance Ledger (`/`)**: Dynamic total net worth calculation with aggregated monthly income vs expenses breakdown and chronological transaction feed.
+- **Interactive SVG Financial Visualizations (`/stats`)**: Monthly expenditure trends and category distribution charts powered by Recharts with custom tooltips and percentage breakdowns.
+- **Multi-Account & Wallet Architecture (`/wallets`)**: Granular account ledgers supporting bank savings accounts, cash registers, and Indonesian digital e-wallets (GoPay, OVO, DANA, ShopeePay).
+- **Payment Card Sub-Ledgers (`/cards`)**: Visual credit and debit card management displaying card networks, billing cycles, available credit lines, and linked expenditure totals.
+- **Fast Modal Transaction Entry (`/add`)**: Streamlined form flow with immediate type toggling (Expense / Income), category pickers, custom date selection, and memo attachments.
+- **Client-Side Privacy Shield**: Instant balance obscuring mode toggling asterisks (`••••••`) across financial figures for safe usage in public spaces.
+- **Installable Progressive Web App**: Offline service worker caching, instant shell delivery, standalone application manifest, and optimized mobile touch gestures.
+- **Tri-State Theme Synchronization**: Seamless Dark, Light, and System theme preferences with instant CSS token switching and persistent `localStorage` storage.
 
 ---
 
 ## Tech Stack
 
-| Layer | Technology | Details |
+| Category | Technologies | Purpose |
 | :--- | :--- | :--- |
-| **Framework** | Next.js `16.1.1` | Modern App Router, Server Components, and optimized image rendering |
-| **Core UI Library** | React `19.2.3` | Modern hooks, concurrent rendering, and reactive state management |
-| **Styling** | Tailwind CSS `4.0` | Next-gen CSS engine with lightning-fast utility parsing |
-| **Data Visualization** | Recharts `3.6.0` | Responsive SVG chart primitives for financial trend analysis |
-| **Animation Engine** | Framer Motion `12.25.0` | Gesture-aware transitions and modal layout animations |
-| **Icons** | Lucide React `0.562.0` | Pixel-perfect vector icon system |
-| **Date Utilities** | Date-fns `4.1.0` | Lightweight and immutable date parsing and formatting |
+| **Core Framework** | Next.js `16.1.1`, React `19.2.3` | App Router architecture, React Server Components, and client state orchestration |
+| **Styling & Theme** | Tailwind CSS `4.0` | High-performance atomic utility styling with native CSS variable color schemes |
+| **Data Visualization** | Recharts `3.6.0` | Responsive SVG chart primitives for spending category breakdowns and monthly velocity |
+| **Micro-Interactions** | Framer Motion `12.25.0` | Smooth gesture-aware bottom sheet drawer and page transitions |
+| **Date Utilities** | Date-fns `4.1.0` | Lightweight and immutable date parsing, interval calculations, and formatting |
+| **Iconography** | Lucide React `0.562.0` | Consistent vector iconography across navigational drawers and category badges |
+| **Deployment** | Vercel Edge Runtime | Static asset pre-rendering and edge CDN distribution |
 
 ---
 
 ## Project Structure
 
-```text
-nextjs-pwa-moneymanagement/
+```bash
+/
 ├── app/
 │   ├── add/                 # Add transaction modal route
 │   ├── cards/               # Payment card management
@@ -72,13 +73,13 @@ nextjs-pwa-moneymanagement/
 │   ├── stats/               # Visual charts and spending statistics
 │   ├── profile/             # User settings and privacy toggles
 │   ├── login/               # Authentication entry point
-│   ├── layout.tsx           # Global app shell and navigation
+│   ├── layout.tsx           # Global app shell, bottom nav, and context providers
 │   └── page.tsx             # Primary dashboard and recent ledger
 ├── components/              # Reusable UI cards, inputs, charts, and navbar
 ├── context/                 # AuthContext, StoreContext, and ThemeContext
-├── lib/                     # Database utilities and helper algorithms
-├── raw_screenshots/         # High-resolution production screen captures
-└── screenshots/             # MacBook Pro M4 & iPhone 16 Pro showcase mockups
+├── lib/                     # Database utilities, sample transactions, and math helpers
+├── screenshots/             # MacBook Pro M4 & iPhone 16 Pro showcase mockups
+└── README.md
 ```
 
 ---
@@ -90,31 +91,36 @@ nextjs-pwa-moneymanagement/
 - **Node.js**: Version 18.18.0 or higher
 - **npm** or **pnpm**
 
-### Installation
+### Installation & Setup
 
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/widifirmaan/nextjs-pwa-moneymanagement.git
-   cd nextjs-pwa-moneymanagement
-   ```
+> **Environment Variables:** No external database or API keys are required for local development. Default sample accounts, cards, and transactions run 100% in-browser via local persistence.
 
-2. **Install dependencies**:
-   ```bash
-   npm install
-   ```
+```bash
+# 1. Clone the repository
+git clone https://github.com/widifirmaan/nextjs-pwa-moneymanagement.git
+cd nextjs-pwa-moneymanagement
 
-3. **Run local development server**:
-   ```bash
-   npm run dev
-   ```
+# 2. Install dependencies
+npm install
 
-4. **Access the application**:
-   Open [http://localhost:3000](http://localhost:3000) in your browser.
+# 3. Start local development server
+npm run dev
+```
 
-5. **Build production bundle**:
-   ```bash
-   npm run build
-   ```
+Open [http://localhost:3000](http://localhost:3000) in your web browser.
+
+### Production Build
+
+```bash
+# Build optimized static and server bundle
+npm run build
+```
+
+---
+
+## Author
+
+Developed by **[Widi Firmansyah](https://widifirmaan.web.id)**.
 
 ---
 

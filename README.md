@@ -11,7 +11,6 @@ MoneW is an offline-capable, mobile-first progressive web application engineered
 [![Recharts](https://img.shields.io/badge/Charts-Recharts_3.6-22C55E?style=flat-square)](https://recharts.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![PWA](https://img.shields.io/badge/PWA-Installable-blueviolet?style=flat-square&logo=pwa&logoColor=white)](#features)
-[![License](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
 
 ---
 
@@ -39,12 +38,14 @@ MoneW is an offline-capable, mobile-first progressive web application engineered
 
 - **Consolidated Real-Time Balance Ledger (`/`)**: Dynamic total net worth calculation with aggregated monthly income vs expenses breakdown and chronological transaction feed.
 - **Interactive SVG Financial Visualizations (`/stats`)**: Monthly expenditure trends and category distribution charts powered by Recharts with custom tooltips and percentage breakdowns.
-- **Multi-Account & Wallet Architecture (`/wallets`)**: Granular account ledgers supporting bank savings accounts, cash registers, and Indonesian digital e-wallets (GoPay, OVO, DANA, ShopeePay).
+- **Multi-Account & Wallet Architecture (`/wallets`)**: Granular account ledgers supporting bank savings accounts, cash registers, and Indonesian digital e-wallets (GoPay, OVO, DANA, ShopeePay) with inter-wallet balance transfers.
 - **Payment Card Sub-Ledgers (`/cards`)**: Visual credit and debit card management displaying card networks, billing cycles, available credit lines, and linked expenditure totals.
-- **Fast Modal Transaction Entry (`/add`)**: Streamlined form flow with immediate type toggling (Expense / Income), category pickers, custom date selection, and memo attachments.
+- **Fast Transaction Entry Flow (`/add`)**: Streamlined form flow with immediate type toggling (Expense / Income / Transfer), category pickers, iOS-style wheel date picker, and memo attachments.
+- **Onboarding Setup Wizard (`SetupWizard.tsx`)**: First-launch onboarding wizard to configure base currency (IDR, USD, EUR, etc.), initial wallet balances, and primary accounts.
 - **Client-Side Privacy Shield**: Instant balance obscuring mode toggling asterisks (`••••••`) across financial figures for safe usage in public spaces.
-- **Installable Progressive Web App**: Offline service worker caching, instant shell delivery, standalone application manifest, and optimized mobile touch gestures.
-- **Tri-State Theme Synchronization**: Seamless Dark, Light, and System theme preferences with instant CSS token switching and persistent `localStorage` storage.
+- **Multi-Color Theme Accents & Dark Mode (`ThemeContext.tsx`)**: Dynamic CSS theme engine supporting system dark/light switching and customizable accent color schemes (Emerald, Violet, Blue, Amber, Rose).
+- **Installable Progressive Web App (PWA)**: Offline service worker caching, instant shell delivery, standalone application manifest, and native install prompt banner.
+- **Data Backup & Profile Portability (`/profile`)**: Complete offline data export and restore in JSON format, along with user profile settings and account reset capability.
 
 ---
 
@@ -121,9 +122,3 @@ npm run build
 ## Author
 
 Developed by **[Widi Firmansyah](https://widifirmaan.web.id)**.
-
----
-
-## License
-
-This project is licensed under the [MIT License](LICENSE).

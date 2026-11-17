@@ -173,7 +173,12 @@ export function EditTransactionModal({
                     <label className="block text-sm font-semibold mb-3 text-muted-foreground">Type</label>
                     <div className="grid grid-cols-2 gap-3">
                         <button
-                            onClick={() => setFormData({ ...formData, type: 'income' })}
+                            onClick={() => {
+                                const newType = 'income';
+                                const currentCat = categories.find(c => c.id === formData.categoryId);
+                                const newCatId = currentCat?.type === newType ? formData.categoryId : categories.find(c => c.type === newType)?.id || formData.categoryId;
+                                setFormData({ ...formData, type: newType, categoryId: newCatId });
+                            }}
                             disabled={isFrozen}
                             className={cn(
                                 "p-4 rounded-xl border-2 transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed",
@@ -185,7 +190,12 @@ export function EditTransactionModal({
                             Income
                         </button>
                         <button
-                            onClick={() => setFormData({ ...formData, type: 'expense' })}
+                            onClick={() => {
+                                const newType = 'expense';
+                                const currentCat = categories.find(c => c.id === formData.categoryId);
+                                const newCatId = currentCat?.type === newType ? formData.categoryId : categories.find(c => c.type === newType)?.id || formData.categoryId;
+                                setFormData({ ...formData, type: newType, categoryId: newCatId });
+                            }}
                             disabled={isFrozen}
                             className={cn(
                                 "p-4 rounded-xl border-2 transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed",

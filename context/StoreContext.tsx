@@ -394,7 +394,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     const updateUserName = async (name: string) => {
         setUserName(name);
         try {
-            await apiFetch('/api/user/profile', {
+            await apiFetch('/api/auth/profile', {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name }),

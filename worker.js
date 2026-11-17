@@ -114,9 +114,18 @@ export default {
             const user = await getUser(request, env);
             if (!user) return json({ error: 'Unauthorized' }, 401);
 
-            if (path === '/api/auth/profile') {
+            if ((path === '/api/auth/profile' || path === '/api/user/profile')) {
                 if (request.method === 'GET') return handleGetProfile(env, user);
                 if (request.method === 'PUT') return handleUpdateProfile(request, env, user);
+            }
+            if (path.startsWith('/api/receipts/') && request.method === 'GET') {
+                const key = path.replace('/api/receipts/', '');
+                const object = await env.MONEY_IMAGES.get(key);
+                if (!object) return json({ error: 'Receipt not found' }, 404);
+                const headers = new Headers();
+                object.writeHttpMetadata(headers);
+                headers.set('etag', object.httpEtag);
+                return new Response(object.body, { headers });
             }
             if (path === '/api/data' && request.method === 'GET') return handleGetData(env, user);
             if (path === '/api/seed' && request.method === 'POST') return handleSeed(env, user);
@@ -290,6 +299,14 @@ async function handleTransfer(request, env, user) {
     const targetWallet = await db.prepare('SELECT * FROM wallets WHERE id = ? AND userId = ?').bind(targetWalletId, user.id).first();
     if (!sourceWallet || !targetWallet) return json({ error: 'Wallet not found' }, 404);
 
+    if (sourceWallet.isFrozen || targetWallet.isFrozen) {
+        return json({ error: 'Cannot transfer from or to a frozen wallet' }, 400);
+    }
+
+    if (sourceWallet.balance < amount) {
+        return json({ error: 'Insufficient balance in source wallet' }, 400);
+    }
+
     const catExpense = await db.prepare("SELECT id FROM categories WHERE userId = ? AND name = 'Others' AND type = 'expense'").bind(user.id).first();
     const catIncome = await db.prepare("SELECT id FROM categories WHERE userId = ? AND name = 'Other' AND type = 'income'").bind(user.id).first();
     if (!catExpense || !catIncome) return json({ error: 'Categories not found. Run seed first.' }, 400);
@@ -319,21 +336,21 @@ async function handleUpload(request, env, user) {
         httpMetadata: { contentType: file.type || 'image/jpeg' },
     });
 
-    return json({ url: `https://pub-${env.MONEY_IMAGES}.r2.dev/${key}` });
+    return json({ url: `/api/receipts/${key}` });
 }
 
 async function handleCreateTransaction(request, env, user) {
-    const { id, amount, type, categoryId, walletId, date, note } = await request.json();
+    const { id, amount, type, categoryId, walletId, date, note, receiptUrl } = await request.json();
 
     const wallet = await env.MONEY_DB.prepare('SELECT * FROM wallets WHERE id = ? AND userId = ?').bind(walletId, user.id).first();
     if (!wallet) return json({ error: 'Wallet not found' }, 404);
 
-    await env.MONEY_DB.prepare('INSERT INTO transactions (id, amount, type, categoryId, walletId, date, note, userId) VALUES (?, ?, ?, ?, ?, ?, ?, ?)').bind(id, amount, type, categoryId, walletId, date, note || '', user.id).run();
+    await env.MONEY_DB.prepare('INSERT INTO transactions (id, amount, type, categoryId, walletId, date, note, receiptUrl, userId) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)').bind(id, amount, type, categoryId, walletId, date, note || '', receiptUrl || null, user.id).run();
 
     const sign = type === 'income' ? 1 : -1;
     await env.MONEY_DB.prepare('UPDATE wallets SET balance = balance + (? * ?) WHERE id = ? AND userId = ?').bind(sign, amount, walletId, user.id).run();
 
-    return json({ id, amount, type, categoryId, walletId, date, note, userId: user.id });
+    return json({ id, amount, type, categoryId, walletId, date, note, receiptUrl, userId: user.id });
 }
 
 async function handleUpdateTransaction(request, env, user) {
@@ -348,7 +365,7 @@ async function handleUpdateTransaction(request, env, user) {
     await db.prepare('UPDATE wallets SET balance = balance - (? * ?) WHERE id = ? AND userId = ?').bind(oldSign, oldTxn.amount, oldTxn.walletId, user.id).run();
 
     const merged = { ...oldTxn, ...body };
-    await db.prepare('UPDATE transactions SET amount = ?, type = ?, categoryId = ?, walletId = ?, date = ?, note = ? WHERE id = ? AND userId = ?').bind(merged.amount, merged.type, merged.categoryId, merged.walletId, merged.date, merged.note || '', txnId, user.id).run();
+    await db.prepare('UPDATE transactions SET amount = ?, type = ?, categoryId = ?, walletId = ?, date = ?, note = ?, receiptUrl = ? WHERE id = ? AND userId = ?').bind(merged.amount, merged.type, merged.categoryId, merged.walletId, merged.date, merged.note || '', merged.receiptUrl || null, txnId, user.id).run();
 
     const newSign = merged.type === 'income' ? 1 : -1;
     await db.prepare('UPDATE wallets SET balance = balance + (? * ?) WHERE id = ? AND userId = ?').bind(newSign, merged.amount, merged.walletId, user.id).run();

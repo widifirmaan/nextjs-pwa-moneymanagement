@@ -30,7 +30,7 @@ if (!fs.existsSync(rawDir)) fs.mkdirSync(rawDir, { recursive: true });
 if (!fs.existsSync(screenshotsDir)) fs.mkdirSync(screenshotsDir, { recursive: true });
 
 const desktopViewport = { width: 1440, height: 900, deviceScaleFactor: 1.5 };
-const mobileViewport = { width: 390, height: 844, deviceScaleFactor: 2, isMobile: true, hasTouch: true };
+const mobileViewport = { width: 390, height: 806, deviceScaleFactor: 2, isMobile: true, hasTouch: true };
 
 const scenes = [
     {

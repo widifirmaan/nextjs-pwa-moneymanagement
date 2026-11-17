@@ -14,15 +14,49 @@ MoneW is an installable, mobile-first Progressive Web App (PWA) designed for per
 
 ## Showcase
 
-| Desktop | Mobile |
+### 1. Dashboard, Net Worth & Privacy Mode (`/`)
+
+| Desktop Interface (MacBook Pro M4) | Mobile Interface (iPhone 16 Pro) |
 | :---: | :---: |
-| **Financial Dashboard Desktop**<br>![Financial Dashboard Desktop](screenshots/MoneW%20Dashboard%20Desktop.png) | **Financial Dashboard Mobile**<br>![Financial Dashboard Mobile](screenshots/MoneW%20Dashboard%20Mobile.png) |
-| **Cashflow & Spending Analytics Desktop**<br>![Monthly Analytics Desktop](screenshots/MoneW%20Monthly%20Analytics%20Desktop.png) | **Cashflow & Spending Analytics Mobile**<br>![Monthly Analytics Mobile](screenshots/MoneW%20Monthly%20Analytics%20Mobile.png) |
-| **Saved Credit & Debit Cards Desktop**<br>![Linked Cards Desktop](screenshots/MoneW%20Linked%20Cards%20Desktop.png) | **Saved Credit & Debit Cards Mobile**<br>![Linked Cards Mobile](screenshots/MoneW%20Linked%20Cards%20Mobile.png) |
-| **Digital Wallets & Accounts Desktop**<br>![Digital Wallets Desktop](screenshots/MoneW%20Digital%20Wallets%20Desktop.png) | **Digital Wallets & Accounts Mobile**<br>![Digital Wallets Mobile](screenshots/MoneW%20Digital%20Wallets%20Mobile.png) |
-| **Add Transaction Flow Desktop**<br>![Add Transaction Desktop](screenshots/MoneW%20Add%20Transaction%20Desktop.png) | **Add Transaction Flow Mobile**<br>![Add Transaction Mobile](screenshots/MoneW%20Add%20Transaction%20Mobile.png) |
-| **User Profile & Theme Customization Desktop**<br>![User Profile Desktop](screenshots/MoneW%20User%20Profile%20Desktop.png) | **User Profile & Theme Customization Mobile**<br>![User Profile Mobile](screenshots/MoneW%20User%20Profile%20Mobile.png) |
-| **Authentication Screen Desktop**<br>![Authentication Desktop](screenshots/MoneW%20Authentication%20Desktop.png) | **Authentication Screen Mobile**<br>![Authentication Mobile](screenshots/MoneW%20Authentication%20Mobile.png) |
+| **Financial Dashboard & Cashflow Overview**<br>![Financial Dashboard Desktop](screenshots/MoneW%20Financial%20Dashboard%20Desktop.png) | **Financial Dashboard & Cashflow Overview**<br>![Financial Dashboard Mobile](screenshots/MoneW%20Financial%20Dashboard%20Mobile.png) |
+| **Privacy Mode Active (Masked Financial Balances)**<br>![Privacy Mode Obscured Desktop](screenshots/MoneW%20Privacy%20Mode%20Obscured%20Desktop.png) | **Privacy Mode Active (Masked Financial Balances)**<br>![Privacy Mode Obscured Mobile](screenshots/MoneW%20Privacy%20Mode%20Obscured%20Mobile.png) |
+
+### 2. Multi-Wallet Sub-Ledgers & Limit Controls (`/wallets`)
+
+| Desktop Interface (MacBook Pro M4) | Mobile Interface (iPhone 16 Pro) |
+| :---: | :---: |
+| **Digital Wallets & Bank Accounts Overview**<br>![Digital Wallets Hub Desktop](screenshots/MoneW%20Digital%20Wallets%20Hub%20Desktop.png) | **Digital Wallets & Bank Accounts Overview**<br>![Digital Wallets Hub Mobile](screenshots/MoneW%20Digital%20Wallets%20Hub%20Mobile.png) |
+| **Wallet Spending Limits & Security Freeze Modal**<br>![Wallet Limits & Settings Modal Desktop](screenshots/MoneW%20Wallet%20Limits%20&%20Settings%20Modal%20Desktop.png) | **Wallet Spending Limits & Security Freeze Modal**<br>![Wallet Limits & Settings Modal Mobile](screenshots/MoneW%20Wallet%20Limits%20&%20Settings%20Modal%20Mobile.png) |
+
+### 3. Saved Payment Cards Sub-Ledger (`/cards`)
+
+| Desktop Interface (MacBook Pro M4) | Mobile Interface (iPhone 16 Pro) |
+| :---: | :---: |
+| **Saved Credit & Debit Cards Sub-Ledger**<br>![Linked Payment Cards Desktop](screenshots/MoneW%20Linked%20Payment%20Cards%20Desktop.png) | **Saved Credit & Debit Cards Sub-Ledger**<br>![Linked Payment Cards Mobile](screenshots/MoneW%20Linked%20Payment%20Cards%20Mobile.png) |
+| **Link New Payment Card Modal**<br>![Add Payment Card Modal Desktop](screenshots/MoneW%20Add%20Payment%20Card%20Modal%20Desktop.png) | **Link New Payment Card Modal**<br>![Add Payment Card Modal Mobile](screenshots/MoneW%20Add%20Payment%20Card%20Modal%20Mobile.png) |
+| **Card 3D Interactive Flip CVV Security**<br>![Card 3D Flip Security Desktop](screenshots/MoneW%20Card%203D%20Flip%20Security%20Desktop.png) | **Card 3D Interactive Flip CVV Security**<br>![Card 3D Flip Security Mobile](screenshots/MoneW%20Card%203D%20Flip%20Security%20Mobile.png) |
+
+### 4. Cashflow & Monthly Spending Analytics (`/stats`)
+
+| Desktop Interface (MacBook Pro M4) | Mobile Interface (iPhone 16 Pro) |
+| :---: | :---: |
+| **Cashflow & Category Spending Breakdown**<br>![Monthly Analytics Desktop](screenshots/MoneW%20Monthly%20Analytics%20Desktop.png) | **Cashflow & Category Spending Breakdown**<br>![Monthly Analytics Mobile](screenshots/MoneW%20Monthly%20Analytics%20Mobile.png) |
+| **Transaction Filter & Multi-Ledger Query Drawer**<br>![Analytics Filter Drawer Desktop](screenshots/MoneW%20Analytics%20Filter%20Drawer%20Desktop.png) | **Transaction Filter & Multi-Ledger Query Drawer**<br>![Analytics Filter Drawer Mobile](screenshots/MoneW%20Analytics%20Filter%20Drawer%20Mobile.png) |
+
+### 5. Transaction Entry Workflows (`/add`)
+
+| Desktop Interface (MacBook Pro M4) | Mobile Interface (iPhone 16 Pro) |
+| :---: | :---: |
+| **Add Expense Transaction Flow**<br>![Add Expense Transaction Desktop](screenshots/MoneW%20Add%20Expense%20Transaction%20Desktop.png) | **Add Expense Transaction Flow**<br>![Add Expense Transaction Mobile](screenshots/MoneW%20Add%20Expense%20Transaction%20Mobile.png) |
+| **Add Income Transaction Flow**<br>![Add Income Transaction Desktop](screenshots/MoneW%20Add%20Income%20Transaction%20Desktop.png) | **Add Income Transaction Flow**<br>![Add Income Transaction Mobile](screenshots/MoneW%20Add%20Income%20Transaction%20Mobile.png) |
+
+### 6. Profile Settings, Theming & Authentication (`/profile`, `/login`)
+
+| Desktop Interface (MacBook Pro M4) | Mobile Interface (iPhone 16 Pro) |
+| :---: | :---: |
+| **User Profile & Account Preferences**<br>![User Profile & Settings Desktop](screenshots/MoneW%20User%20Profile%20&%20Settings%20Desktop.png) | **User Profile & Account Preferences**<br>![User Profile & Settings Mobile](screenshots/MoneW%20User%20Profile%20&%20Settings%20Mobile.png) |
+| **Dynamic Theme Accent Palette Selector**<br>![Dynamic Theme Accent Selector Desktop](screenshots/MoneW%20Dynamic%20Theme%20Accent%20Selector%20Desktop.png) | **Dynamic Theme Accent Palette Selector**<br>![Dynamic Theme Accent Selector Mobile](screenshots/MoneW%20Dynamic%20Theme%20Accent%20Selector%20Mobile.png) |
+| **Authentication Screen (Login & Register)**<br>![Authentication Portal Desktop](screenshots/MoneW%20Authentication%20Portal%20Desktop.png) | **Authentication Screen (Login & Register)**<br>![Authentication Portal Mobile](screenshots/MoneW%20Authentication%20Portal%20Mobile.png) |
 
 ---
 

@@ -2,7 +2,7 @@
 
 > High-performance Progressive Web App (PWA) for multi-wallet expense tracking, payment cards, and cashflow analytics.
 
-MoneW is an installable, mobile-first Progressive Web App (PWA) designed for modern personal finance management. Built on Next.js 16 (App Router), React 19, and Tailwind CSS v4, MoneW runs serverless by pairing an optimized static export shell with a Cloudflare Edge Worker bridge (`worker.js`). All financial ledgers, wallets, transactions, and payment cards are persisted into Cloudflare D1 (relational SQLite) with cryptographic PBKDF2 password hashing and HMAC-SHA256 JWT sessions, with receipt uploads handled via Cloudflare R2 object storage.
+MoneW is an installable, mobile-first Progressive Web App (PWA) designed for personal finance tracking, wallet management, and expense analytics. Built on Next.js 16 (App Router), React 19, and Tailwind CSS v4, MoneW runs serverless on Cloudflare Workers with static assets and an Edge Worker API (`worker.js`). Ledgers, wallets, transactions, and payment cards are persisted into Cloudflare D1 (relational SQLite), with receipt uploads handled via Cloudflare R2 object storage.
 
 [![Live Demo](https://img.shields.io/badge/Demo-money.widifirmaan.web.id-10B981?style=flat-square&logo=cloudflare&logoColor=white)](https://money.widifirmaan.web.id)
 [![Next.js](https://img.shields.io/badge/Next.js-16.1.1-black?style=flat-square&logo=nextdotjs)](https://nextjs.org/)
@@ -10,9 +10,7 @@ MoneW is an installable, mobile-first Progressive Web App (PWA) designed for mod
 [![Tailwind CSS 4](https://img.shields.io/badge/Tailwind-v4.0-38BDF8?style=flat-square&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 [![Cloudflare D1](https://img.shields.io/badge/Database-Cloudflare_D1_(SQLite)-F38020?style=flat-square&logo=cloudflare)](https://developers.cloudflare.com/d1/)
 [![Cloudflare R2](https://img.shields.io/badge/Storage-Cloudflare_R2-F59E0B?style=flat-square&logo=cloudflare)](https://developers.cloudflare.com/r2/)
-[![Edge Worker](https://img.shields.io/badge/Runtime-Cloudflare_Worker-F38020?style=flat-square&logo=cloudflareworkers&logoColor=white)](https://workers.cloudflare.com/)
-[![Security](https://img.shields.io/badge/Auth-PBKDF2_•_JWT-EC4899?style=flat-square)](#edge-serverless-architecture)
-[![PWA](https://img.shields.io/badge/PWA-Installable-blueviolet?style=flat-square&logo=pwa&logoColor=white)](#features)
+[![Cloudflare Worker](https://img.shields.io/badge/Deployment-Cloudflare_Worker-F38020?style=flat-square&logo=cloudflareworkers&logoColor=white)](https://workers.cloudflare.com/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 
 ---
@@ -20,16 +18,16 @@ MoneW is an installable, mobile-first Progressive Web App (PWA) designed for mod
 ## Live Production
 
 - **URL:** [https://money.widifirmaan.web.id](https://money.widifirmaan.web.id)
-- **Deployment:** Cloudflare Pages with Edge Worker runtime bridge (`out/_worker.js`)
+- **Deployment:** Cloudflare Worker with static assets (`wrangler.jsonc`)
 - **Database:** Cloudflare D1 Relational SQLite (`monew-db`)
 - **Object Storage:** Cloudflare R2 Bucket (`monew-images`)
-- **PWA Capabilities:** Standalone installable application on iOS Safari and Android Chrome with offline service worker caching and native web clip configuration
+- **PWA Capabilities:** Standalone installable application with offline service worker caching
 
 ---
 
 ## Showcase
 
-| Desktop Interface (MacBook Pro M4) | Mobile Interface (iPhone 16 Pro) |
+| Desktop | Mobile |
 | :---: | :---: |
 | **Financial Dashboard Desktop**<br>![Financial Dashboard Desktop](screenshots/MoneW%20Dashboard%20Desktop.png) | **Financial Dashboard Mobile**<br>![Financial Dashboard Mobile](screenshots/MoneW%20Dashboard%20Mobile.png) |
 | **Cashflow & Spending Analytics Desktop**<br>![Monthly Analytics Desktop](screenshots/MoneW%20Monthly%20Analytics%20Desktop.png) | **Cashflow & Spending Analytics Mobile**<br>![Monthly Analytics Mobile](screenshots/MoneW%20Monthly%20Analytics%20Mobile.png) |
@@ -65,7 +63,7 @@ MoneW is an installable, mobile-first Progressive Web App (PWA) designed for mod
 | **Styling & Design System** | Tailwind CSS `v4.0`, CSS Custom Properties | Utility-first responsive styling with dynamic accent color tokens and glassmorphism |
 | **Motion & Micro-interactions** | Framer Motion `12.25.0` | 3D interactive sidebar tilt, tab transitions, and animated modal drawers |
 | **Database & Storage** | Cloudflare D1 (SQLite), Cloudflare R2 | Serverless relational edge database for financial records and object storage for receipts |
-| **Edge API Bridge** | Cloudflare Pages Worker (`worker.js`) | Single unified edge script serving static assets and handling secure `/api/*` endpoints |
+| **Edge API & Hosting** | Cloudflare Worker (`worker.js` + static assets) | Edge worker serving static assets and handling secure `/api/*` endpoints |
 | **Security & Authentication** | PBKDF2 (100,000 rounds, Web Crypto), HMAC-SHA256 JWT | Edge-native password hashing, token creation, and stateless authorization |
 | **PWA & Device Integration** | Service Worker (`sw.js`, Workbox), Web App Manifest | Standalone display mode, offline asset caching, and iOS mobile configuration profiles |
 | **Date & Icon Utilities** | Date-fns `4.1.0`, Lucide React `0.562.0` | Financial interval math, date formatting, and category vector iconography |
@@ -191,7 +189,7 @@ CREATE TABLE saved_cards (
 ├── schema.sql               # SQLite schema definition for Cloudflare D1
 ├── tsconfig.json
 ├── worker.js                # Cloudflare Worker REST API and edge router
-└── wrangler.jsonc           # Cloudflare Pages, D1, and R2 resource bindings
+└── wrangler.jsonc           # Cloudflare Worker, D1, and R2 resource bindings
 ```
 
 ---
@@ -202,7 +200,7 @@ CREATE TABLE saved_cards (
 
 - **Node.js**: `20.x` or `22.x`
 - **npm** or **pnpm**
-- **Cloudflare Wrangler CLI**: Installed via npm or run directly with `npx wrangler`
+- **Cloudflare Wrangler CLI**: Installed via npm (`npx wrangler`)
 
 ### 1. Installation
 
@@ -223,7 +221,7 @@ MoneW uses Cloudflare D1 for SQLite persistence. You can run with local D1 emula
 
 ```bash
 # Apply schema to local SQLite instance
-npx wrangler d1 execute monew-db --file=schema.sql
+npx wrangler d1 execute monew-db --local --file=schema.sql
 
 # Seed local database with demo user and realistic transactions
 npm run seed
@@ -249,35 +247,45 @@ npm run seed:remote
 
 ### 3. Local Development
 
-Because MoneW pairs a Next.js static shell with a Cloudflare Edge Worker API (`worker.js`), you can run the full-stack edge environment locally:
-
-```bash
-# Build the application bundle and edge worker bridge
-npm run build
-
-# Start local Cloudflare Pages runtime with local D1 database emulation
-npx wrangler pages dev out --d1 MONEY_DB=monew-db
-```
-
-Or run the fast Next.js development server for rapid UI iteration:
+You can run the Next.js development server for rapid UI iteration:
 
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) (Next.js) or [http://localhost:8788](http://localhost:8788) (Wrangler Pages Dev) in your browser.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+To run the full edge stack locally (Next.js static assets + Cloudflare Worker API + local D1):
+
+```bash
+# Build the application bundle
+npm run build
+
+# Start local Cloudflare Worker runtime with local D1 database emulation
+npx wrangler dev
+```
+
+Open [http://localhost:8787](http://localhost:8787) in your browser.
+
+### 4. Default Demo Credentials
+
+When seeded via `schema.sql` / `npm run seed`, the default account is available:
+
+| Email | Default Secret | Note |
+| :--- | :--- | :--- |
+| `vejoyf@gmail.com` | `dev-secret` | Pre-seeded with realistic BCA, Cash, Mandiri, and GoPay wallets |
 
 ---
 
 ## Production Build & Deployment
 
-To deploy MoneW to Cloudflare Pages:
+To deploy MoneW to Cloudflare Workers:
 
 ```bash
-# 1. Compile Next.js static export and copy worker.js to out/_worker.js
+# 1. Compile Next.js static export
 npm run build
 
-# 2. Deploy out/ directory to Cloudflare Pages
+# 2. Deploy static assets and Worker API via Wrangler
 npm run deploy
 ```
 

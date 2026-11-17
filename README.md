@@ -1,112 +1,81 @@
 # MoneW
 
-> Progressive Web App (PWA) for multi-wallet expense tracking, payment cards, and cashflow analytics.
-
-MoneW is an installable, mobile-first Progressive Web App (PWA) designed for personal finance tracking, wallet management, and expense analytics. Built on Next.js 16 (App Router), React 19, and Tailwind CSS v4, MoneW runs locally with an optimized client shell and an API router bridge (`worker.js`). Ledgers, wallets, transactions, and payment cards are persisted into a local relational SQLite database, with receipt uploads handled via local storage.
+> Aplikasi web progresif (PWA) untuk manajemen keuangan multi-dompet, pencatatan transaksi, sub-ledger kartu pembayaran, dan analisis cashflow bulanan.
 
 [![Next.js](https://img.shields.io/badge/Next.js-16.1.1-black?style=flat-square&logo=nextdotjs)](https://nextjs.org/)
 [![React 19](https://img.shields.io/badge/React-19.2.3-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
 [![Tailwind CSS 4](https://img.shields.io/badge/Tailwind-v4.0-38BDF8?style=flat-square&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 [![SQLite](https://img.shields.io/badge/Database-SQLite_3-003B57?style=flat-square&logo=sqlite&logoColor=white)](https://sqlite.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Live Demo](https://img.shields.io/badge/Demo-money.widifirmaan.web.id-10B981?style=flat-square)](https://money.widifirmaan.web.id)
 
 ---
 
-## Showcase
+## Live URL
 
-### 1. Dashboard, Net Worth & Privacy Mode (`/`)
-
-| Desktop Interface (MacBook Pro M4) | Mobile Interface (iPhone 16 Pro) |
-| :---: | :---: |
-| **Financial Dashboard & Cashflow Overview**<br>![Financial Dashboard Desktop](screenshots/MoneW%20Financial%20Dashboard%20Desktop.png) | **Financial Dashboard & Cashflow Overview**<br>![Financial Dashboard Mobile](screenshots/MoneW%20Financial%20Dashboard%20Mobile.png) |
-| **Privacy Mode Active (Masked Financial Balances)**<br>![Privacy Mode Obscured Desktop](screenshots/MoneW%20Privacy%20Mode%20Obscured%20Desktop.png) | **Privacy Mode Active (Masked Financial Balances)**<br>![Privacy Mode Obscured Mobile](screenshots/MoneW%20Privacy%20Mode%20Obscured%20Mobile.png) |
-
-### 2. Multi-Wallet Sub-Ledgers & Limit Controls (`/wallets`)
-
-| Desktop Interface (MacBook Pro M4) | Mobile Interface (iPhone 16 Pro) |
-| :---: | :---: |
-| **Digital Wallets & Bank Accounts Overview**<br>![Digital Wallets Hub Desktop](screenshots/MoneW%20Digital%20Wallets%20Hub%20Desktop.png) | **Digital Wallets & Bank Accounts Overview**<br>![Digital Wallets Hub Mobile](screenshots/MoneW%20Digital%20Wallets%20Hub%20Mobile.png) |
-| **Wallet Spending Limits & Security Freeze Modal**<br>![Wallet Limits & Settings Modal Desktop](screenshots/MoneW%20Wallet%20Limits%20&%20Settings%20Modal%20Desktop.png) | **Wallet Spending Limits & Security Freeze Modal**<br>![Wallet Limits & Settings Modal Mobile](screenshots/MoneW%20Wallet%20Limits%20&%20Settings%20Modal%20Mobile.png) |
-
-### 3. Saved Payment Cards Sub-Ledger (`/cards`)
-
-| Desktop Interface (MacBook Pro M4) | Mobile Interface (iPhone 16 Pro) |
-| :---: | :---: |
-| **Saved Credit & Debit Cards Sub-Ledger**<br>![Linked Payment Cards Desktop](screenshots/MoneW%20Linked%20Payment%20Cards%20Desktop.png) | **Saved Credit & Debit Cards Sub-Ledger**<br>![Linked Payment Cards Mobile](screenshots/MoneW%20Linked%20Payment%20Cards%20Mobile.png) |
-| **Link New Payment Card Modal**<br>![Add Payment Card Modal Desktop](screenshots/MoneW%20Add%20Payment%20Card%20Modal%20Desktop.png) | **Link New Payment Card Modal**<br>![Add Payment Card Modal Mobile](screenshots/MoneW%20Add%20Payment%20Card%20Modal%20Mobile.png) |
-| **Card 3D Interactive Flip CVV Security**<br>![Card 3D Flip Security Desktop](screenshots/MoneW%20Card%203D%20Flip%20Security%20Desktop.png) | **Card 3D Interactive Flip CVV Security**<br>![Card 3D Flip Security Mobile](screenshots/MoneW%20Card%203D%20Flip%20Security%20Mobile.png) |
-
-### 4. Cashflow & Monthly Spending Analytics (`/stats`)
-
-| Desktop Interface (MacBook Pro M4) | Mobile Interface (iPhone 16 Pro) |
-| :---: | :---: |
-| **Cashflow & Category Spending Breakdown**<br>![Monthly Analytics Desktop](screenshots/MoneW%20Monthly%20Analytics%20Desktop.png) | **Cashflow & Category Spending Breakdown**<br>![Monthly Analytics Mobile](screenshots/MoneW%20Monthly%20Analytics%20Mobile.png) |
-| **Transaction Filter & Multi-Ledger Query Drawer**<br>![Analytics Filter Drawer Desktop](screenshots/MoneW%20Analytics%20Filter%20Drawer%20Desktop.png) | **Transaction Filter & Multi-Ledger Query Drawer**<br>![Analytics Filter Drawer Mobile](screenshots/MoneW%20Analytics%20Filter%20Drawer%20Mobile.png) |
-
-### 5. Transaction Entry Workflows (`/add`)
-
-| Desktop Interface (MacBook Pro M4) | Mobile Interface (iPhone 16 Pro) |
-| :---: | :---: |
-| **Add Expense Transaction Flow**<br>![Add Expense Transaction Desktop](screenshots/MoneW%20Add%20Expense%20Transaction%20Desktop.png) | **Add Expense Transaction Flow**<br>![Add Expense Transaction Mobile](screenshots/MoneW%20Add%20Expense%20Transaction%20Mobile.png) |
-| **Add Income Transaction Flow**<br>![Add Income Transaction Desktop](screenshots/MoneW%20Add%20Income%20Transaction%20Desktop.png) | **Add Income Transaction Flow**<br>![Add Income Transaction Mobile](screenshots/MoneW%20Add%20Income%20Transaction%20Mobile.png) |
-
-### 6. Profile Settings, Theming & Authentication (`/profile`, `/login`)
-
-| Desktop Interface (MacBook Pro M4) | Mobile Interface (iPhone 16 Pro) |
-| :---: | :---: |
-| **User Profile & Account Preferences**<br>![User Profile & Settings Desktop](screenshots/MoneW%20User%20Profile%20&%20Settings%20Desktop.png) | **User Profile & Account Preferences**<br>![User Profile & Settings Mobile](screenshots/MoneW%20User%20Profile%20&%20Settings%20Mobile.png) |
-| **Dynamic Theme Accent Palette Selector**<br>![Dynamic Theme Accent Selector Desktop](screenshots/MoneW%20Dynamic%20Theme%20Accent%20Selector%20Desktop.png) | **Dynamic Theme Accent Palette Selector**<br>![Dynamic Theme Accent Selector Mobile](screenshots/MoneW%20Dynamic%20Theme%20Accent%20Selector%20Mobile.png) |
-| **Authentication Screen (Login & Register)**<br>![Authentication Portal Desktop](screenshots/MoneW%20Authentication%20Portal%20Desktop.png) | **Authentication Screen (Login & Register)**<br>![Authentication Portal Mobile](screenshots/MoneW%20Authentication%20Portal%20Mobile.png) |
+- **Production URL**: [https://money.widifirmaan.web.id](https://money.widifirmaan.web.id)
 
 ---
 
-## Features
+## Screenshot
 
-- **Consolidated Balance & Net Worth (`/`)**: Aggregated multi-wallet net worth tracking, monthly income and expense totals, wallet summary carousel, and real-time transaction ledger.
-- **Multi-Wallet Accounts (`/wallets`)**: Dedicated sub-ledgers for bank accounts (BCA, Mandiri), digital e-wallets (GoPay, OVO, DANA), and physical cash reserves with balance transfers.
-- **Wallet Expense Limits & Safety Freeze**: Configurable daily, weekly, and monthly threshold limits per wallet with automated alert badges and one-tap account freeze capability.
-- **Cashflow & Spending Analytics (`/stats`)**: Timeframe filtering across "This Month", "Last Month", "Last 3 Months", or "Custom Date Range" with month-over-month percentage changes, top spending category rankings (#1, #2, #3) with exact expense values and progress bars, and a filterable transaction audit ledger (filter by Type, Wallet, Category) with pagination.
-- **Saved Payment Cards Sub-Ledger (`/cards`)**: 3D gradient card views supporting Visa and Mastercard networks with masked card numbers, cardholder identification, expiration dates, bank branding, and flip CVV security.
-- **Streamlined Transaction Entry (`/add`)**: Split expense/income workflow, large numeric typography, category picker with Lucide icons, default active wallet binding, and custom iOS wheel date picker.
-- **Digital Receipt Capture (`/api/upload`)**: Upload integration to attach receipt images and invoices to transaction records.
-- **Privacy Mode**: 1-click balance obscuring toggle hiding all sensitive financial numbers behind asterisks (`••••••`) for safe usage in public spaces.
-- **Adaptive Dynamic Theming (`ThemeContext.tsx`)**: Theme engine supporting dark and light modes alongside 5 accent color schemes (Emerald, Violet, Blue, Amber, Rose) injected into CSS custom properties.
-- **Installable Progressive Web App (PWA)**: Standalone web app manifest, offline service worker caching (`sw.js`), and in-app install prompt banner (`InstallPrompt.tsx`).
+| Desktop | Mobile |
+| :---: | :---: |
+| **Dashboard Ringkasan Saldo**<br>![Dashboard](screenshots/Dashboard%20Desktop.png) | **Dashboard Ringkasan Saldo**<br>![Dashboard](screenshots/Dashboard%20Mobile.png) |
+| **Daftar Dompet & Akun Bank**<br>![Wallets](screenshots/Wallets%20Desktop.png) | **Daftar Dompet & Akun Bank**<br>![Wallets](screenshots/Wallets%20Mobile.png) |
+| **Sub-Ledger Kartu Debit & Kredit**<br>![Cards](screenshots/Cards%20Desktop.png) | **Sub-Ledger Kartu Debit & Kredit**<br>![Cards](screenshots/Cards%20Mobile.png) |
+| **Analisis Cashflow & Filter Transaksi**<br>![Analytics](screenshots/Analytics%20Desktop.png) | **Analisis Cashflow & Filter Transaksi**<br>![Analytics](screenshots/Analytics%20Mobile.png) |
+| **Form Tambah Transaksi**<br>![Add Transaction](screenshots/Add%20Transaction%20Desktop.png) | **Form Tambah Transaksi**<br>![Add Transaction](screenshots/Add%20Transaction%20Mobile.png) |
+| **Profil Pengguna & Pilihan Aksen Tema**<br>![Profile](screenshots/Profile%20Desktop.png) | **Profil Pengguna & Pilihan Aksen Tema**<br>![Profile](screenshots/Profile%20Mobile.png) |
+| **Autentikasi Login & Register**<br>![Login](screenshots/Login%20Desktop.png) | **Autentikasi Login & Register**<br>![Login](screenshots/Login%20Mobile.png) |
+
+---
+
+## Fitur
+
+- **Konsolidasi Saldo & Net Worth (`/`)**: Menghitung total akumulasi saldo dari seluruh dompet aktif, total pemasukan, dan total pengeluaran bulan berjalan secara real-time.
+- **Multi-Wallet Accounts (`/wallets`)**: Manajemen terpisah untuk rekening bank (BCA, Mandiri), dompet digital (GoPay, OVO, DANA), dan uang tunai fisik dengan fitur transfer saldo antar-dompet.
+- **Batas Pengeluaran & Safety Freeze**: Pengaturan batas maksimal transaksi harian, mingguan, dan bulanan per dompet, disertai opsi membekukan (*freeze*) dompet untuk mencegah penarikan.
+- **Sub-Ledger Kartu Pembayaran (`/cards`)**: Visualisasi kartu debit dan kredit (Visa & Mastercard) dengan nomor kartu terenkripsi/tersamar, masa berlaku, dan simulasi interaktif flip CVV 3D.
+- **Analisis Cashflow & Laporan Kategori (`/stats`)**: Filter rentang waktu ("Bulan Ini", "Bulan Lalu", "3 Bulan Terakhir", "Kustom"), grafik spending, pemeringkatan 3 kategori teratas, dan riwayat transaksi dengan filter multi-parameter.
+- **Pencatatan Transaksi Cepat (`/add`)**: Alur input pengeluaran dan pemasukan dengan pemilih kategori berikon Lucide, keterhubungan dompet sumber, dan pengatur tanggal.
+- **Lampiran Struk Pembayaran (`/api/upload`)**: Dukungan upload gambar bukti transaksi struk atau tagihan ke penyimpanan lokal.
+- **Privacy Mode**: Tombol 1-klik untuk menyamarkan semua angka nominal saldo menjadi tanda bintang (`••••••`) agar aman saat dibuka di ruang publik.
+- **Dukungan Dynamic Theme**: Pilihan tema gelap/terang serta 5 aksen warna (Emerald, Violet, Blue, Amber, Rose) yang dikelola melalui CSS variables.
+- **Progressive Web App (PWA)**: Manifest aplikasi standalone, caching aset offline melalui service worker (`sw.js`), dan banner rekomendasi instalasi ke layar utama perangkat.
 
 ---
 
 ## Tech Stack
 
-| Category | Technologies | Purpose |
+| Kategori | Teknologi | Deskripsi / Peran |
 | :--- | :--- | :--- |
-| **Core Framework** | Next.js `16.1.1` (App Router), React `19.2.3` | SPA foundation with fast client-side routing and pre-rendered shell |
-| **Styling & Design System** | Tailwind CSS `v4.0`, CSS Custom Properties | Utility-first responsive styling with dynamic accent color tokens |
-| **Motion & Transitions** | Framer Motion `12.25.0` | Tab transitions, animated modal drawers, and interactive cards |
-| **Database & Storage** | SQLite 3, Local Object Storage | Relational SQLite database for financial records and receipt attachments |
-| **API Router** | Edge API Server (`worker.js`) | Local API router serving endpoints and handling `/api/*` data persistence |
-| **Security & Authentication** | PBKDF2 (100,000 rounds, Web Crypto), HMAC-SHA256 JWT | Local password hashing, token creation, and stateless authorization |
-| **PWA & Offline** | Service Worker (`sw.js`), Web App Manifest | Standalone display mode and offline asset caching |
-| **Date & Icon Utilities** | Date-fns `4.1.0`, Lucide React `0.562.0` | Financial interval math, date formatting, and category vector iconography |
+| **Framework Utama** | Next.js `16.1.1` (App Router), React `19.2.3` | SPA modern dengan rendering cepat dan arsitektur modular |
+| **Styling** | Tailwind CSS `v4.0`, CSS Custom Properties | Styling responsif dengan sistem tema aksen dinamis |
+| **Animasi** | Framer Motion `12.25.0` | Transisi halaman, drawer modal, dan interaksi komponen |
+| **Database** | SQLite 3 | Basis data relasional lokal untuk pencatatan user, dompet, kartu, dan transaksi |
+| **API Engine** | Local Server Router (`worker.js`) | Router endpoint lokal untuk melayani persistensi data `/api/*` |
+| **Keamanan & Kredensial** | PBKDF2 (100.000 iterasi, Web Crypto), HMAC-SHA256 JWT | Hashing kata sandi dan manajemen token stateless |
+| **Fitur PWA** | Service Worker (`sw.js`), Web App Manifest | Dukungan offline caching dan instalasi standalone |
+| **Utilitas** | Date-fns `4.1.0`, Lucide React `0.562.0` | Kalkulasi rentang tanggal dan ikon vektor visual |
 
 ---
 
 ## Database Architecture
 
-MoneW organizes relational financial data with SQLite ACID transaction guarantees. The schema (`schema.sql`) organizes data across 5 normalized tables:
+MoneW menggunakan database SQLite dengan integritas transaksi ACID. Skema didefinisikan dalam `schema.sql`:
 
 ```sql
--- 1. User Profiles & Display Preferences
 CREATE TABLE users (
     id TEXT PRIMARY KEY,
     email TEXT UNIQUE NOT NULL,
     name TEXT NOT NULL DEFAULT '',
-    password TEXT NOT NULL DEFAULT '',           -- PBKDF2 256-bit hash
-    colorScheme TEXT NOT NULL DEFAULT 'dark',     -- Theme accent preference
+    password TEXT NOT NULL DEFAULT '',
+    colorScheme TEXT NOT NULL DEFAULT 'dark',
     isSetupCompleted INTEGER NOT NULL DEFAULT 0,
     createdAt TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
--- 2. Expense & Income Categories
 CREATE TABLE categories (
     id TEXT PRIMARY KEY,
     name TEXT NOT NULL,
@@ -117,7 +86,6 @@ CREATE TABLE categories (
     FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- 3. Multi-Wallet Accounts & Spending Limits
 CREATE TABLE wallets (
     id TEXT PRIMARY KEY,
     name TEXT NOT NULL,
@@ -133,7 +101,6 @@ CREATE TABLE wallets (
     FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- 4. Financial Transactions & Receipt Links
 CREATE TABLE transactions (
     id TEXT PRIMARY KEY,
     amount REAL NOT NULL,
@@ -149,7 +116,6 @@ CREATE TABLE transactions (
     FOREIGN KEY (walletId) REFERENCES wallets(id) ON DELETE CASCADE
 );
 
--- 5. Saved Payment Cards
 CREATE TABLE saved_cards (
     id TEXT PRIMARY KEY,
     userId TEXT NOT NULL,
@@ -167,111 +133,74 @@ CREATE TABLE saved_cards (
 
 ---
 
-## Project Structure
+## Panduan Setup & Menjalankan Lokal
 
-```bash
-/
-├── app/
-│   ├── add/                 # Quick transaction entry modal route
-│   ├── cards/               # Saved credit and debit cards management
-│   ├── login/               # Authentication and registration
-│   ├── profile/             # Profile settings and theme selector
-│   ├── stats/               # Cashflow, percentage breakdown, and transaction ledger
-│   ├── wallets/             # Multi-wallet accounts, limits, and transfer drawer
-│   ├── globals.css          # Tailwind CSS v4 variables and theme tokens
-│   ├── layout.tsx           # Global app shell, providers, and viewport setup
-│   └── page.tsx             # Primary overview dashboard and recent feed
-├── components/              # UI primitives, bottom nav, modals, setup wizard
-├── context/                 # AuthContext, StoreContext, and ThemeContext
-├── lib/                     # Data types and CSS class merging helper
-├── public/                  # Manifest, logo, and offline service worker
-├── screenshots/             # Desktop and mobile showcase mockups
-├── scripts/
-│   ├── capture-all.mjs      # Screenshot capture and mockup generator
-│   └── seed.sql             # Turnkey database seeder with realistic Indonesian records
-├── package.json
-├── schema.sql               # SQLite schema definition
-├── tsconfig.json
-├── worker.js                # Local API and edge router
-└── wrangler.jsonc           # Local D1 SQLite and storage resource bindings
+### 1. Prasyarat Sistem
+
+- **Node.js**: Versi `20.x` atau `22.x`
+- **npm** atau **pnpm**
+- **SQLite 3**: Native CLI (`sqlite3`)
+
+### 2. Environment Variables
+
+Buat file `.env.local` pada direktori root:
+
+```env
+JWT_SECRET=dev-secret-key-change-in-production
+NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
----
-
-## Local Setup & Deployment
-
-### 1. Prerequisites
-
-- **Node.js**: Version `20.x` or `22.x`
-- **npm** or **pnpm**
-- **SQLite 3**: Native CLI (`sqlite3`) or local runner via `npx wrangler`
-
-### 2. Installation
+### 3. Instalasi Dependensi
 
 ```bash
-# Clone the repository
+# Clone repository
 git clone https://github.com/widifirmaan/nextjs-pwa-moneymanagement.git
 cd nextjs-pwa-moneymanagement
 
-# Install dependencies
+# Install package
 npm install
 ```
 
-### 3. Setup Database & Seeder Lokal
+### 4. Setup Database & Seeder Lokal
 
-Inisialisasi skema tabel dan isi data awal (seeder) ke database SQLite lokal:
+Inisialisasi tabel dan isi data awal (seeder) ke database SQLite lokal:
 
 ```bash
-# Opsi A: Menggunakan SQLite3 CLI
+# Menggunakan SQLite CLI lokal
 sqlite3 local.db < schema.sql
 sqlite3 local.db < scripts/seed.sql
-
-# Opsi B: Menggunakan local runtime
-npx wrangler d1 execute monew-db --local --file=schema.sql
-npm run seed
 ```
 
-#### Isi Data Seeder:
-* **User Profile**: Akun demo `vejoyf@gmail.com`
-* **11 Kategori Standar**: Food & Drink, Transport, Shopping, Bills, Salary, Investments, Entertainment, Health, Education, dll.
-* **4 Multi-Wallet Accounts**:
-  * Bank BCA (`Rp 18.450.000`)
-  * Bank Mandiri (`Rp 24.800.000`)
-  * GoPay E-Wallet (`Rp 2.150.000`)
-  * Cash Fisik (`Rp 1.250.000`)
-* **3 Kartu Pembayaran**: BCA Platinum Visa, Mandiri Prioritas Mastercard, Jenius Contactless.
-* **13 Transaksi Realistis**: Gaji bulanan, tagihan listrik & internet, gym pass, langganan kursus online, belanja, dll.
+#### Data Seeder Bawaan:
+- **Akun Demo**: `vejoyf@gmail.com`
+- **11 Kategori**: Makanan & Minuman, Transportasi, Belanja, Tagihan, Gaji, Investasi, Hiburan, Kesehatan, Pendidikan, dll.
+- **4 Dompet**:
+  - Bank BCA (`Rp 18.450.000`)
+  - Bank Mandiri (`Rp 24.800.000`)
+  - GoPay (`Rp 2.150.000`)
+  - Tunai Fisik (`Rp 1.250.000`)
+- **3 Kartu Pembayaran**: BCA Platinum Visa, Mandiri Prioritas Mastercard, Jenius Contactless.
+- **13 Transaksi Riil**: Gaji, listrik, internet, gym pass, groceries, dan belanja harian.
 
-### 4. Menjalankan Server Lokal
+### 5. Menjalankan Server Lokal
 
 ```bash
-# Jalankan server frontend Next.js
+# Jalankan mode development
 npm run dev
 ```
 
 Buka [http://localhost:3000](http://localhost:3000) di browser Anda.
 
-Atau jalankan full edge API runtime lokal:
+### 6. Panduan Uji Manual (Testing Checklist)
 
-```bash
-npm run build
-npx wrangler dev
-```
-
-Buka [http://localhost:8787](http://localhost:8787) di browser.
-
-### 5. Panduan Uji Manual (Testing Checklist)
-
-Lakukan verifikasi manual berikut di browser:
-
-| No | Fitur yang Diuji | Langkah Pengujian | Hasil yang Diharapkan |
+| No | Fitur | Langkah Pengujian | Hasil yang Diharapkan |
 | :---: | :--- | :--- | :--- |
-| 1 | **Login Gateway** | Buka `/login`, masukkan email `vejoyf@gmail.com` | Berhasil login dan dialihkan ke dashboard `/` |
-| 2 | **Konsolidasi Saldo** | Periksa ringkasan di dashboard `/` | Total saldo menampilkan total gabungan seluruh dompet (~Rp 46.650.000) |
-| 3 | **Filter Analytics** | Buka `/stats`, ubah dropdown filter waktu | Tampil grafik spending, breakdown persentase, dan ranking kategori |
-| 4 | **Tambah Transaksi** | Buka `/add`, pilih Expense, masukkan nominal `50000`, pilih kategori `Food & Drink`, pilih dompet `GoPay`, submit | Transaksi tersimpan dan saldo GoPay berkurang `Rp 50.000` |
+| 1 | **Login** | Buka `/login`, masukkan email `vejoyf@gmail.com` | Berhasil login dan diarahkan ke dashboard `/` |
+| 2 | **Konsolidasi Saldo** | Periksa kartu total di dashboard `/` | Total saldo menampilkan gabungan nominal seluruh dompet (~Rp 46.650.000) |
+| 3 | **Filter Analytics** | Buka `/stats`, ubah dropdown filter waktu | Tampil grafik spending, breakdown persentase, dan ranking 3 kategori teratas |
+| 4 | **Tambah Transaksi** | Buka `/add`, pilih Pengeluaran, isi `50000`, pilih kategori `Food & Drink`, pilih dompet `GoPay`, simpan | Transaksi baru tercatat dan saldo GoPay berkurang sebesar `Rp 50.000` |
 | 5 | **Sub-Ledger Kartu** | Buka `/cards` | Tampil 3 kartu (BCA, Mandiri, Jenius) dengan preview flip CVV interaktif |
-| 6 | **Privacy Mode** | Klik ikon mata di header | Semua angka saldo tersamarkan menjadi tanda bintang (`••••••`) |
+| 6 | **Privacy Mode** | Klik ikon mata pada header | Seluruh nominal saldo berubah menjadi tanda bintang (`••••••`) |
 
 ---
 

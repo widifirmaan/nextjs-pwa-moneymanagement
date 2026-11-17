@@ -23,5 +23,12 @@
       "binding": "MONEY_IMAGES",
       "bucket_name": "monew-images"
     }
+  ],
+  "routes": [
+    {
+      "pattern": "money.widifirmaan.web.id",
+      "zone_name": "widifirmaan.web.id",
+      "custom_domain": true
+    }
   ]
 }

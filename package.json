@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev -H 0.0.0.0 --webpack",
-    "build": "next build && node -e \"require('fs').copyFileSync('worker.js','out/_worker.js')\"",
-    "deploy": "wrangler pages deploy out",
+    "build": "next build && node -e \"try{require('fs').unlinkSync('out/_worker.js')}catch(e){}\"",
+    "deploy": "wrangler deploy",
     "seed": "wrangler d1 execute monew-db --file=scripts/seed.sql",
     "seed:remote": "wrangler d1 execute monew-db --remote --file=scripts/seed.sql",
     "lint": "eslint"

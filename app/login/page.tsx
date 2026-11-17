@@ -110,25 +110,9 @@ export default function Login() {
                                     <ShieldCheck className="w-5 h-5 text-accent" />
                                 </div>
                                 <div>
-                                    <h4 className="text-sm font-semibold text-foreground">Cloudflare Edge & PWA Ready</h4>
-                                    <p className="text-xs text-muted-foreground">Backed by Cloudflare D1 SQL, R2 receipts, and offline capability.</p>
+                                    <h4 className="text-sm font-semibold text-foreground">Private & Offline-Ready</h4>
+                                    <p className="text-xs text-muted-foreground">Secure receipt storage and instant offline access anywhere.</p>
                                 </div>
-                            </div>
-                        </div>
-
-                        {/* Tech Badges */}
-                        <div className="flex items-center gap-6 pt-2 text-xs text-muted-foreground font-mono">
-                            <div className="flex items-center gap-2">
-                                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                                <span>CLOUDFLARE D1</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <span className="w-2 h-2 rounded-full bg-blue-500" />
-                                <span>R2 STORAGE</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <span className="w-2 h-2 rounded-full bg-amber-500" />
-                                <span>OFFLINE PWA</span>
                             </div>
                         </div>
                     </div>

@@ -13,13 +13,14 @@
 
 ## Live URL
 
-- **Production URL**: [https://money.widifirmaan.web.id](https://money.widifirmaan.web.id)
+- **Production URL:** [https://money.widifirmaan.web.id](https://money.widifirmaan.web.id)
+- **Deployment Platform:** Cloudflare Pages & Cloudflare Workers
 
 ---
 
-## Screenshots
+## Showcase
 
-| Desktop | Mobile |
+| Desktop (MacBook Pro M4) | Mobile (iPhone 16 Pro) |
 | :---: | :---: |
 | **Balance & Net Worth Dashboard**<br>![Dashboard](screenshots/Dashboard%20Desktop.png) | **Balance & Net Worth Dashboard**<br>![Dashboard](screenshots/Dashboard%20Mobile.png) |
 | **Wallet Details Modal & Ledger Tabs**<br>![Dashboard Modal Wallet Details](screenshots/Dashboard%20Modal%20Wallet%20Details%20Desktop.png) | **Wallet Details Modal & Ledger Tabs**<br>![Dashboard Modal Wallet Details](screenshots/Dashboard%20Modal%20Wallet%20Details%20Mobile.png) |
@@ -33,11 +34,11 @@
 | **User Profile & Theme Accent Selector**<br>![Profile](screenshots/Profile%20Desktop.png) | **User Profile & Theme Accent Selector**<br>![Profile](screenshots/Profile%20Mobile.png) |
 | **Reset Data Confirmation Modal**<br>![Profile Modal Reset Confirm](screenshots/Profile%20Modal%20Reset%20Confirm%20Desktop.png) | **Reset Data Confirmation Modal**<br>![Profile Modal Reset Confirm](screenshots/Profile%20Modal%20Reset%20Confirm%20Mobile.png) |
 | **Authentication Portal (Login & Register)**<br>![Login](screenshots/Login%20Desktop.png) | **Authentication Portal (Login & Register)**<br>![Login](screenshots/Login%20Mobile.png) |
-| **Invalid Credentials Error State**<br>![Login Alert Invalid Credentials](screenshots/Login%20Alert%20Invalid%20Credentials%20Desktop.png) | **Invalid Credentials Error State**<br>![Login Alert Invalid Credentials](screenshots/Login%20Alert%20Invalid%20Credentials%20Mobile.png) |
+| **Invalid Credentials Error Alert**<br>![Login Alert Invalid Credentials](screenshots/Login%20Alert%20Invalid%20Credentials%20Desktop.png) | **Invalid Credentials Error Alert**<br>![Login Alert Invalid Credentials](screenshots/Login%20Alert%20Invalid%20Credentials%20Mobile.png) |
 
 ---
 
-## Features
+## Fitur
 
 - **Consolidated Balance & Net Worth (`/`)**: Aggregated net worth tracking across all active wallets, current month income and expense totals, and real-time transaction ledger.
 - **Multi-Wallet Accounts (`/wallets`)**: Dedicated sub-ledgers for commercial bank accounts (BCA, Mandiri), digital e-wallets (GoPay, OVO, DANA), and physical cash with inter-wallet balance transfers.
@@ -59,96 +60,23 @@
 | **Core Framework** | Next.js `16.1.1` (App Router), React `19.2.3` | SPA architecture with pre-rendered app shell and client routing |
 | **Styling** | Tailwind CSS `v4.0`, CSS Custom Properties | Responsive styling with dynamic theme accent tokens |
 | **Animation** | Framer Motion `12.25.0` | Route transitions, modal drawers, and interactive card components |
-| **Database** | SQLite 3 | Local relational database for user profiles, wallets, cards, and transactions |
-| **API Router** | Local Server Router (`worker.js`) | Local endpoint router handling `/api/*` data persistence |
-| **Security & Auth** | PBKDF2 (100,000 rounds, Web Crypto), HMAC-SHA256 JWT | Local password hashing and stateless token authentication |
+| **Charts** | Recharts `3.6.0` | SVG cashflow analytics, category distribution donut, and spending trends |
+| **Database** | SQLite 3 / Cloudflare D1 | Relational database for user profiles, wallets, cards, and transactions |
+| **API Router** | Serverless Worker (`worker.js`) | API route handler handling `/api/*` data persistence |
+| **Security & Auth** | PBKDF2 (100,000 rounds, Web Crypto), HMAC-SHA256 JWT | Password hashing and stateless token authentication |
 | **PWA Capabilities** | Service Worker (`sw.js`), Web App Manifest | Offline asset caching and standalone installation |
 | **Utilities** | Date-fns `4.1.0`, Lucide React `0.562.0` | Date interval math and UI vector iconography |
 
 ---
 
-## Database Architecture
-
-MoneW organizes financial records in a relational SQLite database with ACID transaction guarantees. The schema is defined in `schema.sql`:
-
-```sql
-CREATE TABLE users (
-    id TEXT PRIMARY KEY,
-    email TEXT UNIQUE NOT NULL,
-    name TEXT NOT NULL DEFAULT '',
-    password TEXT NOT NULL DEFAULT '',
-    colorScheme TEXT NOT NULL DEFAULT 'dark',
-    isSetupCompleted INTEGER NOT NULL DEFAULT 0,
-    createdAt TEXT NOT NULL DEFAULT (datetime('now'))
-);
-
-CREATE TABLE categories (
-    id TEXT PRIMARY KEY,
-    name TEXT NOT NULL,
-    icon TEXT NOT NULL,
-    color TEXT NOT NULL,
-    type TEXT NOT NULL CHECK(type IN ('income', 'expense')),
-    userId TEXT NOT NULL,
-    FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
-);
-
-CREATE TABLE wallets (
-    id TEXT PRIMARY KEY,
-    name TEXT NOT NULL,
-    type TEXT NOT NULL CHECK(type IN ('bank', 'ewallet', 'cash')),
-    balance REAL NOT NULL DEFAULT 0,
-    color TEXT NOT NULL,
-    accountNumber TEXT,
-    userId TEXT NOT NULL,
-    isFrozen INTEGER NOT NULL DEFAULT 0,
-    expenseLimitsDaily REAL NOT NULL DEFAULT 0,
-    expenseLimitsWeekly REAL NOT NULL DEFAULT 0,
-    expenseLimitsMonthly REAL NOT NULL DEFAULT 0,
-    FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
-);
-
-CREATE TABLE transactions (
-    id TEXT PRIMARY KEY,
-    amount REAL NOT NULL,
-    type TEXT NOT NULL CHECK(type IN ('income', 'expense')),
-    categoryId TEXT NOT NULL,
-    walletId TEXT NOT NULL,
-    date TEXT NOT NULL,
-    note TEXT NOT NULL DEFAULT '',
-    receiptUrl TEXT,
-    userId TEXT NOT NULL,
-    FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (categoryId) REFERENCES categories(id) ON DELETE CASCADE,
-    FOREIGN KEY (walletId) REFERENCES wallets(id) ON DELETE CASCADE
-);
-
-CREATE TABLE saved_cards (
-    id TEXT PRIMARY KEY,
-    userId TEXT NOT NULL,
-    cardName TEXT NOT NULL,
-    cardHolderName TEXT NOT NULL,
-    cardNumber TEXT NOT NULL,
-    expiryDate TEXT NOT NULL,
-    cvv TEXT NOT NULL,
-    cardType TEXT NOT NULL,
-    color TEXT NOT NULL,
-    bankName TEXT,
-    FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
-);
-```
-
----
-
-## Local Setup & Deployment
+## Tutorial Run Local & Setup
 
 ### 1. Prerequisites
-
 - **Node.js**: Version `20.x` or `22.x`
 - **npm** or **pnpm**
 - **SQLite 3**: Native CLI (`sqlite3`)
 
 ### 2. Environment Variables Setup
-
 Create a `.env.local` file in the project root:
 
 ```env
@@ -157,7 +85,6 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
 ### 3. Installation
-
 ```bash
 # Clone the repository
 git clone https://github.com/widifirmaan/nextjs-pwa-moneymanagement.git
@@ -167,17 +94,19 @@ cd nextjs-pwa-moneymanagement
 npm install
 ```
 
-### 4. Local Database & Seeder Setup
-
+### 4. Database Schema & Seeder Setup
 Initialize the SQLite database schema and seed default records:
 
 ```bash
 # Initialize schema and seed data
 sqlite3 local.db < schema.sql
 sqlite3 local.db < scripts/seed.sql
+
+# Or if using Cloudflare D1 local simulation:
+npm run seed
 ```
 
-#### Pre-seeded Demo Data:
+#### Pre-seeded Demo Data & Auth Credentials:
 - **Demo User Profile**: `vejoyf@gmail.com`
 - **11 Categories**: Food & Drink, Transport, Shopping, Bills, Salary, Investments, Entertainment, Health, Education, etc.
 - **4 Multi-Wallet Accounts**:
@@ -189,27 +118,41 @@ sqlite3 local.db < scripts/seed.sql
 - **13 Realistic Transactions**: Salary, utility bills, internet, gym pass, groceries, and daily expenses.
 
 ### 5. Running the Local Server
-
 ```bash
 # Start Next.js development server
 npm run dev
 ```
-
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-### 6. Manual Testing Checklist
+---
 
-| No | Feature | Test Steps | Expected Result |
-| :---: | :--- | :--- | :--- |
-| 1 | **Login Gateway** | Navigate to `/login`, enter `vejoyf@gmail.com` | Authentication succeeds and redirects to dashboard `/` |
-| 2 | **Consolidated Net Worth** | Verify summary card on dashboard `/` | Displays combined balance across all 4 wallets (~Rp 46,650,000) |
-| 3 | **Analytics Filtering** | Open `/stats`, toggle timeframe dropdown | Renders spending charts, percentage breakdowns, and top 3 categories |
-| 4 | **Add Transaction** | Go to `/add`, select Expense, enter `50000`, choose `Food & Drink`, choose `GoPay`, submit | Transaction is saved and GoPay balance decreases by `Rp 50,000` |
-| 5 | **Payment Cards Hub** | Open `/cards` | Displays 3 cards (BCA, Mandiri, Jenius) with interactive 3D flip CVV preview |
-| 6 | **Privacy Mode** | Click the eye icon in the header | All sensitive financial figures are masked with asterisks (`••••••`) |
+## Testing & QA Automation
+
+Automated testing and QA verification are powered by the system's `qa-toolkit`:
+
+### 1. Playwright Test Suite
+End-to-end smoke verification covering page loads, route accessibility, and authentication flow:
+
+```bash
+cd /home/widifirmaan/Projects/qa-toolkit
+npx playwright test tests/playwright/moneymanagement.spec.js
+```
+
+### 2. Cypress E2E Verification
+Cross-browser regression testing on DOM structure and production stability:
+
+```bash
+cd /home/widifirmaan/Projects/qa-toolkit
+npx cypress run --spec cypress/e2e/moneymanagement.cy.js
+```
+
+### 3. QA Execution Summary
+- **Playwright**: 3 tests passed (Dashboard, Wallets Hub, Cards Sub-Ledger)
+- **Cypress**: 1 spec passed (Production URL rendering & DOM mount)
+- **Status**: ✅ All automated tests verified and passing
 
 ---
 
 ## Author
 
-Developed by **[Widi Firmansyah](https://widifirmaan.web.id)**.
+Made with ❤️ by **Widi Firmansyah** / [widifirmaan.web.id](https://widifirmaan.web.id)

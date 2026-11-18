@@ -22,12 +22,18 @@
 | Desktop | Mobile |
 | :---: | :---: |
 | **Balance & Net Worth Dashboard**<br>![Dashboard](screenshots/Dashboard%20Desktop.png) | **Balance & Net Worth Dashboard**<br>![Dashboard](screenshots/Dashboard%20Mobile.png) |
+| **Wallet Details Modal & Ledger Tabs**<br>![Dashboard Modal Wallet Details](screenshots/Dashboard%20Modal%20Wallet%20Details%20Desktop.png) | **Wallet Details Modal & Ledger Tabs**<br>![Dashboard Modal Wallet Details](screenshots/Dashboard%20Modal%20Wallet%20Details%20Mobile.png) |
 | **Wallets & Bank Accounts Hub**<br>![Wallets](screenshots/Wallets%20Desktop.png) | **Wallets & Bank Accounts Hub**<br>![Wallets](screenshots/Wallets%20Mobile.png) |
+| **Add Wallet Modal & Color Picker**<br>![Wallets Modal Add Wallet](screenshots/Wallets%20Modal%20Add%20Wallet%20Desktop.png) | **Add Wallet Modal & Color Picker**<br>![Wallets Modal Add Wallet](screenshots/Wallets%20Modal%20Add%20Wallet%20Mobile.png) |
 | **Saved Payment Cards Sub-Ledger**<br>![Cards](screenshots/Cards%20Desktop.png) | **Saved Payment Cards Sub-Ledger**<br>![Cards](screenshots/Cards%20Mobile.png) |
+| **Add Payment Card Modal**<br>![Cards Modal Add Card](screenshots/Cards%20Modal%20Add%20Card%20Desktop.png) | **Add Payment Card Modal**<br>![Cards Modal Add Card](screenshots/Cards%20Modal%20Add%20Card%20Mobile.png) |
 | **Cashflow & Spending Analytics**<br>![Analytics](screenshots/Analytics%20Desktop.png) | **Cashflow & Spending Analytics**<br>![Analytics](screenshots/Analytics%20Mobile.png) |
+| **Edit Transaction Modal**<br>![Analytics Modal Edit Transaction](screenshots/Analytics%20Modal%20Edit%20Transaction%20Desktop.png) | **Edit Transaction Modal**<br>![Analytics Modal Edit Transaction](screenshots/Analytics%20Modal%20Edit%20Transaction%20Mobile.png) |
 | **Add Transaction Form**<br>![Add Transaction](screenshots/Add%20Transaction%20Desktop.png) | **Add Transaction Form**<br>![Add Transaction](screenshots/Add%20Transaction%20Mobile.png) |
 | **User Profile & Theme Accent Selector**<br>![Profile](screenshots/Profile%20Desktop.png) | **User Profile & Theme Accent Selector**<br>![Profile](screenshots/Profile%20Mobile.png) |
+| **Reset Data Confirmation Modal**<br>![Profile Modal Reset Confirm](screenshots/Profile%20Modal%20Reset%20Confirm%20Desktop.png) | **Reset Data Confirmation Modal**<br>![Profile Modal Reset Confirm](screenshots/Profile%20Modal%20Reset%20Confirm%20Mobile.png) |
 | **Authentication Portal (Login & Register)**<br>![Login](screenshots/Login%20Desktop.png) | **Authentication Portal (Login & Register)**<br>![Login](screenshots/Login%20Mobile.png) |
+| **Invalid Credentials Error State**<br>![Login Alert Invalid Credentials](screenshots/Login%20Alert%20Invalid%20Credentials%20Desktop.png) | **Invalid Credentials Error State**<br>![Login Alert Invalid Credentials](screenshots/Login%20Alert%20Invalid%20Credentials%20Mobile.png) |
 
 ---
 

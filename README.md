@@ -1,4 +1,4 @@
-# MoneW
+# MoneW 💳
 
 > Progressive Web App (PWA) for multi-wallet personal finance management, expense tracking, payment card sub-ledgers, and monthly cashflow analytics.
 
@@ -18,7 +18,7 @@
 
 ---
 
-## Showcase
+## Screenshots
 
 | Desktop (MacBook Pro M4) | Mobile (iPhone 16 Pro) |
 | :---: | :---: |

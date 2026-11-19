@@ -125,33 +125,6 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
-## Testing & QA Automation
-
-Automated testing and QA verification are powered by the system's `qa-toolkit`:
-
-### 1. Playwright Test Suite
-End-to-end smoke verification covering page loads, route accessibility, and authentication flow:
-
-```bash
-cd /home/widifirmaan/Projects/qa-toolkit
-npx playwright test tests/playwright/moneymanagement.spec.js
-```
-
-### 2. Cypress E2E Verification
-Cross-browser regression testing on DOM structure and production stability:
-
-```bash
-cd /home/widifirmaan/Projects/qa-toolkit
-npx cypress run --spec cypress/e2e/moneymanagement.cy.js
-```
-
-### 3. QA Execution Summary
-- **Playwright**: 3 tests passed (Dashboard, Wallets Hub, Cards Sub-Ledger)
-- **Cypress**: 1 spec passed (Production URL rendering & DOM mount)
-- **Status**: ✅ All automated tests verified and passing
-
----
-
 ## Author
 
 Made with ❤️ by **Widi Firmansyah** / [widifirmaan.web.id](https://widifirmaan.web.id)

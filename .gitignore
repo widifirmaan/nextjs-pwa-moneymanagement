@@ -42,3 +42,5 @@ next-env.d.ts
 
 raw_screenshots/
 .wrangler/
+presentation.html
+*.pdf

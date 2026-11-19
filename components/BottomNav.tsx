@@ -19,11 +19,11 @@ export function BottomNav() {
     return (
         <div className="xl:hidden fixed bottom-0 left-0 right-0 z-50 flex justify-center pointer-events-none">
             <div
-                className="w-full max-w-2xl bg-background/95 backdrop-blur-xl border-t border-border px-6 sm:px-8 md:px-12 pt-2.5 pb-10 sm:pb-9 flex items-center justify-between pointer-events-auto shadow-[0_-5px_30px_-10px_rgba(0,0,0,0.1)]"
-                style={{ paddingBottom: 'max(2.75rem, calc(env(safe-area-inset-bottom, 0px) + 1.25rem))' }}
+                className="w-full max-w-2xl bg-background/95 backdrop-blur-xl border-t border-border px-6 sm:px-8 md:px-12 pt-2 pb-1.5 sm:pb-1.5 flex items-center justify-between pointer-events-auto shadow-[0_-5px_30px_-10px_rgba(0,0,0,0.1)]"
+                style={{ paddingBottom: 'max(0.35rem, calc(env(safe-area-inset-bottom, 0px) + 0.25rem))' }}
             >
                 {navItems.map((item) => (
-                    <Link key={item.label} href={item.href} className="flex flex-col items-center gap-1 group w-12 pt-1 pb-1">
+                    <Link key={item.label} href={item.href} className="flex flex-col items-center gap-0.5 group w-12 pt-1 pb-0.5">
                         <item.icon className={cn("w-6 h-6 transition-colors", pathname === item.href ? "text-primary fill-current" : "text-muted-foreground group-hover:text-primary/70")} />
                         <span className={cn("text-[10px] font-medium transition-colors", pathname === item.href ? "text-primary" : "text-muted-foreground")}>{item.label}</span>
                     </Link>
@@ -36,7 +36,7 @@ export function BottomNav() {
                 </div>
 
                 {navItems2.map((item) => (
-                    <Link key={item.label} href={item.href} className="flex flex-col items-center gap-1 group w-12 pt-1 pb-1">
+                    <Link key={item.label} href={item.href} className="flex flex-col items-center gap-0.5 group w-12 pt-1 pb-0.5">
                         <item.icon className={cn("w-6 h-6 transition-colors", pathname === item.href ? "text-primary fill-current" : "text-muted-foreground group-hover:text-primary/70")} />
                         <span className={cn("text-[10px] font-medium transition-colors", pathname === item.href ? "text-primary" : "text-muted-foreground")}>{item.label}</span>
                     </Link>

@@ -47,7 +47,7 @@
 - **Streamlined Transaction Entry (`/add`)**: Expense and income recording workflows with Lucide category icons, default source wallet selection, and wheel date picker.
 - **Receipt Attachments (`/api/upload`)**: Support for attaching invoice and receipt image files to transaction records stored in Cloudflare R2 object storage.
 - **Privacy Mode**: 1-click balance obscuring toggle masking sensitive financial amounts into asterisks (`••••••`) for secure usage in public spaces.
-- **Adaptive Dynamic Theming**: Dark and light mode foundation paired with 5 selectable theme accent color schemes (Emerald, Violet, Blue, Amber, Rose) injected via CSS variables.
+- **Adaptive Dynamic Theming**: Dark and light mode foundation paired with 9 selectable theme color schemes (Emerald Dream, Dark Emerald, Dark, Light, Ocean Blue, Royal Purple, Coklat Jawa, Sunset Orange, Rose Garden) injected via CSS variables.
 - **Installable Progressive Web App (PWA)**: Web app manifest for standalone home screen installation, offline service worker asset caching (`sw.js`), and install prompt banner.
 
 ---

@@ -76,11 +76,10 @@
 - Database: **No native database installation needed** (handled by Cloudflare D1 local simulation via Wrangler).
 
 ### 2. Environment Variables Setup
-Create a `.env.local` file in the project root:
+Buat file `.env.local` di root project:
 
 ```env
 JWT_SECRET=dev-secret-key-change-in-production
-NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
 ### 3. Installation
@@ -95,75 +94,17 @@ npm install
 
 ### 4. Database Schema & Seeder Setup
 
-MoneW organizes multi-wallet accounts, categorical expenditure limits, saved cards, and transaction records in a relational SQLite / Cloudflare D1 database (`schema.sql`):
+MoneW mengorganisir akun dompet, batas pengeluaran kategori, kartu tersimpan, dan catatan transaksi dalam database SQLite / Cloudflare D1 (`schema.sql`):
 
-```sql
-CREATE TABLE IF NOT EXISTS users (
-    id TEXT PRIMARY KEY,
-    email TEXT UNIQUE NOT NULL,
-    name TEXT NOT NULL DEFAULT '',
-    password TEXT NOT NULL DEFAULT '',
-    colorScheme TEXT NOT NULL DEFAULT 'dark',
-    isSetupCompleted INTEGER NOT NULL DEFAULT 0,
-    createdAt TEXT NOT NULL DEFAULT (datetime('now'))
-);
+| Tabel | Keterangan / Entitas Data |
+| :--- | :--- |
+| `users` | Akun pengguna, profil email, hash sandi PBKDF2, dan preferensi tema |
+| `categories` | Kategori pemasukan/pengeluaran (ikon, warna, dan tipe) |
+| `wallets` | Akun dompet (Bank, E-Wallet, Cash), saldo, limit pengeluaran harian/mingguan/bulanan |
+| `transactions` | Log transaksi keuangan (pemasukan/pengeluaran, tanggal, catatan, struk) |
+| `saved_cards` | Data kartu tersimpan (nomor kartu, masa berlaku, nama bank) |
 
-CREATE TABLE IF NOT EXISTS categories (
-    id TEXT PRIMARY KEY,
-    name TEXT NOT NULL,
-    icon TEXT NOT NULL,
-    color TEXT NOT NULL,
-    type TEXT NOT NULL CHECK(type IN ('income', 'expense')),
-    userId TEXT NOT NULL,
-    FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS wallets (
-    id TEXT PRIMARY KEY,
-    name TEXT NOT NULL,
-    type TEXT NOT NULL CHECK(type IN ('bank', 'ewallet', 'cash')),
-    balance REAL NOT NULL DEFAULT 0,
-    color TEXT NOT NULL,
-    accountNumber TEXT,
-    userId TEXT NOT NULL,
-    isFrozen INTEGER NOT NULL DEFAULT 0,
-    expenseLimitsDaily REAL NOT NULL DEFAULT 0,
-    expenseLimitsWeekly REAL NOT NULL DEFAULT 0,
-    expenseLimitsMonthly REAL NOT NULL DEFAULT 0,
-    FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS transactions (
-    id TEXT PRIMARY KEY,
-    amount REAL NOT NULL,
-    type TEXT NOT NULL CHECK(type IN ('income', 'expense')),
-    categoryId TEXT NOT NULL,
-    walletId TEXT NOT NULL,
-    date TEXT NOT NULL,
-    note TEXT NOT NULL DEFAULT '',
-    receiptUrl TEXT,
-    userId TEXT NOT NULL,
-    FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (categoryId) REFERENCES categories(id) ON DELETE CASCADE,
-    FOREIGN KEY (walletId) REFERENCES wallets(id) ON DELETE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS saved_cards (
-    id TEXT PRIMARY KEY,
-    userId TEXT NOT NULL,
-    cardName TEXT NOT NULL,
-    cardHolderName TEXT NOT NULL,
-    cardNumber TEXT NOT NULL,
-    expiryDate TEXT NOT NULL,
-    cvv TEXT NOT NULL,
-    cardType TEXT NOT NULL,
-    color TEXT NOT NULL,
-    bankName TEXT,
-    FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
-);
-```
-
-Initialize the Cloudflare D1 local database schema and seed default records:
+Inisialisasi skema Cloudflare D1 lokal dan seeder data awal:
 
 ```bash
 # Initialize schema and seed records in Cloudflare D1 local simulation

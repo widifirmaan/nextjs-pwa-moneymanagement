@@ -45,7 +45,7 @@
 - **Payment Card Sub-Ledger (`/cards`)**: 3D card visualization supporting Visa and Mastercard networks with masked card numbers, expiration dates, and interactive 3D flip CVV inspection.
 - **Cashflow & Spending Analytics (`/stats`)**: Timeframe filtering across "This Month", "Last Month", "Last 3 Months", or "Custom Range", percentage category breakdown, top 3 expense rankings, and a filterable transaction table.
 - **Streamlined Transaction Entry (`/add`)**: Expense and income recording workflows with Lucide category icons, default source wallet selection, and wheel date picker.
-- **Receipt Attachments (`/api/upload`)**: Support for attaching invoice and receipt image files to transaction records stored locally.
+- **Receipt Attachments (`/api/upload`)**: Support for attaching invoice and receipt image files to transaction records stored in Cloudflare R2 object storage.
 - **Privacy Mode**: 1-click balance obscuring toggle masking sensitive financial amounts into asterisks (`••••••`) for secure usage in public spaces.
 - **Adaptive Dynamic Theming**: Dark and light mode foundation paired with 5 selectable theme accent color schemes (Emerald, Violet, Blue, Amber, Rose) injected via CSS variables.
 - **Installable Progressive Web App (PWA)**: Web app manifest for standalone home screen installation, offline service worker asset caching (`sw.js`), and install prompt banner.
@@ -60,8 +60,8 @@
 | **Styling** | Tailwind CSS `v4.0`, CSS Custom Properties | Responsive styling with dynamic theme accent tokens |
 | **Animation** | Framer Motion `12.25.0` | Route transitions, modal drawers, and interactive card components |
 | **Charts** | Recharts `3.6.0` | SVG cashflow analytics, category distribution donut, and spending trends |
-| **Database** | SQLite 3 / Cloudflare D1 | Relational database for user profiles, wallets, cards, and transactions |
-| **API Router** | Serverless Worker (`worker.js`) | API route handler handling `/api/*` data persistence |
+| **Database & Storage** | Cloudflare D1 (SQLite 3), Cloudflare R2 (`MONEY_IMAGES`) | Relational database for ledgers and object storage for receipt attachments |
+| **API Router** | Serverless Edge Worker (`worker.js`) | API route handler handling `/api/*` data persistence and R2 uploads |
 | **Security & Auth** | PBKDF2 (100,000 rounds, Web Crypto), HMAC-SHA256 JWT | Password hashing and stateless token authentication |
 | **PWA Capabilities** | Service Worker (`sw.js`), Web App Manifest | Offline asset caching and standalone installation |
 | **Utilities** | Date-fns `4.1.0`, Lucide React `0.562.0` | Date interval math and UI vector iconography |
@@ -73,7 +73,7 @@
 ### 1. Prerequisites
 - **Node.js**: Version `20.x` or `22.x`
 - **npm** or **pnpm**
-- **SQLite 3**: Native CLI (`sqlite3`)
+- Database: **No native database installation needed** (handled by Cloudflare D1 local simulation via Wrangler).
 
 ### 2. Environment Variables Setup
 Create a `.env.local` file in the project root:
@@ -163,14 +163,10 @@ CREATE TABLE IF NOT EXISTS saved_cards (
 );
 ```
 
-Initialize the SQLite database schema and seed default records:
+Initialize the Cloudflare D1 local database schema and seed default records:
 
 ```bash
-# Initialize schema and seed data
-sqlite3 local.db < schema.sql
-sqlite3 local.db < scripts/seed.sql
-
-# Or if using Cloudflare D1 local simulation:
+# Initialize schema and seed records in Cloudflare D1 local simulation
 npm run seed
 ```
 
@@ -186,11 +182,17 @@ npm run seed
 - **13 Realistic Transactions**: Salary, utility bills, internet, gym pass, groceries, and daily expenses.
 
 ### 5. Running the Local Server
+
+MoneW operates as a static export SPA (`output: 'export'`) with its API and R2 uploads handled by `worker.js`:
+
 ```bash
-# Start Next.js development server
+# Option A: Start Next.js development server (UI layout development)
 npm run dev
+
+# Option B: Run fullstack locally (Worker API + D1 DB + R2 Bucket)
+npx wrangler dev
 ```
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Open [http://localhost:3000](http://localhost:3000) (or the port output by Wrangler) in your browser.
 
 ---
 

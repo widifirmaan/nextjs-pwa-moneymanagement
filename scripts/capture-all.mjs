@@ -154,7 +154,7 @@ async function capture() {
 
     // Generate framed mockups
     console.log('🎨 Generating device mockups (MacBook Pro & iPhone 16 Pro)...');
-    const mockupScript = '/home/widifirmaan/Projects/readme-project/scripts/generate-mockups.mjs';
+    const mockupScript = '/home/widifirmaan/Projects/tools/readme-tools/scripts/generate-mockups.mjs';
     execSync(`NODE_PATH=/home/widifirmaan/node_modules node "${mockupScript}" --input "${rawDir}" --output "${screenshotsDir}"`, {
         stdio: 'inherit',
     });

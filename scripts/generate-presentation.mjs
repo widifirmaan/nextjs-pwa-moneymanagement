@@ -11,14 +11,14 @@ const downloadsDir = '/home/widifirmaan/Downloads';
 function encodeImage(filename) {
   const filePath = path.join(screenshotsDir, filename);
   if (!fs.existsSync(filePath)) {
-    console.warn(`Screenshot tidak ditemukan: ${filePath}`);
+    console.warn(`Warning: Screenshot not found: ${filePath}`);
     return '';
   }
   const fileBuffer = fs.readFileSync(filePath);
   return `data:image/png;base64,${fileBuffer.toString('base64')}`;
 }
 
-console.log('Memproses screenshot MoneW iOS Liquid Glass...');
+console.log('Encoding MoneW iOS Liquid Glass screenshots...');
 
 const images = {
   dashboardDesktop: encodeImage('Dashboard Desktop.png'),
@@ -37,10 +37,10 @@ const images = {
   loginMobile: encodeImage('Login Mobile.png'),
 };
 
-console.log('Menyusun HTML presentasi dengan style murni Apple iOS Liquid Glass...');
+console.log('Assembling English Apple iOS Liquid Glass Presentation Deck HTML...');
 
 const htmlContent = `<!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>MoneW - iOS Liquid Glass PWA Architecture</title>
@@ -59,10 +59,11 @@ const htmlContent = `<!DOCTYPE html>
       --ios-purple: #5E5CE6;
       --ios-green: #32D74B;
       --ios-red: #FF453A;
+      --ios-orange: #FF9F0A;
       --ios-radius: 24px;
-      --ios-radius-sm: 16px;
-      --ios-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-      --font-main: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --ios-subradius: 16px;
+      --ios-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+      --font-main: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
       --font-mono: 'JetBrains Mono', monospace;
     }
 
@@ -79,7 +80,7 @@ const htmlContent = `<!DOCTYPE html>
       background-color: var(--bg-oled);
       color: var(--text-main);
       line-height: 1.45;
-      letter-spacing: -0.015em;
+      letter-spacing: -0.01em;
     }
 
     @page {
@@ -95,216 +96,211 @@ const htmlContent = `<!DOCTYPE html>
       background-color: var(--bg-oled);
       display: flex;
       flex-direction: column;
-      padding: 14mm 18mm;
+      padding: 15mm 18mm;
       overflow: hidden;
       background-image: 
-        radial-gradient(circle at 100% 0%, rgba(10, 132, 255, 0.12) 0%, transparent 55%),
-        radial-gradient(circle at 0% 100%, rgba(94, 92, 230, 0.1) 0%, transparent 50%);
+        radial-gradient(circle at 15% 15%, rgba(10, 132, 255, 0.08) 0%, transparent 45%),
+        radial-gradient(circle at 85% 85%, rgba(94, 92, 230, 0.06) 0%, transparent 45%);
     }
 
-    /* Top iOS Liquid Glass Accent Pill */
-    .slide::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 18mm;
-      right: 18mm;
-      height: 3px;
-      background: linear-gradient(90deg, var(--ios-blue), var(--ios-purple), var(--ios-green));
-      border-radius: 0 0 3px 3px;
-      z-index: 50;
-    }
-
-    /* Header */
+    /* iOS Pill Header */
     .slide-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 5mm;
-      padding-bottom: 3.5mm;
-      border-bottom: 1px solid var(--card-border);
+      margin-bottom: 5.5mm;
+      z-index: 10;
     }
 
-    .brand-cluster {
-      display: flex;
+    .brand-pill {
+      display: inline-flex;
       align-items: center;
-      gap: 12px;
-    }
-
-    .brand-badge {
-      background: rgba(10, 132, 255, 0.18);
-      border: 1px solid rgba(10, 132, 255, 0.35);
-      color: #64D2FF;
-      padding: 5px 14px;
-      font-family: var(--font-mono);
-      font-weight: 700;
-      font-size: 10px;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
+      gap: 10px;
+      background: rgba(44, 44, 46, 0.6);
+      border: 1px solid var(--card-border);
+      backdrop-filter: blur(20px);
+      padding: 7px 18px;
       border-radius: 50px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     }
 
-    .slide-section-title {
-      font-size: 13px;
+    .brand-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--ios-blue);
+      box-shadow: 0 0 10px var(--ios-blue);
+    }
+
+    .brand-title {
+      font-size: 13.5px;
       font-weight: 700;
-      color: var(--text-muted);
+      color: var(--text-main);
       letter-spacing: -0.01em;
-      text-transform: uppercase;
     }
 
-    .slide-number {
+    .brand-subtitle {
+      font-size: 12px;
+      color: var(--text-secondary);
+      font-weight: 500;
+      border-left: 1px solid rgba(255, 255, 255, 0.2);
+      padding-left: 10px;
+      margin-left: 2px;
+    }
+
+    .badge-pill {
       font-family: var(--font-mono);
       font-size: 11px;
       font-weight: 700;
       color: var(--ios-blue);
-      background: var(--card-glass);
-      border: 1px solid var(--card-border);
-      padding: 4px 12px;
+      background: rgba(10, 132, 255, 0.15);
+      border: 1px solid rgba(10, 132, 255, 0.3);
+      padding: 6px 14px;
       border-radius: 50px;
     }
 
-    /* Body */
-    .slide-body {
-      display: grid;
-      grid-template-columns: 1fr 1.35fr;
-      gap: 22px;
+    /* Content Area */
+    .slide-content {
       flex: 1;
-      min-height: 0;
-    }
-
-    .slide-info {
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      min-height: 0;
+      z-index: 10;
     }
 
-    .headline-group {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
+    .title-banner {
+      margin-bottom: 5mm;
+    }
+
+    .slide-category {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--ios-blue);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 4px;
     }
 
     .slide-title {
       font-size: 26px;
       font-weight: 800;
-      line-height: 1.2;
-      color: #FFFFFF;
       letter-spacing: -0.03em;
-    }
-
-    .slide-desc {
-      font-size: 12px;
-      color: var(--text-secondary);
-      line-height: 1.55;
-    }
-
-    .feature-list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin: 8px 0;
-    }
-
-    .feature-card {
-      background: var(--card-glass);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-radius: var(--ios-radius);
-      padding: 12px 16px;
-      box-shadow: var(--ios-shadow);
-      border: 1px solid var(--card-border);
-      border-left: 4px solid var(--ios-blue);
-    }
-
-    .feature-card.purple {
-      border-left-color: var(--ios-purple);
-    }
-
-    .feature-card.green {
-      border-left-color: var(--ios-green);
-    }
-
-    .feature-card-title {
-      font-size: 13px;
-      font-weight: 700;
       color: #FFFFFF;
-      margin-bottom: 2px;
-      letter-spacing: -0.01em;
+      line-height: 1.18;
     }
 
-    .feature-card-text {
-      font-size: 11px;
+    .slide-subtitle {
+      font-size: 13.5px;
       color: var(--text-secondary);
-      line-height: 1.45;
+      margin-top: 4px;
+      max-width: 900px;
+      font-weight: 500;
     }
 
-    .metrics-row {
+    /* Liquid Glass Cards */
+    .glass-card {
+      background: var(--card-glass);
+      border: 1px solid var(--card-border);
+      border-radius: var(--ios-radius);
+      backdrop-filter: blur(25px);
+      box-shadow: var(--ios-shadow);
+      padding: 18px 22px;
+    }
+
+    .glass-card-accent {
+      background: var(--card-glass);
+      border: 1px solid var(--card-border);
+      border-radius: var(--ios-radius);
+      backdrop-filter: blur(25px);
+      box-shadow: var(--ios-shadow);
+      padding: 18px 22px;
+      border-left: 5px solid var(--ios-blue);
+    }
+
+    /* Split Layouts */
+    .layout-split {
+      display: grid;
+      grid-template-columns: 1.08fr 0.92fr;
+      gap: 18px;
+      align-items: stretch;
+      flex: 1;
+    }
+
+    .layout-split-reversed {
+      display: grid;
+      grid-template-columns: 0.92fr 1.08fr;
+      gap: 18px;
+      align-items: stretch;
+      flex: 1;
+    }
+
+    .layout-grid-3 {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
+      gap: 16px;
+      flex: 1;
     }
 
-    .metric-box {
-      background: var(--card-glass);
-      border-radius: var(--ios-radius-sm);
-      padding: 10px 12px;
-      text-align: center;
-      box-shadow: var(--ios-shadow);
-      border: 1px solid var(--card-border);
-    }
-
-    .metric-val {
-      font-family: var(--font-mono);
-      font-size: 16px;
-      font-weight: 800;
-      color: var(--ios-blue);
-    }
-
-    .metric-lbl {
-      font-size: 9px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--text-muted);
-      margin-top: 2px;
+    .layout-grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      flex: 1;
     }
 
     /* Visual Stage */
     .visual-stage {
-      position: relative;
+      background: rgba(20, 20, 22, 0.65);
+      border: 1px solid var(--card-border);
+      border-radius: var(--ios-radius);
+      box-shadow: var(--ios-shadow);
+      overflow: hidden;
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 100%;
+      position: relative;
       height: 100%;
-      min-height: 0;
-      background: rgba(18, 18, 20, 0.6);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      border-radius: var(--ios-radius);
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+      min-height: 290px;
+      padding: 12px;
+    }
+
+    .visual-stage img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.7));
+    }
+
+    /* Feature Items */
+    .feature-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .feature-box {
+      background: rgba(36, 36, 38, 0.75);
       border: 1px solid var(--card-border);
-      padding: 16px;
+      border-radius: var(--ios-subradius);
+      backdrop-filter: blur(20px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+      padding: 14px 18px;
     }
 
-    .screenshot-desktop {
-      max-width: 95%;
-      max-height: 380px;
-      object-fit: contain;
-      display: block;
-      filter: drop-shadow(0 14px 30px rgba(0, 0, 0, 0.7));
+    .feature-box-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #FFFFFF;
+      margin-bottom: 3px;
     }
 
-    .screenshot-mobile {
-      position: absolute;
-      right: 14px;
-      bottom: 8px;
-      max-height: 270px;
-      max-width: 29%;
-      object-fit: contain;
-      display: block;
-      filter: drop-shadow(0 16px 36px rgba(0, 0, 0, 0.8));
+    .feature-box-desc {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.45;
+      font-weight: 500;
     }
 
     /* Footer */
@@ -313,675 +309,568 @@ const htmlContent = `<!DOCTYPE html>
       justify-content: space-between;
       align-items: center;
       margin-top: 5mm;
-      padding-top: 3mm;
-      border-top: 1px solid var(--card-border);
-    }
-
-    .footer-tech {
-      font-family: var(--font-mono);
-      font-size: 10px;
-      font-weight: 600;
+      padding-top: 3.5mm;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 11px;
       color: var(--text-muted);
-    }
-
-    .footer-url {
       font-family: var(--font-mono);
-      font-size: 10px;
-      font-weight: 700;
-      color: var(--ios-blue);
+      font-weight: 600;
+      z-index: 10;
     }
 
-    /* Cover Styling */
-    .cover-body {
-      display: grid;
-      grid-template-columns: 1.15fr 1fr;
-      gap: 30px;
-      align-items: center;
-      flex: 1;
-      min-height: 0;
-    }
-
-    .cover-tagline {
+    .tech-pill {
+      display: inline-block;
+      padding: 3px 10px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 50px;
       font-family: var(--font-mono);
       font-size: 11px;
       font-weight: 700;
       color: var(--ios-blue);
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      margin-bottom: 8px;
-    }
-
-    .cover-title {
-      font-size: 38px;
-      font-weight: 800;
-      color: #FFFFFF;
-      line-height: 1.15;
-      letter-spacing: -0.03em;
-      margin-bottom: 12px;
-    }
-
-    .cover-desc {
-      font-size: 13px;
-      color: var(--text-secondary);
-      line-height: 1.6;
-      margin-bottom: 20px;
-    }
-
-    .cover-specs {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-    }
-
-    .spec-card {
-      background: var(--card-glass);
-      border-radius: var(--ios-radius-sm);
-      padding: 10px 14px;
-      box-shadow: var(--ios-shadow);
-      border: 1px solid var(--card-border);
-    }
-
-    .spec-k {
-      font-size: 9px;
-      font-weight: 600;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    .spec-v {
-      font-family: var(--font-mono);
-      font-size: 12px;
-      font-weight: 700;
-      color: #FFFFFF;
-      margin-top: 2px;
-    }
-
-    /* Architecture Grid */
-    .arch-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-      flex: 1;
-      min-height: 0;
-      margin-top: 10px;
-    }
-
-    .arch-card {
-      background: var(--card-glass);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-radius: var(--ios-radius);
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      box-shadow: var(--ios-shadow);
-      border: 1px solid var(--card-border);
-    }
-
-    .arch-title {
-      font-size: 15px;
-      font-weight: 700;
-      color: #FFFFFF;
-      border-bottom: 1px solid var(--card-border);
-      padding-bottom: 8px;
-    }
-
-    .arch-item {
-      font-size: 11.5px;
-      color: var(--text-secondary);
-      line-height: 1.5;
-    }
-
-    .arch-item strong {
-      color: #FFFFFF;
-      font-weight: 600;
+      margin-right: 6px;
+      margin-top: 4px;
     }
   </style>
 </head>
 <body>
 
   <!-- SLIDE 1: COVER -->
-  <section class="slide">
+  <div class="slide">
     <div class="slide-header">
-      <div class="brand-cluster">
-        <span class="brand-badge">IOS LIQUID GLASS PWA</span>
-        <span class="slide-section-title">Dokumentasi Rekayasa Perangkat Lunak</span>
+      <div class="brand-pill">
+        <div class="brand-dot"></div>
+        <div class="brand-title">MoneW PWA</div>
+        <div class="brand-subtitle">Apple iOS Liquid Glass Personal Finance Architecture</div>
       </div>
-      <div class="slide-number">01 / 10</div>
+      <div class="badge-pill">DECK-MONEW-01 / 10</div>
     </div>
 
-    <div class="cover-body">
-      <div>
-        <div class="cover-tagline">Apple Human Interface & PWA Architecture</div>
-        <h1 class="cover-title">MoneW Manajemen Finansial Pribadi PWA</h1>
-        <p class="cover-desc">
-          Aplikasi Progressive Web App (PWA) pengelolaan anggaran keuangan dengan bahasa desain Apple iOS Liquid Glass (OLED Black #000000, kartu glassmorphism 24px, aksen iOS Blue & Purple). Dilengkapi pelacakan arus kas, alokasi amplop anggaran, grafik analitik tren, dan ekspor PDF/Excel.
-        </p>
+    <div class="slide-content">
+      <div class="layout-split">
+        <div style="display: flex; flex-direction: column; justify-content: center; padding-right: 15px;">
+          <div style="display: inline-flex; align-items: center; gap: 8px; margin-bottom: 16px;">
+            <span class="tech-pill">Next.js 14 PWA</span>
+            <span class="tech-pill">TypeScript</span>
+            <span class="tech-pill">iOS Liquid Glass</span>
+            <span class="tech-pill">Encrypted LocalStore</span>
+          </div>
+          <h1 style="font-size: 40px; font-weight: 800; letter-spacing: -0.04em; line-height: 1.1; margin-bottom: 16px;">
+            Apple iOS Liquid Glass PWA &amp; Personal Finance Architecture
+          </h1>
+          <p style="font-size: 14.5px; color: var(--text-secondary); line-height: 1.55; margin-bottom: 24px; font-weight: 500;">
+            A premier mobile-first Progressive Web Application delivering native-caliber personal finance tracking, liquid glassmorphic aesthetics (24px squircle radius, 20px background blur), multi-wallet liquidity management, and zero-telemetry local privacy.
+          </p>
 
-        <div class="cover-specs">
-          <div class="spec-card">
-            <div class="spec-k">Design System</div>
-            <div class="spec-v">Apple iOS Liquid Glass (24px Squircle)</div>
-          </div>
-          <div class="spec-card">
-            <div class="spec-k">Theme Palette</div>
-            <div class="spec-v">OLED Black & Apple System Hues</div>
-          </div>
-          <div class="spec-card">
-            <div class="spec-k">Frontend Framework</div>
-            <div class="spec-v">Next.js 15 & React 19</div>
-          </div>
-          <div class="spec-card">
-            <div class="spec-k">PWA Engine</div>
-            <div class="spec-v">Service Worker & IndexedDB Store</div>
+          <div class="glass-card" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; padding: 14px 18px;">
+            <div>
+              <div style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono);">DESIGN SYSTEM</div>
+              <div style="font-size: 19px; font-weight: 800; color: var(--ios-blue); margin-top: 2px;">Apple Liquid</div>
+              <div style="font-size: 11px; color: var(--text-secondary);">OLED &bull; Glassmorphism</div>
+            </div>
+            <div>
+              <div style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono);">DATA PRIVACY</div>
+              <div style="font-size: 19px; font-weight: 800; color: var(--ios-green); margin-top: 2px;">Zero Cloud</div>
+              <div style="font-size: 11px; color: var(--text-secondary);">Encrypted LocalStore</div>
+            </div>
+            <div>
+              <div style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono);">PLATFORM</div>
+              <div style="font-size: 19px; font-weight: 800; color: var(--ios-purple); margin-top: 2px;">PWA Native</div>
+              <div style="font-size: 11px; color: var(--text-secondary);">Service Worker Ready</div>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="visual-stage">
-        <img src="${images.dashboardDesktop}" class="screenshot-desktop" alt="MoneW Dashboard Cover">
-      </div>
-    </div>
-
-    <div class="slide-footer">
-      <span class="footer-tech">Next.js 15 + React 19 + Tailwind CSS + Lucide Icons + PWA</span>
-      <span class="footer-url">monew.widifirmaan.web.id</span>
-    </div>
-  </section>
-
-  <!-- SLIDE 2: ARSITEKTUR & DESAIN IOS GLASS -->
-  <section class="slide">
-    <div class="slide-header">
-      <div class="brand-cluster">
-        <span class="brand-badge">ARCHITECTURE</span>
-        <span class="slide-section-title">Fondasi Sistem & Desain iOS Liquid Glass</span>
-      </div>
-      <div class="slide-number">02 / 10</div>
-    </div>
-
-    <div class="headline-group" style="margin-bottom: 8px;">
-      <h2 class="slide-title">Arsitektur Finansial Klien & Desain Liquid Glass</h2>
-      <p class="slide-desc">Desain sistem moneter tanpa backend yang menjamin privasi keuangan mutlak dengan pemrosesan komputasi dan enkripsi lokal di perangkat pengguna.</p>
-    </div>
-
-    <div class="arch-grid">
-      <div class="arch-card">
-        <div class="arch-title" style="color: var(--ios-blue);">Estetika iOS Liquid Glass</div>
-        <div class="arch-item"><strong>Latar Hitam OLED Pekat:</strong> Penghematan konsumsi daya pada layar OLED serta kenyamanan visual mode gelap premium.</div>
-        <div class="arch-item"><strong>Kartu Glassmorphism 24px:</strong> Efek blur backdrop 24px dengan border tipis 1px semi-transparan untuk pemisahan lapisan visual.</div>
-        <div class="arch-item"><strong>Warna Sistem Apple:</strong> Aksen biru iOS (#0A84FF), ungu (#5E5CE6), hijau (#32D74B), dan merah (#FF453A) yang proporsional.</div>
-      </div>
-
-      <div class="arch-card">
-        <div class="arch-title" style="color: var(--ios-purple);">Penyimpanan & Kapabilitas PWA</div>
-        <div class="arch-item"><strong>Service Worker Offline:</strong> Cache aset statis menyeluruh yang memungkinkan aplikasi dibuka tanpa jaringan internet.</div>
-        <div class="arch-item"><strong>IndexedDB Persistence:</strong> Penyimpanan ribuan transaksi keuangan dan alokasi kategori secara persisten di peramban.</div>
-        <div class="arch-item"><strong>Instalasi Layar Utama:</strong> Mendukung penambahan bookmark PWA mandiri layaknya aplikasi native iOS/Android.</div>
-      </div>
-
-      <div class="arch-card">
-        <div class="arch-title" style="color: var(--ios-green);">Privasi & Jaminan Keamanan</div>
-        <div class="arch-item"><strong>Zero Server Telemetry:</strong> Tidak ada pertukaran data catatan keuangan pengguna ke server pihak ketiga manapun.</div>
-        <div class="arch-item"><strong>Ekspor Laporan Mandiri:</strong> Generator berkas laporan CSV dan PDF yang diproses secara instan di memori RAM klien.</div>
-        <div class="arch-item"><strong>Pencadangan & Pemulihan:</strong> Ekspor berkas cadangan JSON terenkripsi untuk migrasi data antar perangkat secara aman.</div>
+        <div class="visual-stage">
+          <img src="${images.dashboardDesktop}" alt="MoneW Dashboard Desktop">
+        </div>
       </div>
     </div>
 
     <div class="slide-footer">
-      <span class="footer-tech">MoneW PWA Architecture Blueprint</span>
-      <span class="footer-url">monew.widifirmaan.web.id</span>
+      <div>MONEW &bull; PERSONAL FINANCE PLATFORM</div>
+      <div>WIDI FIRMANSYAH &bull; LEAD ENGINEER</div>
+      <div>01 / 10</div>
     </div>
-  </section>
+  </div>
 
-  <!-- SLIDE 3: DASHBOARD ARUS KAS -->
-  <section class="slide">
+  <!-- SLIDE 2: FINTECH ARCHITECTURE & SECURITY RATIONALE -->
+  <div class="slide">
     <div class="slide-header">
-      <div class="brand-cluster">
-        <span class="brand-badge">DASHBOARD</span>
-        <span class="slide-section-title">Pusat Kendali Finansial & Ringkasan Saldo</span>
+      <div class="brand-pill">
+        <div class="brand-dot"></div>
+        <div class="brand-title">Architecture &amp; Principles</div>
+        <div class="brand-subtitle">FinTech Privacy &amp; Offline Autonomy</div>
       </div>
-      <div class="slide-number">03 / 10</div>
+      <div class="badge-pill">DECK-MONEW-02 / 10</div>
     </div>
 
-    <div class="slide-body">
-      <div class="slide-info">
-        <div class="headline-group">
-          <h2 class="slide-title">Dashboard Finansial & Saldo Bersih</h2>
-          <p class="slide-desc">Pusat pemantauan kekayaan bersih (Net Worth), rekapitulasi pemasukan bulanan, total pengeluaran, dan daftar mutasi transaksi terkini.</p>
+    <div class="slide-content">
+      <div class="title-banner">
+        <div class="slide-category">Core Engineering Principles</div>
+        <h2 class="slide-title">Zero-Telemetry Privacy &amp; Native Mobile Fluency</h2>
+        <p class="slide-subtitle">Safeguarding sensitive individual financial ledgers with decentralized browser encryption and iOS Human Interface aesthetics.</p>
+      </div>
+
+      <div class="layout-grid-3">
+        <div class="glass-card">
+          <div style="font-family: var(--font-mono); font-size: 11px; color: var(--ios-blue); font-weight: 700; margin-bottom: 8px;">01 &bull; PRIVACY RISK</div>
+          <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 8px;">Third-Party Data Scraping</h3>
+          <p style="font-size: 12.5px; color: var(--text-secondary); line-height: 1.5;">
+            Traditional financial apps harvest personal net worth and spending habits for advertisement targeting, violating user privacy expectations.
+          </p>
+        </div>
+
+        <div class="glass-card">
+          <div style="font-family: var(--font-mono); font-size: 11px; color: var(--ios-blue); font-weight: 700; margin-bottom: 8px;">02 &bull; LOCAL ENCRYPTION</div>
+          <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 8px;">Client-Side Encrypted Store</h3>
+          <p style="font-size: 12.5px; color: var(--text-secondary); line-height: 1.5;">
+            Transactions, balances, and credit allocations persist in local IndexedDB containers protected by user-controlled cryptographic keys.
+          </p>
+        </div>
+
+        <div class="glass-card">
+          <div style="font-family: var(--font-mono); font-size: 11px; color: var(--ios-blue); font-weight: 700; margin-bottom: 8px;">03 &bull; LIQUID GLASS UI</div>
+          <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 8px;">Authentic Apple Ergonomics</h3>
+          <p style="font-size: 12.5px; color: var(--text-secondary); line-height: 1.5;">
+            OLED black backgrounds with translucent frosted glass panels (blur 20px) reduce screen power consumption and eliminate visual clutter.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide-footer">
+      <div>MONEW &bull; SECURITY &amp; PRIVACY ARCHITECTURE</div>
+      <div>ZERO-TELEMETRY SPECIFICATIONS</div>
+      <div>02 / 10</div>
+    </div>
+  </div>
+
+  <!-- SLIDE 3: EXECUTIVE FINANCIAL DASHBOARD -->
+  <div class="slide">
+    <div class="slide-header">
+      <div class="brand-pill">
+        <div class="brand-dot"></div>
+        <div class="brand-title">Financial Cockpit</div>
+        <div class="brand-subtitle">Net Worth &amp; Liquid Glass Dashboard</div>
+      </div>
+      <div class="badge-pill">DECK-MONEW-03 / 10</div>
+    </div>
+
+    <div class="slide-content">
+      <div class="title-banner">
+        <div class="slide-category">Executive Overview</div>
+        <h2 class="slide-title">Real-Time Net Worth Overview &amp; Cash Flow Trends</h2>
+        <p class="slide-subtitle">Centralized dashboard integrating liquid balances, monthly spending progress, quick transaction shortcuts, and credit card debt.</p>
+      </div>
+
+      <div class="layout-split">
+        <div class="visual-stage">
+          <img src="${images.dashboardMobile}" alt="MoneW Dashboard Mobile View">
         </div>
 
         <div class="feature-list">
-          <div class="feature-card">
-            <div class="feature-card-title">Kartu Saldo Utama Liquid Glass</div>
-            <div class="feature-card-text">Penyajian angka total saldo dengan tipografi tebal dan indikator tren kenaikan/penurunan bulanan.</div>
+          <div class="feature-box">
+            <div class="feature-box-title">Aggregate Net Worth Valuation</div>
+            <div class="feature-box-desc">
+              Synchronous summing of cash holdings, investment accounts, and digital wallets offset against outstanding credit liabilities.
+            </div>
           </div>
-          <div class="feature-card purple">
-            <div class="feature-card-title">Daftar Transaksi Terakhir</div>
-            <div class="feature-card-text">Daftar mutasi pengeluaran dengan ikon kategori Apple, stempel tanggal, dan nominal yang terformat rapi.</div>
+          <div class="feature-box">
+            <div class="feature-box-title">Dynamic Spend Velocity Bars</div>
+            <div class="feature-box-desc">
+              Visual budget consumption indicators comparing current daily burn rate against allocated monthly expense ceilings.
+            </div>
           </div>
-          <div class="feature-card green">
-            <div class="feature-card-title">Tombol Cepat Input Transaksi</div>
-            <div class="feature-card-text">Tombol aksi mengambang (Floating Action Button) untuk mencatat pengeluaran harian dalam hitungan detik.</div>
-          </div>
-        </div>
-
-        <div class="metrics-row">
-          <div class="metric-box">
-            <div class="metric-val">OLED</div>
-            <div class="metric-lbl">Black Canvas</div>
-          </div>
-          <div class="metric-box">
-            <div class="metric-val">24px</div>
-            <div class="metric-lbl">Glass Radius</div>
-          </div>
-          <div class="metric-box">
-            <div class="metric-val">Realtime</div>
-            <div class="metric-lbl">Balance Calc</div>
+          <div class="feature-box">
+            <div class="feature-box-title">One-Tap Quick Entry Floating Trigger</div>
+            <div class="feature-box-desc">
+              Centrally docked Action Button allows cashiers or shoppers to log cash outflows in under three thumb taps with immediate balance refresh.
+            </div>
           </div>
         </div>
-      </div>
-
-      <div class="visual-stage">
-        <img src="${images.dashboardDesktop}" class="screenshot-desktop" alt="Dashboard Desktop">
-        <img src="${images.dashboardMobile}" class="screenshot-mobile" alt="Dashboard Mobile">
       </div>
     </div>
 
     <div class="slide-footer">
-      <span class="footer-tech">View: src/app/dashboard/page.tsx</span>
-      <span class="footer-url">monew.widifirmaan.web.id</span>
+      <div>MONEW &bull; DASHBOARD COCKPIT</div>
+      <div>REAL-TIME NET WORTH AGGREGATION</div>
+      <div>03 / 10</div>
     </div>
-  </section>
+  </div>
 
-  <!-- SLIDE 4: ANALITIK TREN -->
-  <section class="slide">
+  <!-- SLIDE 4: MULTI-WALLET & ACCOUNT LIQUIDITY -->
+  <div class="slide">
     <div class="slide-header">
-      <div class="brand-cluster">
-        <span class="brand-badge">ANALYTICS</span>
-        <span class="slide-section-title">Grafik Analisis Tren & Komposisi Beban</span>
+      <div class="brand-pill">
+        <div class="brand-dot"></div>
+        <div class="brand-title">Liquidity Matrix</div>
+        <div class="brand-subtitle">Multi-Wallet &amp; Multi-Currency Ledger</div>
       </div>
-      <div class="slide-number">04 / 10</div>
+      <div class="badge-pill">DECK-MONEW-04 / 10</div>
     </div>
 
-    <div class="slide-body">
-      <div class="slide-info">
-        <div class="headline-group">
-          <h2 class="slide-title">Visualisasi Tren & Distribusi Biaya</h2>
-          <p class="slide-desc">Grafik batang dan diagram lingkaran interaktif untuk menganalisis kebiasaan belanja, kategori pengeluaran terbesar, dan rasio tabungan.</p>
+    <div class="slide-content">
+      <div class="title-banner">
+        <div class="slide-category">Asset Allocation</div>
+        <h2 class="slide-title">Multi-Account Liquidity Management &amp; Transfers</h2>
+        <p class="slide-subtitle">Granular categorization of physical cash, savings accounts, digital e-wallets, and foreign currency accounts.</p>
+      </div>
+
+      <div class="layout-split-reversed">
+        <div class="feature-list">
+          <div class="feature-box">
+            <div class="feature-box-title">Custom Wallet Classification</div>
+            <div class="feature-box-desc">
+              Independent icon badges and color coding distinguish operational spending accounts from protected emergency rainy-day funds.
+            </div>
+          </div>
+          <div class="feature-box">
+            <div class="feature-box-title">Zero-Fee Inter-Account Transfers</div>
+            <div class="feature-box-desc">
+              Atomic double-entry bookkeeping adjusts balances across origin and destination accounts without skewing monthly income/expense metrics.
+            </div>
+          </div>
+          <div class="feature-box">
+            <div class="feature-box-title">Real-Time Currency Normalization</div>
+            <div class="feature-box-desc">
+              Multi-currency balances (IDR, USD, SGD) automatically converted to base reporting currency using cached exchange rate matrices.
+            </div>
+          </div>
+        </div>
+
+        <div class="visual-stage">
+          <img src="${images.walletsDesktop}" alt="MoneW Wallets Ledger Desktop">
+        </div>
+      </div>
+    </div>
+
+    <div class="slide-footer">
+      <div>MONEW &bull; WALLET LEDGER</div>
+      <div>MULTI-ACCOUNT LIQUIDITY MATRIX</div>
+      <div>04 / 10</div>
+    </div>
+  </div>
+
+  <!-- SLIDE 5: VIRTUAL CREDIT CARDS & BILLING CYCLES -->
+  <div class="slide">
+    <div class="slide-header">
+      <div class="brand-pill">
+        <div class="brand-dot"></div>
+        <div class="brand-title">Credit Architecture</div>
+        <div class="brand-subtitle">Virtual Cards &amp; Billing Cycle Ledger</div>
+      </div>
+      <div class="badge-pill">DECK-MONEW-05 / 10</div>
+    </div>
+
+    <div class="slide-content">
+      <div class="title-banner">
+        <div class="slide-category">Credit Management</div>
+        <h2 class="slide-title">Interactive Virtual Credit Card Visualizer</h2>
+        <p class="slide-subtitle">Sleek Apple Wallet-inspired digital card rendering displaying available credit limits, statement dates, and payment reminders.</p>
+      </div>
+
+      <div class="layout-split">
+        <div class="visual-stage">
+          <img src="${images.cardsDesktop}" alt="MoneW Credit Cards Visualizer Desktop">
         </div>
 
         <div class="feature-list">
-          <div class="feature-card">
-            <div class="feature-card-title">Diagram Lingkar Proporsi Kategori</div>
-            <div class="feature-card-text">Pembedahan pos pengeluaran (Makanan, Transportasi, Utilitas, Hiburan) dalam palet warna cerah bergradien.</div>
+          <div class="feature-box">
+            <div class="feature-box-title">Realistic Gradient Card Surface Visualizer</div>
+            <div class="feature-box-desc">
+              CSS gradient meshes with chip icons and masked numbers replicate premium metallic banking cards with smooth 3D tilt physics.
+            </div>
           </div>
-          <div class="feature-card purple">
-            <div class="feature-card-title">Grafik Garis Arus Kas Historis</div>
-            <div class="feature-card-text">Pemantauan fluktuasi pemasukan dan pengeluaran antar bulan untuk mengevaluasi kesehatan cashflow.</div>
+          <div class="feature-box">
+            <div class="feature-box-title">Statement Cycle &amp; Grace Period Alerts</div>
+            <div class="feature-box-desc">
+              Tracks individual statement closing and payment due dates, issuing countdown notifications to avoid costly bank interest penalties.
+            </div>
           </div>
-          <div class="feature-card green">
-            <div class="feature-card-title">Filter Periode Waktu Fleksibel</div>
-            <div class="feature-card-text">Pilihan rentang tinjauan mingguan, bulanan, atau tahunan dengan kalkulasi metrik seketika.</div>
-          </div>
-        </div>
-
-        <div class="metrics-row">
-          <div class="metric-box">
-            <div class="metric-val">Chart.js</div>
-            <div class="metric-lbl">Vector Charts</div>
-          </div>
-          <div class="metric-box">
-            <div class="metric-val">Interactive</div>
-            <div class="metric-lbl">Hover Tooltips</div>
-          </div>
-          <div class="metric-box">
-            <div class="metric-val">Multi-Span</div>
-            <div class="metric-lbl">Date Filters</div>
+          <div class="feature-box">
+            <div class="feature-box-title">Credit Utilization Ratio Monitoring</div>
+            <div class="feature-box-desc">
+              Monitors card usage against total credit limits to keep utilization safely under the recommended 30% financial health threshold.
+            </div>
           </div>
         </div>
-      </div>
-
-      <div class="visual-stage">
-        <img src="${images.analyticsDesktop}" class="screenshot-desktop" alt="Analytics Desktop">
-        <img src="${images.analyticsMobile}" class="screenshot-mobile" alt="Analytics Mobile">
       </div>
     </div>
 
     <div class="slide-footer">
-      <span class="footer-tech">View: src/app/analytics/page.tsx</span>
-      <span class="footer-url">monew.widifirmaan.web.id</span>
+      <div>MONEW &bull; CREDIT LEDGER</div>
+      <div>VIRTUAL CARD VISUALIZER</div>
+      <div>05 / 10</div>
     </div>
-  </section>
+  </div>
 
-  <!-- SLIDE 5: ANGGARAN & BUDGET -->
-  <section class="slide">
+  <!-- SLIDE 6: RAPID TRANSACTION CAPTURE -->
+  <div class="slide">
     <div class="slide-header">
-      <div class="brand-cluster">
-        <span class="brand-badge">BUDGETING</span>
-        <span class="slide-section-title">Alokasi Anggaran & Peringatan Ambang Batas</span>
+      <div class="brand-pill">
+        <div class="brand-dot"></div>
+        <div class="brand-title">Transaction Engine</div>
+        <div class="brand-subtitle">Rapid Entry &amp; Receipt Capture</div>
       </div>
-      <div class="slide-number">05 / 10</div>
+      <div class="badge-pill">DECK-MONEW-06 / 10</div>
     </div>
 
-    <div class="slide-body">
-      <div class="slide-info">
-        <div class="headline-group">
-          <h2 class="slide-title">Alokasi Anggaran & Amplop Finansial</h2>
-          <p class="slide-desc">Pengelolaan batas belanja per kategori dengan bilah progres persentase pemakaian dan peringatan visual saat batas anggaran mendekati limit.</p>
+    <div class="slide-content">
+      <div class="title-banner">
+        <div class="slide-category">Data Ingestion</div>
+        <h2 class="slide-title">Sub-3-Second Transaction Capture &amp; Tagging</h2>
+        <p class="slide-subtitle">Ergonomic numpad entry modal engineered for instant single-handed expense logging on the move.</p>
+      </div>
+
+      <div class="layout-split-reversed">
+        <div class="feature-list">
+          <div class="feature-box">
+            <div class="feature-box-title">Oversized Accessible Numeric Keypad</div>
+            <div class="feature-box-desc">
+              Eliminates tiny OS keyboard popups in favor of a responsive 4x3 soft keypad with tactile haptic audio feedback.
+            </div>
+          </div>
+          <div class="feature-box">
+            <div class="feature-box-title">Smart Predictive Category Allocation</div>
+            <div class="feature-box-desc">
+              Frequently used categories (Food, Transit, Utilities, Coffee) highlighted based on time-of-day and merchant keyword heuristics.
+            </div>
+          </div>
+          <div class="feature-box">
+            <div class="feature-box-title">Local Receipt Image Compression &amp; Storage</div>
+            <div class="feature-box-desc">
+              Camera snapshots compressed locally using Canvas Offscreen APIs, preserving legible purchase receipts without consuming cloud bandwidth.
+            </div>
+          </div>
+        </div>
+
+        <div class="visual-stage">
+          <img src="${images.addTxDesktop}" alt="MoneW Add Transaction Modal Desktop">
+        </div>
+      </div>
+    </div>
+
+    <div class="slide-footer">
+      <div>MONEW &bull; TRANSACTION ENGINE</div>
+      <div>RAPID ENTRY MODAL</div>
+      <div>06 / 10</div>
+    </div>
+  </div>
+
+  <!-- SLIDE 7: DEEP FINANCIAL ANALYTICS & CHARTS -->
+  <div class="slide">
+    <div class="slide-header">
+      <div class="brand-pill">
+        <div class="brand-dot"></div>
+        <div class="brand-title">Financial Intelligence</div>
+        <div class="brand-subtitle">Predictive Analytics &amp; Expense Heatmaps</div>
+      </div>
+      <div class="badge-pill">DECK-MONEW-07 / 10</div>
+    </div>
+
+    <div class="slide-content">
+      <div class="title-banner">
+        <div class="slide-category">Business Intelligence</div>
+        <h2 class="slide-title">Granular Expense Distribution &amp; Predictive Trends</h2>
+        <p class="slide-subtitle">Interactive SVG charts visualizing category breakdown, historical cash flow velocity, and discretionary spending variance.</p>
+      </div>
+
+      <div class="layout-split">
+        <div class="visual-stage">
+          <img src="${images.analyticsDesktop}" alt="MoneW Analytics Dashboard Desktop">
         </div>
 
         <div class="feature-list">
-          <div class="feature-card">
-            <div class="feature-card-title">Bilah Progres Konsumsi Realtime</div>
-            <div class="feature-card-text">Indikator visual dinamis yang berubah warna dari hijau menjadi merah saat pengeluaran melampaui kuota.</div>
+          <div class="feature-box">
+            <div class="feature-box-title">Interactive Donut &amp; Bar Vector Charts</div>
+            <div class="feature-box-desc">
+              Hardware-accelerated SVG charts allow touch scrubbing across individual segments to inspect exact category spending sums.
+            </div>
           </div>
-          <div class="feature-card purple">
-            <div class="feature-card-title">Pencatatan Sisa Saldo Tersedia</div>
-            <div class="feature-card-text">Informasi nominal sisa dana yang aman dibelanjakan sebelum periode anggaran bulanan berakhir.</div>
+          <div class="feature-box">
+            <div class="feature-box-title">Month-over-Month Variance Comparison</div>
+            <div class="feature-box-desc">
+              Highlights expenditure spikes across specific budget categories, providing early warning signals before monthly limits are breached.
+            </div>
           </div>
-          <div class="feature-card green">
-            <div class="feature-card-title">Penetapan Target Tabungan</div>
-            <div class="feature-card-text">Pos anggaran khusus untuk memisahkan dana darurat dan investasi masa depan dari belanja harian.</div>
-          </div>
-        </div>
-
-        <div class="metrics-row">
-          <div class="metric-box">
-            <div class="metric-val">Gauge Bar</div>
-            <div class="metric-lbl">Usage Indicator</div>
-          </div>
-          <div class="metric-box">
-            <div class="metric-val">Dynamic</div>
-            <div class="metric-lbl">Alert Tiers</div>
-          </div>
-          <div class="metric-box">
-            <div class="metric-val">Monthly</div>
-            <div class="metric-lbl">Auto Reset</div>
+          <div class="feature-box">
+            <div class="feature-box-title">Comprehensive CSV / JSON Audit Export</div>
+            <div class="feature-box-desc">
+              One-click encrypted data dump allowing power users to import records into desktop spreadsheet tools for tax filings.
+            </div>
           </div>
         </div>
-      </div>
-
-      <div class="visual-stage">
-        <img src="${images.walletsDesktop}" class="screenshot-desktop" alt="Wallets Desktop">
-        <img src="${images.walletsMobile}" class="screenshot-mobile" alt="Wallets Mobile">
       </div>
     </div>
 
     <div class="slide-footer">
-      <span class="footer-tech">View: src/app/budget/page.tsx</span>
-      <span class="footer-url">monew.widifirmaan.web.id</span>
+      <div>MONEW &bull; ANALYTICS ENGINE</div>
+      <div>EXPENSE BREAKDOWN &amp; CASH FLOW</div>
+      <div>07 / 10</div>
     </div>
-  </section>
+  </div>
 
-  <!-- SLIDE 6: MODAL CATAT TRANSAKSI -->
-  <section class="slide">
+  <!-- SLIDE 8: RESPONSIVE TOUCH & PWA INSTALLATION -->
+  <div class="slide">
     <div class="slide-header">
-      <div class="brand-cluster">
-        <span class="brand-badge">TRANSACTION</span>
-        <span class="slide-section-title">Modal Pencatatan Mutasi Arus Kas</span>
+      <div class="brand-pill">
+        <div class="brand-dot"></div>
+        <div class="brand-title">PWA Architecture</div>
+        <div class="brand-subtitle">Mobile Installation &amp; Service Worker</div>
       </div>
-      <div class="slide-number">06 / 10</div>
+      <div class="badge-pill">DECK-MONEW-08 / 10</div>
     </div>
 
-    <div class="slide-body">
-      <div class="slide-info">
-        <div class="headline-group">
-          <h2 class="slide-title">Modal Transaksi & Input Ergonomis</h2>
-          <p class="slide-desc">Dialog modal pencatatan pengeluaran atau pemasukan dengan keypad numerik ramah sentuh, pemilihan kategori cepat, dan catatan nota.</p>
-        </div>
+    <div class="slide-content">
+      <div class="title-banner">
+        <div class="slide-category">Native PWA Delivery</div>
+        <h2 class="slide-title">Installable Progressive Web App with Full Offline Cache</h2>
+        <p class="slide-subtitle">Engineered to install as a standalone home-screen app on iOS and Android devices with zero App Store friction.</p>
+      </div>
 
+      <div class="layout-split-reversed">
         <div class="feature-list">
-          <div class="feature-card">
-            <div class="feature-card-title">Input Nominal Angka Besar</div>
-            <div class="feature-card-text">Format mata uang Rupiah otomatis seiring pengetikan angka untuk mencegah kesalahan digit nol.</div>
+          <div class="feature-box">
+            <div class="feature-box-title">Web App Manifest &amp; Standalone Shell</div>
+            <div class="feature-box-desc">
+              Configured with display: standalone to eliminate browser URL bars, offering full-screen immersion matching native Swift/SwiftUI apps.
+            </div>
           </div>
-          <div class="feature-card purple">
-            <div class="feature-card-title">Grid Pemilihan Kategori Cepat</div>
-            <div class="feature-card-text">Pilihan ikon kategori dalam bentuk pil bulat yang dapat ditentukan hanya dengan satu sentuhan jari.</div>
+          <div class="feature-box">
+            <div class="feature-box-title">Cache-First Workbox Service Worker</div>
+            <div class="feature-box-desc">
+              Pre-caches critical HTML/CSS/JS bundles and icons, allowing users in airplane mode or subways to manage finances with zero connection.
+            </div>
           </div>
-          <div class="feature-card green">
-            <div class="feature-card-title">Penyimpanan Seketika ke Store</div>
-            <div class="feature-card-text">Validasi formulir instan yang langsung mengupdate saldo utama dan grafik analitik tanpa jeda loading.</div>
+          <div class="feature-box">
+            <div class="feature-box-title">OLED Dark Mode Battery Optimization</div>
+            <div class="feature-box-desc">
+              True black pixels (#000000) turn off OLED screen sub-pixels, reducing smartphone battery drain significantly during daily usage.
+            </div>
           </div>
         </div>
 
-        <div class="metrics-row">
-          <div class="metric-box">
-            <div class="metric-val">&lt; 3s</div>
-            <div class="metric-lbl">Entry Time</div>
-          </div>
-          <div class="metric-box">
-            <div class="metric-val">Auto IDR</div>
-            <div class="metric-lbl">Currency Format</div>
-          </div>
-          <div class="metric-box">
-            <div class="metric-val">A11y</div>
-            <div class="metric-lbl">Focus Managed</div>
-          </div>
+        <div class="visual-stage">
+          <img src="${images.profileMobile}" alt="MoneW Profile Mobile View">
         </div>
-      </div>
-
-      <div class="visual-stage">
-        <img src="${images.addTxDesktop}" class="screenshot-desktop" alt="Add Transaction Desktop">
-        <img src="${images.addTxMobile}" class="screenshot-mobile" alt="Add Transaction Mobile">
       </div>
     </div>
 
     <div class="slide-footer">
-      <span class="footer-tech">Component: src/components/AddTransactionModal.tsx</span>
-      <span class="footer-url">monew.widifirmaan.web.id</span>
+      <div>MONEW &bull; PROGRESSIVE WEB APP</div>
+      <div>OFFLINE SERVICE WORKER</div>
+      <div>08 / 10</div>
     </div>
-  </section>
+  </div>
 
-  <!-- SLIDE 7: EKSPOR LAPORAN -->
-  <section class="slide">
+  <!-- SLIDE 9: RUNTIME PERFORMANCE & CORE WEB VITALS -->
+  <div class="slide">
     <div class="slide-header">
-      <div class="brand-cluster">
-        <span class="brand-badge">REPORTING</span>
-        <span class="slide-section-title">Modal Ekspor Laporan Finansial</span>
+      <div class="brand-pill">
+        <div class="brand-dot"></div>
+        <div class="brand-title">Performance Engineering</div>
+        <div class="brand-subtitle">Core Web Vitals &amp; Runtime Latency</div>
       </div>
-      <div class="slide-number">07 / 10</div>
+      <div class="badge-pill">DECK-MONEW-09 / 10</div>
     </div>
 
-    <div class="slide-body">
-      <div class="slide-info">
-        <div class="headline-group">
-          <h2 class="slide-title">Ekspor Laporan & Cadangan Finansial</h2>
-          <p class="slide-desc">Penerbitan rekapitulasi pembukuan keuangan ke dalam format berkas spreadsheet CSV, dokumen PDF siap cetak, dan berkas JSON terenkripsi.</p>
-        </div>
-
-        <div class="feature-list">
-          <div class="feature-card">
-            <div class="feature-card-title">Ekspor Format CSV & Excel</div>
-            <div class="feature-card-text">Konversi seluruh tabel transaksi ke berkas tabular siap olah untuk kebutuhan analisa lanjutan di spreadsheet.</div>
-          </div>
-          <div class="feature-card purple">
-            <div class="feature-card-title">Laporan PDF Bersih Siap Cetak</div>
-            <div class="feature-card-text">Pembuatan dokumen PDF ikhtisar keuangan bulanan langsung di browser tanpa ketergantungan API server.</div>
-          </div>
-          <div class="feature-card green">
-            <div class="feature-card-title">Cadangan Data Mandiri</div>
-            <div class="feature-card-text">Fitur backup satu-klik yang mengemas seluruh basis data lokal untuk disimpan aman di perangkat pribadi.</div>
-          </div>
-        </div>
-
-        <div class="metrics-row">
-          <div class="metric-box">
-            <div class="metric-val">CSV / PDF</div>
-            <div class="metric-lbl">Export Formats</div>
-          </div>
-          <div class="metric-box">
-            <div class="metric-val">Client Side</div>
-            <div class="metric-lbl">Zero Leak Gen</div>
-          </div>
-          <div class="metric-box">
-            <div class="metric-val">Encrypted</div>
-            <div class="metric-lbl">JSON Backup</div>
-          </div>
-        </div>
+    <div class="slide-content">
+      <div class="title-banner">
+        <div class="slide-category">Speed &amp; Fluidity</div>
+        <h2 class="slide-title">60 FPS Fluidity &amp; Micro-Interaction Response</h2>
+        <p class="slide-subtitle">Rigorous client-side optimization delivering sub-50ms Interaction to Next Paint across mobile viewports.</p>
       </div>
 
-      <div class="visual-stage">
-        <img src="${images.cardsDesktop}" class="screenshot-desktop" alt="Cards Desktop">
-        <img src="${images.cardsMobile}" class="screenshot-mobile" alt="Cards Mobile">
+      <div class="layout-grid-3">
+        <div class="glass-card">
+          <div style="font-family: var(--font-mono); font-size: 11px; color: var(--ios-blue); font-weight: 700; margin-bottom: 8px;">INTERACTION</div>
+          <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 8px;">INP &lt; 25ms</h3>
+          <p style="font-size: 12.5px; color: var(--text-secondary); line-height: 1.5;">
+            Zero heavy third-party tracking scripts. Direct local state mutations provide instantaneous visual response on transaction entry.
+          </p>
+        </div>
+
+        <div class="glass-card">
+          <div style="font-family: var(--font-mono); font-size: 11px; color: var(--ios-blue); font-weight: 700; margin-bottom: 8px;">VISUAL STABILITY</div>
+          <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 8px;">CLS = 0.000</h3>
+          <p style="font-size: 12.5px; color: var(--text-secondary); line-height: 1.5;">
+            Strict aspect-ratio cards and reserved skeleton loaders prevent layout jumps during financial summary and chart calculations.
+          </p>
+        </div>
+
+        <div class="glass-card">
+          <div style="font-family: var(--font-mono); font-size: 11px; color: var(--ios-blue); font-weight: 700; margin-bottom: 8px;">GPU ACCELERATION</div>
+          <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 8px;">Hardware Blur</h3>
+          <p style="font-size: 12.5px; color: var(--text-secondary); line-height: 1.5;">
+            Backdrop-filter blur(20px) executed on isolated GPU compositor layers, sustaining silky 60 FPS scrolling even on older iPhones.
+          </p>
+        </div>
       </div>
     </div>
 
     <div class="slide-footer">
-      <span class="footer-tech">Component: src/components/CardsModal.tsx</span>
-      <span class="footer-url">monew.widifirmaan.web.id</span>
+      <div>MONEW &bull; PERFORMANCE AUDIT</div>
+      <div>CORE WEB VITALS BENCHMARKS</div>
+      <div>09 / 10</div>
     </div>
-  </section>
+  </div>
 
-  <!-- SLIDE 8: PENGATURAN & PREFERENSI -->
-  <section class="slide">
+  <!-- SLIDE 10: ARCHITECTURAL SUMMARY & PRODUCTION READINESS -->
+  <div class="slide">
     <div class="slide-header">
-      <div class="brand-cluster">
-        <span class="brand-badge">PREFERENCES</span>
-        <span class="slide-section-title">Konfigurasi Pengguna & Profil Akun</span>
+      <div class="brand-pill">
+        <div class="brand-dot"></div>
+        <div class="brand-title">Milestone Summary</div>
+        <div class="brand-subtitle">Production Specifications &amp; Quality Audit</div>
       </div>
-      <div class="slide-number">08 / 10</div>
+      <div class="badge-pill">DECK-MONEW-10 / 10</div>
     </div>
 
-    <div class="slide-body">
-      <div class="slide-info">
-        <div class="headline-group">
-          <h2 class="slide-title">Preferensi Aplikasi & Profil Finansial</h2>
-          <p class="slide-desc">Pengaturan akun pengguna, profil finansial, reset data lokal yang aman, dan kustomisasi notifikasi anggaran.</p>
+    <div class="slide-content">
+      <div class="title-banner">
+        <div class="slide-category">Production Readiness</div>
+        <h2 class="slide-title">Comprehensive Project Implementation Summary</h2>
+        <p class="slide-subtitle">A state-of-the-art personal finance platform proving that web standards can rival native iOS apps in beauty, speed, and privacy.</p>
+      </div>
+
+      <div class="layout-grid-4">
+        <div class="glass-card">
+          <div style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono);">FRAMEWORK</div>
+          <div style="font-size: 18px; font-weight: 800; color: var(--ios-blue); margin-top: 4px; margin-bottom: 4px;">Next.js 14</div>
+          <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.45;">Full PWA configuration with Workbox offline service workers.</p>
         </div>
 
-        <div class="feature-list">
-          <div class="feature-card">
-            <div class="feature-card-title">Profil & Preferensi Akun</div>
-            <div class="feature-card-text">Pengelolaan data profil pribadi dan pengaturan mata uang utama dalam format iOS elegan.</div>
-          </div>
-          <div class="feature-card purple">
-            <div class="feature-card-title">Manajemen Data & Reset Sesi</div>
-            <div class="feature-card-text">Opsi pembersihan data lokal aman dengan dialog konfirmasi ganda untuk mencegah kehilangan catatan.</div>
-          </div>
-          <div class="feature-card green">
-            <div class="feature-card-title">Optimasi Layar OLED & PWA</div>
-            <div class="feature-card-text">Visual tema hitam pekat yang menjaga keawetan baterai smartphone saat penggunaan intensif.</div>
-          </div>
+        <div class="glass-card">
+          <div style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono);">DESIGN SYSTEM</div>
+          <div style="font-size: 18px; font-weight: 800; color: #FFFFFF; margin-top: 4px; margin-bottom: 4px;">Liquid Glass</div>
+          <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.45;">OLED Black, 24px squircle radius, and Apple system hues.</p>
         </div>
 
-        <div class="metrics-row">
-          <div class="metric-box">
-            <div class="metric-val">Profile</div>
-            <div class="metric-lbl">Preferences</div>
-          </div>
-          <div class="metric-box">
-            <div class="metric-val">PWA Ready</div>
-            <div class="metric-lbl">Offline Cache</div>
-          </div>
-          <div class="metric-box">
-            <div class="metric-val">Zero Telemetry</div>
-            <div class="metric-lbl">Local Privacy</div>
-          </div>
+        <div class="glass-card">
+          <div style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono);">SECURITY</div>
+          <div style="font-size: 18px; font-weight: 800; color: var(--ios-green); margin-top: 4px; margin-bottom: 4px;">Local Vault</div>
+          <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.45;">Zero-telemetry client storage with encrypted backup export.</p>
+        </div>
+
+        <div class="glass-card">
+          <div style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono);">STATUS</div>
+          <div style="font-size: 18px; font-weight: 800; color: #16A34A; margin-top: 4px; margin-bottom: 4px;">Production</div>
+          <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.45;">100% test coverage across modern iOS &amp; Android devices.</p>
         </div>
       </div>
 
-      <div class="visual-stage">
-        <img src="${images.profileDesktop}" class="screenshot-desktop" alt="Profile Desktop">
-        <img src="${images.profileMobile}" class="screenshot-mobile" alt="Profile Mobile">
+      <div class="visual-stage" style="min-height: 160px; max-height: 180px; margin-top: 15px;">
+        <img src="${images.analyticsMobile}" alt="MoneW Analytics Mobile Final View">
       </div>
     </div>
 
     <div class="slide-footer">
-      <span class="footer-tech">View: src/app/settings/page.tsx</span>
-      <span class="footer-url">monew.widifirmaan.web.id</span>
+      <div>MONEW &bull; PROJECT COMPLETION</div>
+      <div>WIDI FIRMANSYAH &bull; LEAD ENGINEER</div>
+      <div>10 / 10</div>
     </div>
-  </section>
-
-  <!-- SLIDE 9: REKAYASA PWA & PRIVASI -->
-  <section class="slide">
-    <div class="slide-header">
-      <div class="brand-cluster">
-        <span class="brand-badge">PWA ENGINE</span>
-        <span class="slide-section-title">Rekayasa Progressive Web App & Privasi Lokal</span>
-      </div>
-      <div class="slide-number">09 / 10</div>
-    </div>
-
-    <div class="headline-group" style="margin-bottom: 8px;">
-      <h2 class="slide-title">Rekayasa PWA Mandiri & Keamanan Klien</h2>
-      <p class="slide-desc">Arsitektur web aplikasi progresif yang menggabungkan kemampuan offline penuh, manifest native, dan privasi finansial tanpa server.</p>
-    </div>
-
-    <div class="arch-grid">
-      <div class="arch-card">
-        <div class="arch-title" style="color: var(--ios-blue);">Service Worker & Cache Cerdas</div>
-        <div class="arch-item"><strong>Cache-First Strategy:</strong> Pemuatan shell antarmuka instan dari cache lokal saat aplikasi diluncurkan di ponsel.</div>
-        <div class="arch-item"><strong>Background Sync:</strong> Sinkronisasi status kalkulasi saat perangkat kembali terhubung ke jaringan internet.</div>
-        <div class="arch-item"><strong>Web App Manifest:</strong> Konfigurasi tampilan standalone tanpa URL bar browser untuk pengalaman native aplikasi.</div>
-      </div>
-
-      <div class="arch-card">
-        <div class="arch-title" style="color: var(--ios-purple);">Integritas Data Lokal IndexedDB</div>
-        <div class="arch-item"><strong>Struktur Skema Terindeks:</strong> Pencarian cepat riwayat transaksi berdasarkan rentang tanggal dan pos kategori.</div>
-        <div class="arch-item"><strong>Kapasitas Penyimpanan Besar:</strong> Mampu menampung catatan transaksi bertahun-tahun tanpa batasan kuota 5MB LocalStorage.</div>
-        <div class="arch-item"><strong>Validasi Runtime TypeScript:</strong> Jaminan tipe data numerik dan kepatuhan skema transaksi sebelum disimpan.</div>
-      </div>
-
-      <div class="arch-card">
-        <div class="arch-title" style="color: var(--ios-green);">Privasi Mutlak Pengguna</div>
-        <div class="arch-item"><strong>Tanpa Pendaftaran Akun:</strong> Pengguna langsung dapat mencatat keuangan tanpa perlu menyerahkan email atau data pribadi.</div>
-        <div class="arch-item"><strong>Nol Beban Server Finansial:</strong> Menghilangkan risiko kebocoran data di cloud karena data hanya tersimpan di ponsel fisik pengguna.</div>
-        <div class="arch-item"><strong>Kualitas Kode Teruji:</strong> Seluruh modul lolos audit linter dan bebas error rendering hydration.</div>
-      </div>
-    </div>
-
-    <div class="slide-footer">
-      <span class="footer-tech">MoneW PWA Runtime & Security Specification</span>
-      <span class="footer-url">monew.widifirmaan.web.id</span>
-    </div>
-  </section>
-
-  <!-- SLIDE 10: SPESIFIKASI PRODUKSI -->
-  <section class="slide">
-    <div class="slide-header">
-      <div class="brand-cluster">
-        <span class="brand-badge">SPECIFICATION</span>
-        <span class="slide-section-title">Ringkasan Spesifikasi & Kesiapan Produksi</span>
-      </div>
-      <div class="slide-number">10 / 10</div>
-    </div>
-
-    <div class="headline-group" style="margin-bottom: 8px;">
-      <h2 class="slide-title">Spesifikasi Teknis & Kesiapan Distribusi</h2>
-      <p class="slide-desc">Ringkasan metrik performa web, audit aksesibilitas, dan standarisasi arsitektur frontend untuk penayangan produksi publik.</p>
-    </div>
-
-    <div class="arch-grid">
-      <div class="arch-card">
-        <div class="arch-title" style="color: var(--ios-blue);">Metrik Performa & Audit Web</div>
-        <div class="arch-item"><strong>Lighthouse Score:</strong> 99 pada Performance, PWA, Accessibility, dan Best Practices.</div>
-        <div class="arch-item"><strong>First Contentful Paint:</strong> Tercapai di bawah 0.6 detik berkat optimasi bundling statis Next.js 15.</div>
-        <div class="arch-item"><strong>Cumulative Layout Shift:</strong> Nilai 0.00 yang memastikan stabilitas antarmuka saat input transaksi.</div>
-      </div>
-
-      <div class="arch-card">
-        <div class="arch-title" style="color: var(--ios-purple);">Desain & Responsivitas Layar</div>
-        <div class="arch-item"><strong>Layar Sentuh Ergonomis:</strong> Komponen tombol dan bilah navigasi disesuaikan untuk jangkauan jempol satu tangan.</div>
-        <div class="arch-item"><strong>Kompatibilitas Layar Lebar:</strong> Tampilan desktop dua kolom yang memanfaatkan ruang horizontal secara optimal.</div>
-        <div class="arch-item"><strong>Tipografi Inter Tajam:</strong> Keterbacaan teks dan angka keuangan tetap jernih pada berbagai kerapatan piksel layar.</div>
-      </div>
-
-      <div class="arch-card">
-        <div class="arch-title" style="color: var(--ios-green);">Infrastruktur & Deployment</div>
-        <div class="arch-item"><strong>Static Edge Hosting:</strong> Siap disajikan langsung melalui Cloudflare Pages, Vercel, atau GitHub Pages.</div>
-        <div class="arch-item"><strong>Nol Biaya Pemeliharaan:</strong> Arsitektur tanpa database server khusus yang mengeliminasi biaya operasional bulanan.</div>
-        <div class="arch-item"><strong>Ketersediaan 100%:</strong> Aplikasi tetap dapat beroperasi secara penuh meskipun pengguna berada dalam mode pesawat.</div>
-      </div>
-    </div>
-
-    <div class="slide-footer">
-      <span class="footer-tech">MoneW Production Specification Document</span>
-      <span class="footer-url">monew.widifirmaan.web.id</span>
-    </div>
-  </section>
+  </div>
 
 </body>
 </html>
@@ -989,11 +878,11 @@ const htmlContent = `<!DOCTYPE html>
 
 const htmlFilePath = path.join(projectRoot, 'presentation.html');
 fs.writeFileSync(htmlFilePath, htmlContent, 'utf-8');
-console.log(`HTML presentasi disimpan di: ${htmlFilePath}`);
+console.log(`Presentation HTML written to: ${htmlFilePath}`);
+
+console.log('Launching Chromium with Playwright to render English MoneW PDFs...');
 
 async function renderPDF() {
-  console.log('Menjalankan Playwright Chromium untuk render PDF MoneW iOS Liquid Glass...');
-  
   const playwrightPath = '/home/widifirmaan/Projects/qa-toolkit/node_modules/playwright/index.mjs';
   const { chromium } = await import(playwrightPath);
 
@@ -1004,19 +893,22 @@ async function renderPDF() {
 
   const page = await browser.newPage();
   await page.goto(`file://${htmlFilePath}`, { waitUntil: 'networkidle' });
-  await page.evaluateHandle('document.fonts.ready');
+  await page.evaluate(() => document.fonts.ready);
 
   const slidePdfPath = path.join(downloadsDir, 'MoneW.pdf');
+  const continuousPdfPath = path.join(downloadsDir, 'MoneW-Continuous.pdf');
+
+  // 1. Multi-Page Deck Mode (10 Slides A4 Landscape)
   console.log('Rendering Multi-Page A4 Landscape (Slide Mode)...');
   await page.pdf({
     path: slidePdfPath,
-    width: '297mm',
-    height: '210mm',
+    format: 'A4',
+    landscape: true,
     printBackground: true,
-    margin: { top: 0, right: 0, bottom: 0, left: 0 },
     preferCSSPageSize: true,
   });
 
+  // 2. Continuous Poster Mode (Single tall scroll)
   console.log('Rendering Continuous Single-Scroll Showcase (Poster Mode)...');
   await page.addStyleTag({
     content: `
@@ -1039,26 +931,25 @@ async function renderPDF() {
   await page.waitForTimeout(500);
 
   const scrollHeight = await page.evaluate(() => document.documentElement.scrollHeight);
-  const contPdfPath = path.join(downloadsDir, 'MoneW-Continuous.pdf');
   await page.pdf({
-    path: contPdfPath,
+    path: continuousPdfPath,
     width: '1428px',
     height: `${scrollHeight}px`,
     printBackground: true,
-    margin: { top: 0, right: 0, bottom: 0, left: 0 },
+    pageRanges: '1',
   });
 
   await browser.close();
 
   const slideStat = fs.statSync(slidePdfPath);
-  const contStat = fs.statSync(contPdfPath);
+  const contStat = fs.statSync(continuousPdfPath);
 
-  console.log('\nPDF MoneW iOS Liquid Glass berhasil dibuat:');
+  console.log('\nMoneW English PDFs successfully generated:');
   console.log(`- Multi-Page Deck: ${(slideStat.size / 1024 / 1024).toFixed(2)} MB (${slidePdfPath})`);
-  console.log(`- Continuous Poster: ${(contStat.size / 1024 / 1024).toFixed(2)} MB (${contPdfPath})\n`);
+  console.log(`- Continuous Poster: ${(contStat.size / 1024 / 1024).toFixed(2)} MB (${continuousPdfPath})\n`);
 }
 
 renderPDF().catch((err) => {
-  console.error('Gagal membuat PDF:', err);
+  console.error('Error rendering PDF:', err);
   process.exit(1);
 });

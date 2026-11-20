@@ -40,7 +40,7 @@
 ## Fitur
 
 - **Consolidated Balance & Net Worth (`/`)**: Aggregated net worth tracking across all active wallets, current month income and expense totals, and real-time transaction ledger.
-- **Multi-Wallet Accounts (`/wallets`)**: Dedicated sub-ledgers for commercial bank accounts (BCA, Mandiri), digital e-wallets (GoPay, OVO, DANA), and physical cash with inter-wallet balance transfers.
+- **Multi-Wallet Accounts (`/wallets`)**: Dedicated sub-ledgers for commercial bank accounts (BCA, Mandiri), digital e-wallets (GoPay, OVO, DANA), and physical cash with real-time balance tracking, expense limits, and account freezing.
 - **Spending Limits & Account Safety Freeze**: Configurable daily, weekly, and monthly threshold limits per wallet, paired with a one-tap account freeze toggle.
 - **Payment Card Sub-Ledger (`/cards`)**: 3D card visualization supporting Visa and Mastercard networks with masked card numbers, expiration dates, and interactive 3D flip CVV inspection.
 - **Cashflow & Spending Analytics (`/stats`)**: Timeframe filtering across "This Month", "Last Month", "Last 3 Months", or "Custom Range", percentage category breakdown, top 3 expense rankings, and a filterable transaction table.

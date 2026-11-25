@@ -17,18 +17,36 @@ const inter = Inter({
 });
 
 export const viewport: Viewport = {
-  minimumScale: 1,
   initialScale: 1,
-  maximumScale: 1,
   width: 'device-width',
-  userScalable: false,
   viewportFit: 'cover',
   themeColor: '#09090b',
 };
 
 export const metadata: Metadata = {
-  title: "MoneW - Smart Finance",
-  description: "Modern Money Management App",
+  metadataBase: new URL('https://money.widifirmaan.web.id'),
+  title: {
+    default: "MoneW - Smart Money Management",
+    template: "%s | MoneW",
+  },
+  description: "Personal finance Progressive Web App for tracking multi-wallet balances, expenses, receipts, spending limits, and saved cards.",
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    type: "website",
+    url: "https://money.widifirmaan.web.id/",
+    siteName: "MoneW",
+    title: "MoneW - Smart Money Management",
+    description: "Track multi-wallet balances, expenses, receipt images, spending limits, and saved cards across devices.",
+    images: ["/monew-logo.png"],
+  },
+  twitter: {
+    card: "summary",
+    title: "MoneW - Smart Money Management",
+    description: "Track multi-wallet balances, expenses, receipt images, spending limits, and saved cards across devices.",
+    images: ["/monew-logo.png"],
+  },
   manifest: "/manifest.json",
   icons: {
     icon: '/monew-logo.png',

@@ -49,10 +49,16 @@ export default function AddTransaction() {
         formData.append('file', file);
 
         try {
+            const token = typeof window !== 'undefined' ? localStorage.getItem('monew_token') : null;
             const res = await fetch('/api/upload', {
                 method: 'POST',
+                headers: token ? { Authorization: `Bearer ${token}` } : {},
                 body: formData
             });
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({ error: 'Upload failed' }));
+                throw new Error(err.error || 'Upload failed');
+            }
             const data = await res.json();
             if (data.url) {
                 setReceiptUrl(data.url);

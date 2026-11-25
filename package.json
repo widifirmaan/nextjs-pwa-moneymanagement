@@ -3,14 +3,19 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -H 0.0.0.0 --webpack",
-    "build": "next build && node -e \"try{require('fs').unlinkSync('out/_worker.js')}catch(e){}\"",
-    "deploy": "wrangler deploy",
+    "dev": "next dev --webpack",
+    "build": "next build",
+    "build:cloudflare": "STATIC_EXPORT=1 next build && node -e \"try{require('fs').unlinkSync('out/_worker.js')}catch(e){}\"",
+    "start": "next start",
+    "db:setup": "node scripts/setup-local-db.mjs",
+    "db:reset": "node scripts/setup-local-db.mjs --reset",
+    "deploy": "npm run build:cloudflare && wrangler deploy",
     "seed": "wrangler d1 execute monew-db --file=scripts/seed.sql",
     "seed:remote": "wrangler d1 execute monew-db --remote --file=scripts/seed.sql",
     "lint": "eslint"
   },
   "dependencies": {
+    "@libsql/client": "^0.18.0",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "framer-motion": "^12.25.0",
@@ -18,7 +23,6 @@
     "next": "16.1.1",
     "react": "19.2.3",
     "react-dom": "19.2.3",
-    "recharts": "^3.6.0",
     "tailwind-merge": "^3.4.0"
   },
   "devDependencies": {

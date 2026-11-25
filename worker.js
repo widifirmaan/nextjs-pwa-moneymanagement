@@ -1,6 +1,6 @@
 const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
 };
 
@@ -11,17 +11,43 @@ function json(data, status = 200) {
     });
 }
 
+function uint8ToBase64(bytes) {
+    let binary = '';
+    const chunkSize = 0x8000;
+    for (let i = 0; i < bytes.length; i += chunkSize) {
+        binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
+    }
+    return btoa(binary);
+}
+
+function toBase64Url(bytes) {
+    return uint8ToBase64(bytes).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+function fromBase64Url(input) {
+    const normalized = input.replace(/-/g, '+').replace(/_/g, '/');
+    const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, '=');
+    const binary = atob(padded);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) {
+        bytes[i] = binary.charCodeAt(i);
+    }
+    return bytes;
+}
+
 async function createJWT(payload, secret) {
     const encoder = new TextEncoder();
-    const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
-    const body = btoa(JSON.stringify({ ...payload, iat: Math.floor(Date.now() / 1000) }));
+    const now = Math.floor(Date.now() / 1000);
+    const header = toBase64Url(encoder.encode(JSON.stringify({ alg: 'HS256', typ: 'JWT' })));
+    const body = toBase64Url(encoder.encode(JSON.stringify({ ...payload, iat: now, exp: now + 7 * 24 * 60 * 60 })));
     const key = await crypto.subtle.importKey(
         'raw', encoder.encode(secret),
         { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
     );
-    const sig = btoa(String.fromCharCode(...new Uint8Array(
+    const sigBytes = new Uint8Array(
         await crypto.subtle.sign('HMAC', key, encoder.encode(`${header}.${body}`))
-    )));
+    );
+    const sig = toBase64Url(sigBytes);
     return `${header}.${body}.${sig}`;
 }
 
@@ -36,11 +62,13 @@ async function verifyJWT(token, secret) {
         );
         const valid = await crypto.subtle.verify(
             'HMAC', key,
-            new Uint8Array([...atob(parts[2])].map(c => c.charCodeAt(0))),
+            fromBase64Url(parts[2]),
             encoder.encode(`${parts[0]}.${parts[1]}`)
         );
         if (!valid) return null;
-        return JSON.parse(atob(parts[1]));
+        const payload = JSON.parse(new TextDecoder().decode(fromBase64Url(parts[1])));
+        if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) return null;
+        return payload;
     } catch { return null; }
 }
 
@@ -54,7 +82,7 @@ async function hashPassword(password, salt) {
         { name: 'PBKDF2', salt: encoder.encode(salt), iterations: 100000, hash: 'SHA-256' },
         key, 256
     );
-    return btoa(String.fromCharCode(...new Uint8Array(bits)));
+    return uint8ToBase64(new Uint8Array(bits));
 }
 
 async function getUser(request, env) {
@@ -69,92 +97,119 @@ function getUserId(url) {
     return parts[parts.length - 1];
 }
 
-export default {
-    async fetch(request, env, ctx) {
-        if (request.method === 'OPTIONS') {
-            return new Response(null, { headers: corsHeaders });
+export async function handleApiRequest(request, env) {
+    if (request.method === 'OPTIONS') {
+        return new Response(null, { status: 204, headers: corsHeaders });
+    }
+
+    const url = new URL(request.url);
+    const path = url.pathname;
+
+    try {
+        if (path === '/api/ping') {
+            return json({ ok: true, service: 'monew-api', status: 'running', path });
         }
 
-        const url = new URL(request.url);
-        const path = url.pathname;
-
-        if (!path.startsWith('/api/')) {
-            return env.ASSETS.fetch(request);
-        }
-
-        try {
-            if (path === '/api/ping') return json({ pong: true, path });
-            if (path === '/api/debug-env') return json({
+        const allowDebug = env.ALLOW_DEBUG === '1';
+        if (allowDebug && path === '/api/debug-env') {
+            return json({
                 hasJWT: !!env.JWT_SECRET,
-                hasD1: !!env.MONEY_DB,
-                hasR2: !!env.MONEY_IMAGES,
-                jwtType: typeof env.JWT_SECRET,
-                d1Type: typeof env.MONEY_DB,
+                hasDB: !!env.MONEY_DB,
+                hasImages: !!env.MONEY_IMAGES,
             });
-            if (path === '/api/debug-test') {
-                const results = {};
-                try { results.uuid = crypto.randomUUID(); } catch(e) { results.uuidErr = e.message; }
-                try { results.hash = await hashPassword('test', 'salt'); } catch(e) { results.hashErr = e.message; }
-                try { results.jwt = await createJWT({test:1}, env.JWT_SECRET || 'dev-secret'); } catch(e) { results.jwtErr = e.message; }
-                try {
-                    if (env.MONEY_DB) {
-                        const r = await env.MONEY_DB.prepare('SELECT 1 as val').all();
-                        results.d1 = r.results;
-                    } else {
-                        results.d1 = 'no D1';
-                    }
-                } catch(e) { results.d1Err = e.message; }
-                return json(results);
+        }
+        if (allowDebug && path === '/api/debug-test') {
+            const results = {};
+            try { results.uuid = crypto.randomUUID(); } catch (e) { results.uuidErr = e.message; }
+            try { results.hash = await hashPassword('test', 'salt'); } catch (e) { results.hashErr = e.message; }
+            try { results.jwt = await createJWT({ test: 1 }, env.JWT_SECRET || 'dev-secret'); } catch (e) { results.jwtErr = e.message; }
+            try {
+                if (env.MONEY_DB) {
+                    const r = await env.MONEY_DB.prepare('SELECT 1 as val').all();
+                    results.db = r.results;
+                } else {
+                    results.db = 'no DB';
+                }
+            } catch (e) { results.dbErr = e.message; }
+            return json(results);
+        }
+
+        if (path === '/api/auth/login' && request.method === 'POST') return handleLogin(request, env);
+        if (path === '/api/auth/register' && request.method === 'POST') return handleRegister(request, env);
+        if (path === '/api/ios-profile' && request.method === 'GET') return handleIosProfile(request, env);
+
+        if (path.startsWith('/api/receipts/') && request.method === 'GET') {
+            const rawKey = decodeURIComponent(path.replace('/api/receipts/', ''));
+            if (!rawKey || rawKey.includes('..') || !rawKey.startsWith('receipts/')) {
+                return json({ error: 'Invalid receipt key' }, 400);
             }
-
-            if (path === '/api/auth/login' && request.method === 'POST') return handleLogin(request, env);
-            if (path === '/api/auth/register' && request.method === 'POST') return handleRegister(request, env);
-            if (path === '/api/ios-profile' && request.method === 'GET') return handleIosProfile(request, env);
-
-            const user = await getUser(request, env);
-            if (!user) return json({ error: 'Unauthorized' }, 401);
-
-            if ((path === '/api/auth/profile' || path === '/api/user/profile')) {
-                if (request.method === 'GET') return handleGetProfile(env, user);
-                if (request.method === 'PUT') return handleUpdateProfile(request, env, user);
+            if (!env.MONEY_IMAGES) {
+                return json({ error: 'Receipt storage not configured' }, 404);
             }
-            if (path.startsWith('/api/receipts/') && request.method === 'GET') {
-                const key = path.replace('/api/receipts/', '');
-                const object = await env.MONEY_IMAGES.get(key);
-                if (!object) return json({ error: 'Receipt not found' }, 404);
-                const headers = new Headers();
+            const object = await env.MONEY_IMAGES.get(rawKey);
+            if (!object) return json({ error: 'Receipt not found' }, 404);
+            if (typeof object.writeHttpMetadata === 'function') {
+                const headers = new Headers(corsHeaders);
                 object.writeHttpMetadata(headers);
-                headers.set('etag', object.httpEtag);
+                if (object.httpEtag) headers.set('etag', object.httpEtag);
                 return new Response(object.body, { headers });
             }
-            if (path === '/api/data' && request.method === 'GET') return handleGetData(env, user);
-            if (path === '/api/seed' && request.method === 'POST') return handleSeed(env, user);
-            if (path === '/api/user/preferences') {
-                if (request.method === 'GET') return handleGetPreferences(env, user);
-                if (request.method === 'POST') return handleUpdatePreferences(request, env, user);
-            }
-            if (path === '/api/user/reset' && request.method === 'POST') return handleReset(env, user);
-            if (path === '/api/transfer' && request.method === 'POST') return handleTransfer(request, env, user);
-            if (path === '/api/upload' && request.method === 'POST') return handleUpload(request, env, user);
-            if (path === '/api/transactions' && request.method === 'POST') return handleCreateTransaction(request, env, user);
-            if (path.match(/^\/api\/transactions\/[^\/]+$/) && request.method === 'PUT') return handleUpdateTransaction(request, env, user);
-            if (path.match(/^\/api\/transactions\/[^\/]+$/) && request.method === 'DELETE') return handleDeleteTransaction(request, env, user);
-            if (path === '/api/wallets' && request.method === 'GET') return handleGetWallets(env, user);
-            if (path === '/api/wallets' && request.method === 'POST') return handleCreateWallet(request, env, user);
-            if (path.match(/^\/api\/wallets\/[^\/]+$/) && request.method === 'PUT') return handleUpdateWallet(request, env, user);
-            if (path.match(/^\/api\/wallets\/[^\/]+$/) && request.method === 'DELETE') return handleDeleteWallet(request, env, user);
-            if (path === '/api/cards' && request.method === 'GET') return handleGetCards(env, user);
-            if (path === '/api/cards' && request.method === 'POST') return handleCreateCard(request, env, user);
-            if (path.match(/^\/api\/cards\/[^\/]+$/) && request.method === 'PUT') return handleUpdateCard(request, env, user);
-            if (path.match(/^\/api\/cards\/[^\/]+$/) && request.method === 'DELETE') return handleDeleteCard(request, env, user);
-            if (path === '/api/debug-db' && request.method === 'GET') return handleDebugDb(env, user);
-
-            return json({ error: 'Not found' }, 404);
-        } catch (error) {
-            return json({ error: error.message || 'Internal error' }, 500);
+            const blob = await object.blob();
+            return new Response(blob, {
+                headers: {
+                    'Content-Type': blob.type || 'image/jpeg',
+                    'Cache-Control': 'public, max-age=31536000',
+                    ...corsHeaders,
+                },
+            });
         }
+
+        const user = await getUser(request, env);
+        if (!user) return json({ error: 'Unauthorized' }, 401);
+
+        if ((path === '/api/auth/profile' || path === '/api/user/profile')) {
+            if (request.method === 'GET') return handleGetProfile(env, user);
+            if (request.method === 'PUT') return handleUpdateProfile(request, env, user);
+        }
+        if (path === '/api/data' && request.method === 'GET') return handleGetData(env, user);
+        if (path === '/api/seed' && request.method === 'POST') return handleSeed(env, user);
+        if (path === '/api/user/preferences') {
+            if (request.method === 'GET') return handleGetPreferences(env, user);
+            if (request.method === 'POST') return handleUpdatePreferences(request, env, user);
+        }
+        if (path === '/api/user/reset' && request.method === 'POST') return handleReset(env, user);
+        if (path === '/api/transfer' && request.method === 'POST') return handleTransfer(request, env, user);
+        if (path === '/api/upload' && request.method === 'POST') return handleUpload(request, env, user);
+        if (path === '/api/transactions' && request.method === 'POST') return handleCreateTransaction(request, env, user);
+        if (path.match(/^\/api\/transactions\/[^\/]+$/) && request.method === 'PUT') return handleUpdateTransaction(request, env, user);
+        if (path.match(/^\/api\/transactions\/[^\/]+$/) && request.method === 'DELETE') return handleDeleteTransaction(request, env, user);
+        if (path === '/api/wallets' && request.method === 'GET') return handleGetWallets(env, user);
+        if (path === '/api/wallets' && request.method === 'POST') return handleCreateWallet(request, env, user);
+        if (path.match(/^\/api\/wallets\/[^\/]+$/) && request.method === 'PUT') return handleUpdateWallet(request, env, user);
+        if (path.match(/^\/api\/wallets\/[^\/]+$/) && request.method === 'DELETE') return handleDeleteWallet(request, env, user);
+        if (path === '/api/cards' && request.method === 'GET') return handleGetCards(env, user);
+        if (path === '/api/cards' && request.method === 'POST') return handleCreateCard(request, env, user);
+        if (path.match(/^\/api\/cards\/[^\/]+$/) && request.method === 'PUT') return handleUpdateCard(request, env, user);
+        if (path.match(/^\/api\/cards\/[^\/]+$/) && request.method === 'DELETE') return handleDeleteCard(request, env, user);
+        if (allowDebug && path === '/api/debug-db' && request.method === 'GET') return handleDebugDb(env, user);
+
+        return json({ error: 'Not found' }, 404);
+    } catch (error) {
+        return json({ error: error.message || 'Internal error' }, 500);
+    }
+}
+
+const workerHandler = {
+    async fetch(request, env) {
+        const url = new URL(request.url);
+        if (url.pathname.startsWith('/api/')) {
+            return handleApiRequest(request, env);
+        }
+        return env.ASSETS.fetch(request);
     }
 };
+
+export default workerHandler;
 
 async function handleLogin(request, env) {
     const { email, password } = await request.json();
@@ -326,14 +381,25 @@ async function handleTransfer(request, env, user) {
 async function handleUpload(request, env, user) {
     const formData = await request.formData();
     const file = formData.get('file');
-    if (!file) return json({ error: 'No file uploaded' }, 400);
+    if (!file || typeof file.arrayBuffer !== 'function') return json({ error: 'No file uploaded' }, 400);
 
-    const ext = file.name.split('.').pop() || 'jpg';
-    const key = `receipts/${user.id}/${Date.now()}_${crypto.randomUUID()}.${ext}`;
     const buffer = await file.arrayBuffer();
+    if (buffer.byteLength > 5 * 1024 * 1024) {
+        return json({ error: 'File exceeds 5MB limit' }, 413);
+    }
 
+    const rawExt = (file.name || 'receipt.jpg').split('.').pop()?.toLowerCase() || 'jpg';
+    const ext = /^[a-z0-9]{1,8}$/.test(rawExt) ? rawExt : 'jpg';
+    const contentType = file.type || 'image/jpeg';
+
+    if (!env.MONEY_IMAGES) {
+        const base64 = uint8ToBase64(new Uint8Array(buffer));
+        return json({ url: `data:${contentType};base64,${base64}` });
+    }
+
+    const key = `receipts/${user.id}/${Date.now()}_${crypto.randomUUID()}.${ext}`;
     await env.MONEY_IMAGES.put(key, buffer, {
-        httpMetadata: { contentType: file.type || 'image/jpeg' },
+        httpMetadata: { contentType },
     });
 
     return json({ url: `/api/receipts/${key}` });
@@ -344,6 +410,7 @@ async function handleCreateTransaction(request, env, user) {
 
     const wallet = await env.MONEY_DB.prepare('SELECT * FROM wallets WHERE id = ? AND userId = ?').bind(walletId, user.id).first();
     if (!wallet) return json({ error: 'Wallet not found' }, 404);
+    if (wallet.isFrozen) return json({ error: 'Cannot add transaction to a frozen wallet' }, 400);
 
     await env.MONEY_DB.prepare('INSERT INTO transactions (id, amount, type, categoryId, walletId, date, note, receiptUrl, userId) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)').bind(id, amount, type, categoryId, walletId, date, note || '', receiptUrl || null, user.id).run();
 
@@ -361,10 +428,19 @@ async function handleUpdateTransaction(request, env, user) {
     const oldTxn = await db.prepare('SELECT * FROM transactions WHERE id = ? AND userId = ?').bind(txnId, user.id).first();
     if (!oldTxn) return json({ error: 'Transaction not found' }, 404);
 
+    const oldWallet = await db.prepare('SELECT isFrozen FROM wallets WHERE id = ? AND userId = ?').bind(oldTxn.walletId, user.id).first();
+    if (oldWallet?.isFrozen) return json({ error: 'Cannot modify transactions on a frozen wallet' }, 400);
+
+    const merged = { ...oldTxn, ...body };
+    if (merged.walletId !== oldTxn.walletId) {
+        const targetWallet = await db.prepare('SELECT isFrozen FROM wallets WHERE id = ? AND userId = ?').bind(merged.walletId, user.id).first();
+        if (!targetWallet) return json({ error: 'Target wallet not found' }, 404);
+        if (targetWallet.isFrozen) return json({ error: 'Cannot move transaction to a frozen wallet' }, 400);
+    }
+
     const oldSign = oldTxn.type === 'income' ? 1 : -1;
     await db.prepare('UPDATE wallets SET balance = balance - (? * ?) WHERE id = ? AND userId = ?').bind(oldSign, oldTxn.amount, oldTxn.walletId, user.id).run();
 
-    const merged = { ...oldTxn, ...body };
     await db.prepare('UPDATE transactions SET amount = ?, type = ?, categoryId = ?, walletId = ?, date = ?, note = ?, receiptUrl = ? WHERE id = ? AND userId = ?').bind(merged.amount, merged.type, merged.categoryId, merged.walletId, merged.date, merged.note || '', merged.receiptUrl || null, txnId, user.id).run();
 
     const newSign = merged.type === 'income' ? 1 : -1;
@@ -379,6 +455,9 @@ async function handleDeleteTransaction(request, env, user) {
 
     const txn = await db.prepare('SELECT * FROM transactions WHERE id = ? AND userId = ?').bind(txnId, user.id).first();
     if (!txn) return json({ error: 'Transaction not found' }, 404);
+
+    const wallet = await db.prepare('SELECT isFrozen FROM wallets WHERE id = ? AND userId = ?').bind(txn.walletId, user.id).first();
+    if (wallet?.isFrozen) return json({ error: 'Cannot delete transactions from a frozen wallet' }, 400);
 
     const sign = txn.type === 'income' ? 1 : -1;
     await db.prepare('UPDATE wallets SET balance = balance - (? * ?) WHERE id = ? AND userId = ?').bind(sign, txn.amount, txn.walletId, user.id).run();
@@ -483,14 +562,16 @@ async function handleIosProfile(request, env) {
     const url = new URL(request.url);
     const baseUrl = `${url.protocol}//${url.host}`;
 
-    let iconBase64 = '';
-    try {
-        const iconReq = await env.ASSETS.fetch(new URL('/monew-logo.png', url.origin));
-        if (iconReq.ok) {
-            const buffer = await iconReq.arrayBuffer();
-            iconBase64 = btoa(String.fromCharCode(...new Uint8Array(buffer)));
-        }
-    } catch {}
+    let iconBase64 = env.PUBLIC_LOGO_BASE64 || '';
+    if (!iconBase64 && env.ASSETS) {
+        try {
+            const iconReq = await env.ASSETS.fetch(new URL('/monew-logo.png', url.origin));
+            if (iconReq.ok) {
+                const buffer = await iconReq.arrayBuffer();
+                iconBase64 = uint8ToBase64(new Uint8Array(buffer));
+            }
+        } catch {}
+    }
 
     const uuid = () => crypto.randomUUID();
     const mobileConfig = `<?xml version="1.0" encoding="UTF-8"?>

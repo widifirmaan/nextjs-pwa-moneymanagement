@@ -57,3 +57,31 @@ INSERT INTO transactions (id, amount, type, categoryId, walletId, date, note, re
 ('tx-nov-11', 520000, 'expense', '535f0fe3-d905-499a-a760-5b764d023b12', '74181ade-ecbc-40ef-a14c-2b874896903c', '2026-11-15T19:30:00.000Z', 'Family Dinner at Artisan Bistro', null, '620c27fa-2024-4863-8ac5-2c2f1514a4aa'),
 ('tx-nov-12', 185000, 'expense', '535f0fe3-d905-499a-a760-5b764d023b12', '5e6f7a8b-9c0d-1e2f-3a4b-5c6d7e8f9a0b', '2026-11-16T12:45:00.000Z', 'Cold Brew & Artisan Lunch', null, '620c27fa-2024-4863-8ac5-2c2f1514a4aa'),
 ('tx-nov-13', 250000, 'expense', '2186b7ba-a8ad-48cc-9663-56deb679340c', '24a6697f-a0db-48d1-afba-b092b997d5b2', '2026-11-17T09:15:00.000Z', 'Workspace Supplies & Stationery', null, '620c27fa-2024-4863-8ac5-2c2f1514a4aa');
+
+-- 6. Seed Local Demo Account (demo@monew.app / demo123)
+INSERT OR IGNORE INTO users (id, email, name, password, colorScheme, isSetupCompleted)
+VALUES ('11111111-1111-4111-8111-111111111111', 'demo@monew.app', 'Demo User', 'Xq4U3+oDK0W+icJeCeAyBaefFlyKrDo1/UPFnB1b4NI=', 'dark', 1);
+
+INSERT OR IGNORE INTO categories (id, name, icon, color, type, userId) VALUES
+('demo-cat-food', 'Food & Drink', 'Utensils', 'bg-orange-500', 'expense', '11111111-1111-4111-8111-111111111111'),
+('demo-cat-trans', 'Transport', 'Car', 'bg-blue-500', 'expense', '11111111-1111-4111-8111-111111111111'),
+('demo-cat-shop', 'Shopping', 'ShoppingBag', 'bg-pink-500', 'expense', '11111111-1111-4111-8111-111111111111'),
+('demo-cat-bills', 'Bills', 'Receipt', 'bg-red-500', 'expense', '11111111-1111-4111-8111-111111111111'),
+('demo-cat-salary', 'Salary', 'Briefcase', 'bg-green-500', 'income', '11111111-1111-4111-8111-111111111111'),
+('demo-cat-invest', 'Investments', 'TrendingUp', 'bg-emerald-500', 'income', '11111111-1111-4111-8111-111111111111'),
+('demo-cat-others', 'Others', 'MoreHorizontal', 'bg-slate-500', 'expense', '11111111-1111-4111-8111-111111111111'),
+('demo-cat-other', 'Other', 'MoreHorizontal', 'bg-slate-500', 'income', '11111111-1111-4111-8111-111111111111');
+
+INSERT OR IGNORE INTO wallets (id, name, type, balance, color, accountNumber, userId, isFrozen, expenseLimitsDaily, expenseLimitsWeekly, expenseLimitsMonthly) VALUES
+('demo-wallet-bca', 'BCA', 'bank', 12500000, 'bg-blue-600', '527-112-8801', '11111111-1111-4111-8111-111111111111', 0, 500000, 2500000, 8000000),
+('demo-wallet-cash', 'Cash', 'cash', 950000, 'bg-green-600', null, '11111111-1111-4111-8111-111111111111', 0, 0, 0, 0),
+('demo-wallet-gopay', 'GoPay', 'ewallet', 1450000, 'bg-cyan-500', '0812-0000-1234', '11111111-1111-4111-8111-111111111111', 0, 0, 0, 0);
+
+INSERT OR IGNORE INTO saved_cards (id, userId, cardName, cardHolderName, cardNumber, expiryDate, cvv, cardType, color, bankName) VALUES
+('demo-card-1', '11111111-1111-4111-8111-111111111111', 'Demo Everyday Visa', 'Demo User', '4556 1234 5678 9012', '09/29', '421', 'visa', 'from-blue-500 to-cyan-500', 'Bank Central Asia');
+
+INSERT OR IGNORE INTO transactions (id, amount, type, categoryId, walletId, date, note, receiptUrl, userId) VALUES
+('demo-tx-01', 15000000, 'income', 'demo-cat-salary', 'demo-wallet-bca', '2026-11-01T09:00:00.000Z', 'Monthly Salary', null, '11111111-1111-4111-8111-111111111111'),
+('demo-tx-02', 450000, 'expense', 'demo-cat-bills', 'demo-wallet-bca', '2026-11-05T10:30:00.000Z', 'Internet & Utilities', null, '11111111-1111-4111-8111-111111111111'),
+('demo-tx-03', 185000, 'expense', 'demo-cat-food', 'demo-wallet-gopay', '2026-11-10T12:15:00.000Z', 'Team Lunch', null, '11111111-1111-4111-8111-111111111111'),
+('demo-tx-04', 120000, 'expense', 'demo-cat-trans', 'demo-wallet-cash', '2026-11-12T18:00:00.000Z', 'Fuel & Parking', null, '11111111-1111-4111-8111-111111111111');

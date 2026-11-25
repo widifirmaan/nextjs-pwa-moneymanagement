@@ -11,6 +11,18 @@ function json(data, status = 200) {
     });
 }
 
+async function runBatch(db, stmts) {
+    if (!db || !Array.isArray(stmts) || stmts.length === 0) return [];
+    if (typeof db.batch === 'function') {
+        return await db.batch(stmts);
+    }
+    const results = [];
+    for (const stmt of stmts) {
+        results.push(await stmt.run());
+    }
+    return results;
+}
+
 function uint8ToBase64(bytes) {
     let binary = '';
     const chunkSize = 0x8000;
@@ -248,6 +260,7 @@ async function handleRegister(request, env) {
 
 async function handleGetProfile(env, user) {
     const dbUser = await env.MONEY_DB.prepare('SELECT id, email, name, colorScheme FROM users WHERE id = ?').bind(user.id).first();
+    if (!dbUser) return json({ error: 'User not found' }, 404);
     return json({ id: dbUser.id, email: dbUser.email, name: dbUser.name || user.name, colorScheme: dbUser.colorScheme || 'dark' });
 }
 
@@ -298,14 +311,22 @@ async function handleSeed(env, user) {
     ];
 
     const catIds = {};
+    const stmts = [];
     for (const cat of defaultCategories) {
         const id = crypto.randomUUID();
         catIds[cat.name] = id;
-        await db.prepare('INSERT INTO categories (id, name, icon, color, type, userId) VALUES (?, ?, ?, ?, ?, ?)').bind(id, cat.name, cat.icon, cat.color, cat.type, user.id).run();
+        stmts.push(
+            db.prepare('INSERT INTO categories (id, name, icon, color, type, userId) VALUES (?, ?, ?, ?, ?, ?)')
+                .bind(id, cat.name, cat.icon, cat.color, cat.type, user.id)
+        );
     }
 
     const walletId = crypto.randomUUID();
-    await db.prepare('INSERT INTO wallets (id, name, type, balance, color, userId) VALUES (?, ?, ?, ?, ?, ?)').bind(walletId, 'Cash', 'cash', 0, 'bg-green-600', user.id).run();
+    stmts.push(
+        db.prepare('INSERT INTO wallets (id, name, type, balance, color, userId) VALUES (?, ?, ?, ?, ?, ?)')
+            .bind(walletId, 'Cash', 'cash', 0, 'bg-green-600', user.id)
+    );
+    await runBatch(db, stmts);
 
     return json({ message: 'Database seeded successfully' });
 }
@@ -333,13 +354,13 @@ async function handleUpdatePreferences(request, env, user) {
 
 async function handleReset(env, user) {
     const db = env.MONEY_DB;
-    await Promise.all([
-        db.prepare('DELETE FROM transactions WHERE userId = ?').bind(user.id).run(),
-        db.prepare('DELETE FROM wallets WHERE userId = ?').bind(user.id).run(),
-        db.prepare('DELETE FROM categories WHERE userId = ?').bind(user.id).run(),
-        db.prepare('DELETE FROM saved_cards WHERE userId = ?').bind(user.id).run(),
+    await runBatch(db, [
+        db.prepare('DELETE FROM transactions WHERE userId = ?').bind(user.id),
+        db.prepare('DELETE FROM wallets WHERE userId = ?').bind(user.id),
+        db.prepare('DELETE FROM categories WHERE userId = ?').bind(user.id),
+        db.prepare('DELETE FROM saved_cards WHERE userId = ?').bind(user.id),
+        db.prepare('UPDATE users SET isSetupCompleted = 0 WHERE id = ?').bind(user.id),
     ]);
-    await db.prepare('UPDATE users SET isSetupCompleted = 0 WHERE id = ?').bind(user.id).run();
     return json({ success: true, message: 'Data reset successfully' });
 }
 
@@ -370,10 +391,12 @@ async function handleTransfer(request, env, user) {
     const incomeId = crypto.randomUUID();
     const ts = date || new Date().toISOString();
 
-    await db.prepare('INSERT INTO transactions (id, amount, type, categoryId, walletId, date, note, userId) VALUES (?, ?, ?, ?, ?, ?, ?, ?)').bind(expenseId, amount, 'expense', catExpense.id, sourceWalletId, ts, `Transfer to ${targetWallet.name}${note ? ': ' + note : ''}`, user.id).run();
-    await db.prepare('INSERT INTO transactions (id, amount, type, categoryId, walletId, date, note, userId) VALUES (?, ?, ?, ?, ?, ?, ?, ?)').bind(incomeId, amount, 'income', catIncome.id, targetWalletId, ts, `Transfer from ${sourceWallet.name}${note ? ': ' + note : ''}`, user.id).run();
-    await db.prepare('UPDATE wallets SET balance = balance - ? WHERE id = ? AND userId = ?').bind(amount, sourceWalletId, user.id).run();
-    await db.prepare('UPDATE wallets SET balance = balance + ? WHERE id = ? AND userId = ?').bind(amount, targetWalletId, user.id).run();
+    await runBatch(db, [
+        db.prepare('INSERT INTO transactions (id, amount, type, categoryId, walletId, date, note, userId) VALUES (?, ?, ?, ?, ?, ?, ?, ?)').bind(expenseId, amount, 'expense', catExpense.id, sourceWalletId, ts, `Transfer to ${targetWallet.name}${note ? ': ' + note : ''}`, user.id),
+        db.prepare('INSERT INTO transactions (id, amount, type, categoryId, walletId, date, note, userId) VALUES (?, ?, ?, ?, ?, ?, ?, ?)').bind(incomeId, amount, 'income', catIncome.id, targetWalletId, ts, `Transfer from ${sourceWallet.name}${note ? ': ' + note : ''}`, user.id),
+        db.prepare('UPDATE wallets SET balance = balance - ? WHERE id = ? AND userId = ?').bind(amount, sourceWalletId, user.id),
+        db.prepare('UPDATE wallets SET balance = balance + ? WHERE id = ? AND userId = ?').bind(amount, targetWalletId, user.id),
+    ]);
 
     return json({ success: true });
 }
@@ -406,18 +429,21 @@ async function handleUpload(request, env, user) {
 }
 
 async function handleCreateTransaction(request, env, user) {
-    const { id, amount, type, categoryId, walletId, date, note, receiptUrl } = await request.json();
+    const body = await request.json();
+    const txnId = body.id || crypto.randomUUID();
+    const { amount, type, categoryId, walletId, date, note, receiptUrl } = body;
 
     const wallet = await env.MONEY_DB.prepare('SELECT * FROM wallets WHERE id = ? AND userId = ?').bind(walletId, user.id).first();
     if (!wallet) return json({ error: 'Wallet not found' }, 404);
     if (wallet.isFrozen) return json({ error: 'Cannot add transaction to a frozen wallet' }, 400);
 
-    await env.MONEY_DB.prepare('INSERT INTO transactions (id, amount, type, categoryId, walletId, date, note, receiptUrl, userId) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)').bind(id, amount, type, categoryId, walletId, date, note || '', receiptUrl || null, user.id).run();
-
     const sign = type === 'income' ? 1 : -1;
-    await env.MONEY_DB.prepare('UPDATE wallets SET balance = balance + (? * ?) WHERE id = ? AND userId = ?').bind(sign, amount, walletId, user.id).run();
+    await runBatch(env.MONEY_DB, [
+        env.MONEY_DB.prepare('INSERT INTO transactions (id, amount, type, categoryId, walletId, date, note, receiptUrl, userId) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)').bind(txnId, amount, type, categoryId, walletId, date, note || '', receiptUrl || null, user.id),
+        env.MONEY_DB.prepare('UPDATE wallets SET balance = balance + (? * ?) WHERE id = ? AND userId = ?').bind(sign, amount, walletId, user.id),
+    ]);
 
-    return json({ id, amount, type, categoryId, walletId, date, note, receiptUrl, userId: user.id });
+    return json({ id: txnId, amount, type, categoryId, walletId, date, note, receiptUrl, userId: user.id });
 }
 
 async function handleUpdateTransaction(request, env, user) {
@@ -439,12 +465,13 @@ async function handleUpdateTransaction(request, env, user) {
     }
 
     const oldSign = oldTxn.type === 'income' ? 1 : -1;
-    await db.prepare('UPDATE wallets SET balance = balance - (? * ?) WHERE id = ? AND userId = ?').bind(oldSign, oldTxn.amount, oldTxn.walletId, user.id).run();
-
-    await db.prepare('UPDATE transactions SET amount = ?, type = ?, categoryId = ?, walletId = ?, date = ?, note = ?, receiptUrl = ? WHERE id = ? AND userId = ?').bind(merged.amount, merged.type, merged.categoryId, merged.walletId, merged.date, merged.note || '', merged.receiptUrl || null, txnId, user.id).run();
-
     const newSign = merged.type === 'income' ? 1 : -1;
-    await db.prepare('UPDATE wallets SET balance = balance + (? * ?) WHERE id = ? AND userId = ?').bind(newSign, merged.amount, merged.walletId, user.id).run();
+
+    await runBatch(db, [
+        db.prepare('UPDATE wallets SET balance = balance - (? * ?) WHERE id = ? AND userId = ?').bind(oldSign, oldTxn.amount, oldTxn.walletId, user.id),
+        db.prepare('UPDATE transactions SET amount = ?, type = ?, categoryId = ?, walletId = ?, date = ?, note = ?, receiptUrl = ? WHERE id = ? AND userId = ?').bind(merged.amount, merged.type, merged.categoryId, merged.walletId, merged.date, merged.note || '', merged.receiptUrl || null, txnId, user.id),
+        db.prepare('UPDATE wallets SET balance = balance + (? * ?) WHERE id = ? AND userId = ?').bind(newSign, merged.amount, merged.walletId, user.id),
+    ]);
 
     return json({ message: 'Transaction updated' });
 }
@@ -460,8 +487,10 @@ async function handleDeleteTransaction(request, env, user) {
     if (wallet?.isFrozen) return json({ error: 'Cannot delete transactions from a frozen wallet' }, 400);
 
     const sign = txn.type === 'income' ? 1 : -1;
-    await db.prepare('UPDATE wallets SET balance = balance - (? * ?) WHERE id = ? AND userId = ?').bind(sign, txn.amount, txn.walletId, user.id).run();
-    await db.prepare('DELETE FROM transactions WHERE id = ? AND userId = ?').bind(txnId, user.id).run();
+    await runBatch(db, [
+        db.prepare('UPDATE wallets SET balance = balance - (? * ?) WHERE id = ? AND userId = ?').bind(sign, txn.amount, txn.walletId, user.id),
+        db.prepare('DELETE FROM transactions WHERE id = ? AND userId = ?').bind(txnId, user.id),
+    ]);
 
     return json({ message: 'Transaction deleted' });
 }
@@ -504,8 +533,10 @@ async function handleUpdateWallet(request, env, user) {
 
 async function handleDeleteWallet(request, env, user) {
     const walletId = getUserId(new URL(request.url));
-    await env.MONEY_DB.prepare('DELETE FROM transactions WHERE walletId = ? AND userId = ?').bind(walletId, user.id).run();
-    await env.MONEY_DB.prepare('DELETE FROM wallets WHERE id = ? AND userId = ?').bind(walletId, user.id).run();
+    await runBatch(env.MONEY_DB, [
+        env.MONEY_DB.prepare('DELETE FROM transactions WHERE walletId = ? AND userId = ?').bind(walletId, user.id),
+        env.MONEY_DB.prepare('DELETE FROM wallets WHERE id = ? AND userId = ?').bind(walletId, user.id),
+    ]);
     return json({ message: 'Wallet deleted' });
 }
 

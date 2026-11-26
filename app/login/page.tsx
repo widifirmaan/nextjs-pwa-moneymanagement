@@ -53,7 +53,7 @@ export default function Login() {
     }
 
     return (
-        <div className="relative min-h-screen flex items-center justify-center bg-background text-foreground overflow-hidden px-4 py-8 sm:px-6 lg:px-8">
+        <main className="relative min-h-screen flex items-center justify-center bg-background text-foreground overflow-hidden px-4 py-8 sm:px-6 lg:px-8">
             {/* Ambient Warm Glows matching MoneW Coklat Jawa aesthetic */}
             <div className="absolute -top-32 -left-32 w-96 h-96 bg-primary/20 rounded-full blur-[120px] pointer-events-none" />
             <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-accent/20 rounded-full blur-[120px] pointer-events-none" />
@@ -258,6 +258,6 @@ export default function Login() {
 
                 </div>
             </div>
-        </div>
+        </main>
     )
 }

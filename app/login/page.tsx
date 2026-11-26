@@ -45,8 +45,8 @@ export default function Login() {
             } else {
                 await login(email, password)
             }
-        } catch (err: any) {
-            setError(err.message || "Authentication failed. Please check your credentials.")
+        } catch (err: unknown) {
+            setError((err instanceof Error ? err.message : "") || "Authentication failed. Please check your credentials.")
         } finally {
             setIsLoading(false)
         }
@@ -75,9 +75,9 @@ export default function Login() {
                         </div>
 
                         <div className="space-y-3">
-                            <h2 className="text-4xl font-extrabold tracking-tight text-foreground leading-tight">
+                            <h1 className="text-4xl font-extrabold tracking-tight text-foreground leading-tight">
                                 Take Full Control of Your <span className="text-gradient">Personal Wealth</span>
-                            </h2>
+                            </h1>
                             <p className="text-base text-muted-foreground leading-relaxed max-w-lg">
                                 Manage bank accounts, virtual cards, cash, and digital wallets in one unified, elegant, and private dashboard.
                             </p>
@@ -90,7 +90,7 @@ export default function Login() {
                                     <CreditCard className="w-5 h-5 text-accent" />
                                 </div>
                                 <div>
-                                    <h4 className="text-sm font-semibold text-foreground">Multi-Wallet & Card Management</h4>
+                                    <h3 className="text-sm font-semibold text-foreground">Multi-Wallet & Card Management</h3>
                                     <p className="text-xs text-muted-foreground">Support for BCA, Mandiri, Jenius, GoPay, and custom e-wallets.</p>
                                 </div>
                             </div>
@@ -100,7 +100,7 @@ export default function Login() {
                                     <PieChart className="w-5 h-5 text-accent" />
                                 </div>
                                 <div>
-                                    <h4 className="text-sm font-semibold text-foreground">Interactive Expense Analytics</h4>
+                                    <h3 className="text-sm font-semibold text-foreground">Interactive Expense Analytics</h3>
                                     <p className="text-xs text-muted-foreground">Visual spending categories, monthly analytics, and budget thresholds.</p>
                                 </div>
                             </div>
@@ -110,7 +110,7 @@ export default function Login() {
                                     <ShieldCheck className="w-5 h-5 text-accent" />
                                 </div>
                                 <div>
-                                    <h4 className="text-sm font-semibold text-foreground">Private & Offline-Ready</h4>
+                                    <h3 className="text-sm font-semibold text-foreground">Private & Offline-Ready</h3>
                                     <p className="text-xs text-muted-foreground">Secure receipt storage and instant offline access anywhere.</p>
                                 </div>
                             </div>
@@ -134,9 +134,9 @@ export default function Login() {
 
                             {/* Form Header */}
                             <div className="text-center lg:text-left space-y-1 mb-6">
-                                <h3 className="text-2xl font-bold tracking-tight text-foreground">
+                                <h2 className="text-2xl font-bold tracking-tight text-foreground">
                                     {isRegister ? "Create Account" : "Sign In"}
-                                </h3>
+                                </h2>
                                 <p className="text-sm text-muted-foreground">
                                     {isRegister ? "Join MoneW to start managing your wealth" : "Welcome back! Enter your details to continue"}
                                 </p>

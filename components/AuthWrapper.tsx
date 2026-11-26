@@ -6,7 +6,12 @@ export default function AuthWrapper({ children }: { children: React.ReactNode })
     const { user, isLoading } = useAuth()
 
     if (isLoading) {
-        return <div className="min-h-screen flex items-center justify-center text-white">Loading...</div>
+        return (
+            <div className="min-h-screen flex items-center justify-center text-white">
+                <h1 className="sr-only">MoneW - Smart Money Management</h1>
+                Loading...
+            </div>
+        )
     }
 
     if (!user) {

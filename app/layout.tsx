@@ -30,12 +30,9 @@ export const metadata: Metadata = {
     template: "%s | MoneW",
   },
   description: "Personal finance Progressive Web App for tracking multi-wallet balances, expenses, receipts, spending limits, and saved cards.",
-  alternates: {
-    canonical: "/",
-  },
   openGraph: {
     type: "website",
-    url: "https://money.widifirmaan.web.id/",
+    url: "https://money.widifirmaan.web.id",
     siteName: "MoneW",
     title: "MoneW - Smart Money Management",
     description: "Track multi-wallet balances, expenses, receipt images, spending limits, and saved cards across devices.",

@@ -2,5 +2,10 @@ User-agent: *
 Allow: /
 Allow: /login
 Disallow: /api/
+Disallow: /add
+Disallow: /wallets
+Disallow: /cards
+Disallow: /stats
+Disallow: /profile
 
 Sitemap: https://money.widifirmaan.web.id/sitemap.xml
